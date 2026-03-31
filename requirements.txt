@@ -10,5 +10,5 @@ xlrd
 openpyxl
 unidecode
 plotly
-google-generativeai
+
 
