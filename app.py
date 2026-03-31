@@ -11,7 +11,7 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v36.0 Infinity Nexus",
+    page_title="BHXH Thuận An - v37.0 Quantum Odyssey",
     page_icon="🚀",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -58,10 +58,10 @@ def get_ai_response(prompt, context=""):
 
     elif any(word in prompt_lower for word in ["c12", "tra cuu", "thong bao"]):
         response += "💡 **Về Thông báo C12-TS:**\n"
-        response += "Hệ thống Infinity Nexus hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị (VD: TA0001) để xem bảng Dashboard tài chính trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
+        response += "Hệ thống Quantum Odyssey hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị (VD: TA0001) để xem bảng Dashboard tài chính trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
 
     elif any(word in prompt_lower for word in ["chao", "hello", "hi", "xin chao"]):
-        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v36.0. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
+        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v37.0. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
 
     else:
         if not response:
@@ -80,7 +80,7 @@ if 'active_pdf' not in st.session_state: st.session_state.active_pdf = None
 if 'search_query' not in st.session_state: st.session_state.search_query = ""
 if 'welcome_done' not in st.session_state: st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN INFINITY NEXUS v36.0 - TỐI ƯU HÓA HOÀN MỸ) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN QUANTUM ODYSSEY v37.0 - TỐI ƯU HÓA HOÀN MỸ) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
@@ -90,30 +90,37 @@ st.markdown("""
     }
 
     * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
-    .stApp { background: #f8fafc; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 25px 25px; }
+    
+    /* V37 Custom Scrollbar */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 5px; }
+    ::-webkit-scrollbar-thumb:hover { background: #00f2fe; }
+
+    .stApp { background: #f8fafc; background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 30px 30px; }
 
     /* SIDEBAR ĐẲNG CẤP VŨ TRỤ */
-    [data-testid="stSidebar"] { background: linear-gradient(180deg, #020617 0%, #1e3a8a 100%) !important; box-shadow: 5px 0 20px rgba(0,0,0,0.1); }
+    [data-testid="stSidebar"] { background: linear-gradient(180deg, #020617 0%, #1e3a8a 100%) !important; box-shadow: 5px 0 25px rgba(0,242,254,0.15); border-right: 1px solid rgba(0, 242, 254, 0.2); }
     [data-testid="stSidebar"] h1 { color: white !important; text-shadow: 0 0 25px var(--neon-blue); letter-spacing: 2px; }
     
-    /* NÂNG CẤP MENU SIDEBAR (NÚT BẤM KÍNH MỜ PHÁT SÁNG) */
+    /* NÂNG CẤP MENU SIDEBAR (NÚT BẤM KÍNH MỜ PHÁT SÁNG V37) */
     [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
         padding: 5px 15px;
-        margin-bottom: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        margin-bottom: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover {
-        background: rgba(255, 255, 255, 0.15);
+        background: linear-gradient(90deg, rgba(59,130,246,0.3) 0%, rgba(0,242,254,0.1) 100%);
         border-color: var(--neon-blue);
-        transform: translateX(8px);
-        box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        transform: translateX(10px);
+        box-shadow: -5px 0 20px rgba(0, 242, 254, 0.4);
     }
     [data-testid="stSidebar"] .stRadio label p {
         color: #f8fafc !important; font-size: 1.25rem !important; font-weight: 800 !important;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5) !important; padding: 12px 0 !important; letter-spacing: 0.5px;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.8) !important; padding: 12px 0 !important; letter-spacing: 0.5px;
     }
 
     /* BẢNG LED RGB ANIMATION */
@@ -124,7 +131,7 @@ st.markdown("""
         animation: ledGlow 2.5s infinite; border-top: 3px solid #39ff14; border-bottom: 3px solid #39ff14;
     }
 
-    /* SIÊU Ô TÌM KIẾM GATEWAY - BÓNG ĐỔ ĐA TẦNG */
+    /* SIÊU Ô TÌM KIẾM GATEWAY - BÓNG ĐỔ ĐA TẦNG VÀ HIỆU ỨNG FOCUS KÉP */
     .gateway-container { max-width: 1000px; margin: 0 auto 1.5rem auto; text-align: center; }
     div[data-testid="stTextInput"] > div { height: 130px !important; background: transparent !important; border:none !important; box-shadow:none !important; padding: 0 !important; margin: 0 !important; }
     
@@ -138,7 +145,7 @@ st.markdown("""
         box-shadow: 0 20px 50px rgba(59, 130, 246, 0.2), inset 0 0 0 4px var(--secondary) !important;
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .stTextInput input:focus { transform: translateY(-5px); box-shadow: 0 30px 60px rgba(0, 242, 254, 0.4), inset 0 0 0 6px var(--neon-blue) !important; }
+    .stTextInput input:focus { transform: translateY(-5px); box-shadow: 0 30px 60px rgba(0, 242, 254, 0.5), inset 0 0 0 6px var(--neon-blue) !important; outline: none !important;}
 
     /* ANIMATED HEADER CARD (GLASSMORPHISM 3.0) */
     @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
@@ -157,18 +164,18 @@ st.markdown("""
     .premium-header h1 { font-size: 3.8rem; font-weight: 900; margin: 0; text-shadow: 2px 2px 15px rgba(0,0,0,0.4); position: relative; z-index: 2; }
     .premium-header p { font-size: 1.5rem; font-weight: 600; margin: 10px 0 0 0; color: #e0f2fe; position: relative; z-index: 2; }
 
-    /* RADIANT CARDS 3D - HOVER GLOW V36 */
+    /* RADIANT CARDS 3D - HOVER GLOW V37 */
     .crystal-card {
-        background: rgba(255, 255, 255, 0.9); padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         border: 1px solid #e2e8f0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(15px);
     }
     .crystal-card::before { content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--secondary); transition: all 0.3s; }
-    .crystal-card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px rgba(0, 242, 254, 0.25); border-color: #bae6fd; }
+    .crystal-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 25px 50px rgba(0, 242, 254, 0.25); border-color: #bae6fd; z-index: 10; }
     .crystal-card:hover::before { width: 100%; opacity: 0.05; }
     
-    .metric-val { font-size: 2.6rem; font-weight: 900; color: var(--primary); margin-top: 8px; letter-spacing: -1px; }
-    .metric-lbl { font-size: 1.05rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+    .metric-val { font-size: 2.8rem; font-weight: 900; color: var(--primary); margin-top: 8px; letter-spacing: -1px; }
+    .metric-lbl { font-size: 1.1rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
 
     /* SMART SUMMARY BANNER */
     .ai-summary {
@@ -178,17 +185,17 @@ st.markdown("""
         box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
     }
 
-    .bank-card { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 3px solid #fbbf24; border-radius: 25px; padding: 30px; margin-top: 25px; box-shadow: 0 15px 35px rgba(245, 158, 11, 0.15); }
+    .bank-card { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 3px solid #fbbf24; border-radius: 25px; padding: 30px; margin-top: 20px; }
     .stCodeBlock code { font-size: 1.6rem !important; font-weight: 900 !important; color: #b45309 !important; background: white !important; border-radius: 10px !important;}
     
-    /* SLIDER STYLING CHO V36 */
+    /* SLIDER STYLING CHO V37 */
     div[data-testid="stSlider"] > div > div > div { background-color: var(--secondary) !important; }
-    div[data-testid="stSlider"] > div > div > div > div { background-color: var(--neon-blue) !important; box-shadow: 0 0 10px var(--neon-blue) !important; }
+    div[data-testid="stSlider"] > div > div > div > div { background-color: var(--neon-blue) !important; box-shadow: 0 0 15px var(--neon-blue) !important; border: 2px solid white; }
 
-    /* ANIMATED PULSING BUTTON V36 */
+    /* ANIMATED PULSING BUTTON V37 */
     @keyframes pulse-btn {
         0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7); }
-        70% { box-shadow: 0 0 0 20px rgba(14, 165, 233, 0); }
+        70% { box-shadow: 0 0 0 25px rgba(14, 165, 233, 0); }
         100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
     }
     .stButton>button { border-radius: 50px !important; font-weight: 800 !important; text-transform: uppercase; padding: 0.8rem 3rem !important; transition: all 0.3s ease !important; }
@@ -196,22 +203,44 @@ st.markdown("""
         background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%) !important; color: white !important; 
         font-size: 1.6rem !important; height: 80px !important; width: 80% !important; border: none !important; 
         box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4) !important; letter-spacing: 2px;
-        animation: pulse-btn 2.5s infinite;
+        animation: pulse-btn 2s infinite;
     }
     .btn-main > div > button:hover { transform: scale(1.05) translateY(-3px) !important; box-shadow: 0 20px 45px rgba(37, 99, 235, 0.6) !important; animation: none; }
+    
+    /* BLINKING LIVE DOT */
+    @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0;} 100% {opacity: 1;} }
+    .live-dot { color: #ef4444; animation: blink 1s infinite; font-size: 1.2rem; vertical-align: middle; margin-right: 5px;}
     </style>
     """, unsafe_allow_html=True)
 
-# --- ĐỒNG HỒ REAL-TIME (JS V36 CYBERPUNK STYLE) ---
+# --- ĐỒNG HỒ REAL-TIME (JS V37 QUANTUM STYLE ĐỈNH CAO) ---
 def live_clock():
     components.html("""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Plus+Jakarta+Sans:wght@600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@600;800&display=swap');
+        
+        @keyframes rotateBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes neonFlicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { text-shadow: 0 0 15px #00f2fe, 0 0 30px #3b82f6; opacity: 1; }
+            20%, 24%, 55% { text-shadow: none; opacity: 0.8; }
+        }
+        
+        .clock-wrapper {
+            background: linear-gradient(45deg, #00f2fe, #4facfe, #3b82f6, #8b5cf6);
+            background-size: 300% 300%;
+            animation: rotateBorder 5s ease infinite;
+            padding: 3px;
+            border-radius: 25px;
+            margin-bottom: 10px;
+        }
+        
         .clock-container {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 58, 138, 0.4));
-            border: 1px solid rgba(0, 242, 254, 0.3);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2), inset 0 0 15px rgba(0, 242, 254, 0.1);
-            border-radius: 20px;
+            background: rgba(2, 6, 23, 0.85);
+            border-radius: 22px;
             padding: 20px 10px;
             text-align: center;
             backdrop-filter: blur(10px);
@@ -222,24 +251,23 @@ def live_clock():
             font-weight: 800;
             color: #bae6fd;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             margin-bottom: 5px;
         }
         .time-text {
             font-family: 'Orbitron', sans-serif;
             font-size: 2.8rem;
-            font-weight: 700;
+            font-weight: 900;
             color: #ffffff;
-            text-shadow: 0 0 15px #00f2fe, 0 0 30px #3b82f6;
-            letter-spacing: 2px;
-            background: -webkit-linear-gradient(#fff, #00f2fe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: 3px;
+            animation: neonFlicker 4s infinite;
         }
     </style>
-    <div class="clock-container">
-        <div class="date-text" id="day-str"></div>
-        <div class="time-text" id="time-str"></div>
+    <div class="clock-wrapper">
+        <div class="clock-container">
+            <div class="date-text" id="day-str"></div>
+            <div class="time-text" id="time-str"></div>
+        </div>
     </div>
     <script>
         function updateClock() {
@@ -252,9 +280,21 @@ def live_clock():
         }
         setInterval(updateClock, 1000); updateClock();
     </script>
-    """, height=160)
+    """, height=180)
 
-# --- HÀM RENDER PDF (CHỐNG BLOCK CHROME 100% - ĐƯỢC GIỮ NGUYÊN HOÀN TOÀN TỪ V29/V35) ---
+# --- USER PROFILE WIDGET (SIDEBAR V37) ---
+def render_admin_profile():
+    st.sidebar.markdown("""
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 20px; display: flex; align-items: center; margin-bottom: 20px; backdrop-filter: blur(10px);">
+            <img src="https://cdn-icons-png.flaticon.com/512/4140/4140037.png" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid #00f2fe; padding: 2px; margin-right: 15px;">
+            <div>
+                <div style="color: white; font-weight: 800; font-size: 1.1rem; line-height: 1.2;">Admin BHXH</div>
+                <div style="color: #39ff14; font-size: 0.8rem; font-weight: 700;">🟢 Online Secure</div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+
+# --- HÀM RENDER PDF (CHỐNG BLOCK CHROME 100% - ĐƯỢC GIỮ NGUYÊN HOÀN TOÀN) ---
 def render_pdf_unblockable(file_path):
     try:
         with open(file_path, "rb") as f:
@@ -339,16 +379,17 @@ def load_data():
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("<h1 style='text-align:center;'>🚀 INFINITY NEXUS</h1>", unsafe_allow_html=True)
-    st.divider()
+    st.markdown("<h1 style='text-align:center;'>🚀 QUANTUM ODYSSEY</h1>", unsafe_allow_html=True)
+    render_admin_profile() # Widget Profile Mới
+    
     menu = ["📊 Tra cứu C12-TS", "🤖 Trợ lý AI Thông Minh", "📂 Thư viện Văn bản", "📑 Cẩm nang Nghiệp vụ", "🧮 Máy tính BHXH", "📍 Liên hệ BHXH"]
-    st.session_state.current_tab = st.radio("CHỨC NĂNG HỆ THỐNG", menu, label_visibility="collapsed")
+    st.session_state.current_tab = st.radio("CHUYỂN HƯỚNG TÍNH NĂNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v36.0 Infinity Nexus | Advanced Pro 3.1 Edition")
+    st.caption("v37.0 Quantum Odyssey | Advanced Pro 3.1")
 
 # --- HEADER LED ---
-marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v36.0 KỶ NGUYÊN VÔ CỰC • GIAO DIỆN HOLOGRAPHIC 3.0 VỚI TIỆN ÍCH SLIDER & IN BÁO CÁO NHANH 🌟"
+marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v37.0 KỶ NGUYÊN LƯỢNG TỬ • GIAO DIỆN HOLOGRAPHIC 4.0 • TÍCH HỢP ĐỒNG HỒ CYBERPUNK & TIỆN ÍCH TRỰC QUAN 🌟"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -370,7 +411,7 @@ if df is not None:
 
             # EXECUTIVE DASHBOARD
             if not st.session_state.search_query and not user_input:
-                st.markdown("<h3 style='color:#1e3a8a; text-align:center; margin-bottom: 20px; font-weight:900;'>📈 BẢNG ĐIỀU KHIỂN TỔNG QUAN (EXECUTIVE DASHBOARD)</h3>", unsafe_allow_html=True)
+                st.markdown("<h3 style='color:#1e3a8a; text-align:center; margin-bottom: 20px; font-weight:900;'><span class='live-dot'>●</span> BẢNG ĐIỀU KHIỂN TỔNG QUAN (LIVE STREAM)</h3>", unsafe_allow_html=True)
                 e1, e2, e3 = st.columns(3)
                 total_units = len(df)
                 with e1: st.markdown(f"<div class='exec-widget'><div class='exec-title'>TỔNG SỐ ĐƠN VỊ QUẢN LÝ</div><div class='exec-number'>{total_units:,}</div><div style='color:#93c5fd;'>Doanh nghiệp đang hoạt động</div></div>", unsafe_allow_html=True)
@@ -380,8 +421,8 @@ if df is not None:
 
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
-                st.markdown("##### 📢 TIN TỨC V36")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 KỶ NGUYÊN VÔ CỰC</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Nâng cấp thanh trượt (Slider) mượt mà, đồng hồ Cyberpunk siêu việt và Tiện ích in ấn tức thì.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 36.0</small></div>", unsafe_allow_html=True)
+                st.markdown("##### 📢 TIN TỨC V37")
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 KỶ NGUYÊN LƯỢNG TỬ</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Đồng hồ Cyberpunk cực ngầu, thanh Slider mượt mà & Nút In ấn tiện lợi. Update chuẩn xác thông tin Cơ quan.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 37.0</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -410,7 +451,7 @@ if df is not None:
                     """, unsafe_allow_html=True)
 
         else:
-            # --- DASHBOARD KẾT QUẢ v36 ---
+            # --- DASHBOARD KẾT QUẢ v37 ---
             if not st.session_state.welcome_done:
                 st.balloons(); st.session_state.welcome_done = True
             
@@ -463,7 +504,7 @@ if df is not None:
                 csv_data = convert_df(pd.DataFrame([unit_data]))
                 st.download_button(label="📥 TẢI BÁO CÁO NÀY (EXCEL/CSV)", data=csv_data, file_name=f"BaoCao_BHXH_{unit_data.get('madvi')}.csv", mime='text/csv', use_container_width=True)
                 
-                # V36 NEW: TIỆN ÍCH IN BÁO CÁO NHANH BẰNG JS (JS Print Component)
+                # V37 NEW: TIỆN ÍCH IN BÁO CÁO NHANH BẰNG JS (JS Print Component)
                 components.html("""
                     <button onclick="window.parent.print()" style="width: 100%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 15px; border-radius: 50px; font-weight: 900; font-size: 1.1rem; cursor: pointer; box-shadow: 0 10px 20px rgba(16,185,129,0.3); font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; transition: all 0.3s; margin-top: 10px;">
                         🖨️ IN BẢN BÁO CÁO NÀY NGAY
@@ -563,12 +604,12 @@ if df is not None:
             3. **Nộp hồ sơ giấy:** Đơn vị thu hồi Tờ bìa sổ và các tờ rời của NLĐ (kèm theo Mẫu TK1-TS nếu cần điều chỉnh thông tin) và gửi qua dịch vụ bưu chính về cơ quan BHXH để tiến hành in tờ rời chốt sổ.
             """)
 
-    # --- TAB 5: MÁY TÍNH BHXH (NÂNG CẤP V36 - SLIDER HIỆN ĐẠI) ---
+    # --- TAB 5: MÁY TÍNH BHXH (NÂNG CẤP V37 - SLIDER & XUẤT CSV TIỆN LỢI) ---
     elif st.session_state.current_tab == "🧮 Máy tính BHXH":
-        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V36")
+        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V37")
         st.markdown("<p style='font-size: 1.2rem; color: #475569; margin-bottom: 20px;'>Kéo thanh trượt (slider) hoặc nhập trực tiếp mức lương cơ sở/quỹ lương để hệ thống tự động phân tách nghĩa vụ tài chính.</p>", unsafe_allow_html=True)
         
-        # V36 NEW: SỬ DỤNG SLIDER BAR ĐỂ NÂNG CẤP TRẢI NGHIỆM
+        # V37 SLIDER BAR ĐÃ ĐƯỢC TỐI ƯU CSS
         sal = st.slider("🎚️ KÉO ĐỂ CHỌN MỨC LƯƠNG HOẶC QUỸ LƯƠNG ĐÓNG BHXH (VNĐ):", min_value=1000000, max_value=200000000, value=5000000, step=100000, format="%d VNĐ")
             
         # Tính toán
@@ -646,8 +687,15 @@ if df is not None:
                 <span style='font-size: 3.5rem; color: #1e3a8a; font-weight: 900;'>{(nld_total + dn_total):,.0f} VNĐ</span>
             </div>
         """, unsafe_allow_html=True)
+        
+        # V37 NEW: Nút Tải Dự Toán CSV
+        calc_data = pd.DataFrame([{
+            "Lương Kê Khai": sal, "NLĐ (BHXH 8%)": nld_bhxh, "NLĐ (BHYT 1.5%)": nld_bhyt, "NLĐ (BHTN 1%)": nld_bhtn, "Tổng NLĐ Đóng": nld_total,
+            "DN (BHXH 17.5%)": dn_bhxh, "DN (BHYT 3%)": dn_bhyt, "DN (BHTN 1%)": dn_bhtn, "Tổng DN Đóng": dn_total, "TỔNG NỘP (32%)": (nld_total + dn_total)
+        }])
+        st.download_button(label="📥 TẢI BẢNG DỰ TOÁN CHI TIẾT (CSV)", data=convert_df(calc_data), file_name="Bang_Du_Toan_BHXH.csv", mime='text/csv')
 
-    # --- TAB 6: LIÊN HỆ (ĐÃ CẬP NHẬT CHUẨN XÁC THEO YÊU CẦU) ---
+    # --- TAB 6: LIÊN HỆ (CẬP NHẬT CHUẨN XÁC ĐỊA CHỈ v37.0) ---
     elif st.session_state.current_tab == "📍 Liên hệ BHXH":
         st.markdown("## 📍 TRUNG TÂM HỖ TRỢ & LIÊN HỆ")
         st.markdown("""
@@ -662,4 +710,4 @@ if df is not None:
         </div>
         """, unsafe_allow_html=True)
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v36.0 Infinity Nexus (Advanced Edition)</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v37.0 Quantum Odyssey (Enterprise Level)</center>", unsafe_allow_html=True)
