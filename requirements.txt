@@ -9,5 +9,5 @@ google-auth
 numpy
 xlrd
 openpyxl
-
+unidecode
 
