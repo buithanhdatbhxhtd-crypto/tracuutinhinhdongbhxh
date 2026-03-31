@@ -33,8 +33,15 @@ def get_ai_response(prompt, context=""):
         full_prompt = f"{system_instruction}\n\n[CÂU HỎI]: {prompt}"
         
     headers = {'Content-Type': 'application/json'}
+    # Tắt bộ lọc an toàn để tránh bị chặn nhầm và lỗi KeyError
     data = {
-        "contents": [{"parts": [{"text": full_prompt}]}]
+        "contents": [{"parts": [{"text": full_prompt}]}],
+        "safetySettings": [
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
+        ]
     }
     
     # HỆ THỐNG ĐỊNH TUYẾN MODEL: Quét các model khả dụng nhất hiện hành
@@ -49,15 +56,29 @@ def get_ai_response(prompt, context=""):
     for model in available_models:
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
         try:
-            response = requests.post(url, headers=headers, json=data)
+            response = requests.post(url, headers=headers, json=data, timeout=15)
             if response.status_code == 200:
-                return response.json()['candidates'][0]['content']['parts'][0]['text']
+                res_json = response.json()
+                candidates = res_json.get('candidates', [])
+                if not candidates:
+                    return "⚠️ **AI:** Câu hỏi bị từ chối do chính sách của Google."
+                
+                cand = candidates[0]
+                if 'content' in cand and 'parts' in cand['content']:
+                    return cand['content']['parts'][0]['text']
+                elif cand.get('finishReason') == 'SAFETY':
+                    return "⚠️ **AI:** Nội dung bị bộ lọc an toàn chặn."
+                else:
+                    last_error = "Cấu trúc phản hồi không hợp lệ."
+                    continue
             else:
                 err_msg = response.json().get('error', {}).get('message', 'Lỗi không xác định')
                 last_error = f"[{model}] {err_msg}"
                 # Nếu API key sai, thoát ngay lập tức
                 if "API key not valid" in err_msg:
                     return "⚠️ **Lỗi API Key:** Khóa API của bạn không hợp lệ hoặc đã bị xoá trên Google AI Studio."
+                if "429" in str(response.status_code) or "quota" in err_msg.lower():
+                    return "⚠️ **Hệ thống AI đang quá tải:** Vui lòng đợi 1 phút và thử lại."
                 # Nếu lỗi 404 thì tiếp tục vòng lặp sang model khác
         except Exception as e:
             last_error = str(e)
