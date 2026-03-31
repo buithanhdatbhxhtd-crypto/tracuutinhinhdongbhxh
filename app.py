@@ -11,7 +11,7 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v34.0 Galactic Era",
+    page_title="BHXH Thuận An - v35.0 Cosmic Nexus",
     page_icon="🚀",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -58,10 +58,10 @@ def get_ai_response(prompt, context=""):
 
     elif any(word in prompt_lower for word in ["c12", "tra cuu", "thong bao"]):
         response += "💡 **Về Thông báo C12-TS:**\n"
-        response += "Hệ thống Galactic Era hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị (VD: TA0001) để xem bảng Dashboard tài chính trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
+        response += "Hệ thống Cosmic Nexus hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị (VD: TA0001) để xem bảng Dashboard tài chính trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
 
     elif any(word in prompt_lower for word in ["chao", "hello", "hi", "xin chao"]):
-        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v34.0. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
+        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v35.0. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
 
     else:
         if not response:
@@ -80,13 +80,13 @@ if 'active_pdf' not in st.session_state: st.session_state.active_pdf = None
 if 'search_query' not in st.session_state: st.session_state.search_query = ""
 if 'welcome_done' not in st.session_state: st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN GALACTIC ERA v34.0 - ĐẲNG CẤP VÀ TINH TẾ) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN COSMIC NEXUS v35.0 - NÂNG CẤP HIỆU ỨNG TƯƠNG LAI) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
     
     :root {
-        --primary: #0f172a; --secondary: #3b82f6; --accent: #0ea5e9; --neon-blue: #00f2fe; --neon-purple: #4facfe;
+        --primary: #0f172a; --secondary: #3b82f6; --accent: #0ea5e9; --neon-blue: #00f2fe; --neon-purple: #8b5cf6;
     }
 
     * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
@@ -127,7 +127,7 @@ st.markdown("""
     /* ANIMATED HEADER CARD (GLASSMORPHISM 3.0) */
     @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     .premium-header {
-        background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #0ea5e9, #020617);
+        background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #8b5cf6, #020617);
         background-size: 400% 400%; animation: gradientBG 12s ease infinite;
         color: white; padding: 45px; border-radius: 35px; box-shadow: 0 25px 60px rgba(30, 58, 138, 0.3);
         margin-top: 25px; border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(25px); position: relative; overflow: hidden;
@@ -141,14 +141,14 @@ st.markdown("""
     .premium-header h1 { font-size: 3.8rem; font-weight: 900; margin: 0; text-shadow: 2px 2px 15px rgba(0,0,0,0.4); position: relative; z-index: 2; }
     .premium-header p { font-size: 1.5rem; font-weight: 600; margin: 10px 0 0 0; color: #e0f2fe; position: relative; z-index: 2; }
 
-    /* RADIANT CARDS 3D MỚI NHẤT */
+    /* RADIANT CARDS 3D - HOVER GLOW MỚI NHẤT V35 */
     .crystal-card {
         background: rgba(255, 255, 255, 0.9); padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         border: 1px solid #e2e8f0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
         backdrop-filter: blur(10px);
     }
     .crystal-card::before { content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: var(--secondary); transition: all 0.3s; }
-    .crystal-card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px rgba(37, 99, 235, 0.15); border-color: #bae6fd; }
+    .crystal-card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px rgba(0, 242, 254, 0.25); border-color: #bae6fd; }
     .crystal-card:hover::before { width: 100%; opacity: 0.05; }
     
     .metric-val { font-size: 2.6rem; font-weight: 900; color: var(--primary); margin-top: 8px; letter-spacing: -1px; }
@@ -165,9 +165,20 @@ st.markdown("""
     .bank-card { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 3px solid #fbbf24; border-radius: 25px; padding: 30px; margin-top: 25px; box-shadow: 0 15px 35px rgba(245, 158, 11, 0.15); }
     .stCodeBlock code { font-size: 1.6rem !important; font-weight: 900 !important; color: #b45309 !important; background: white !important; border-radius: 10px !important;}
     
+    /* ANIMATED PULSING BUTTON V35 */
+    @keyframes pulse-btn {
+        0% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.7); }
+        70% { box-shadow: 0 0 0 20px rgba(14, 165, 233, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+    }
     .stButton>button { border-radius: 50px !important; font-weight: 800 !important; text-transform: uppercase; padding: 0.8rem 3rem !important; transition: all 0.3s ease !important; }
-    .btn-main > div > button { background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%) !important; color: white !important; font-size: 1.6rem !important; height: 80px !important; width: 80% !important; border: none !important; box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4) !important; letter-spacing: 2px; }
-    .btn-main > div > button:hover { transform: scale(1.05) translateY(-3px) !important; box-shadow: 0 20px 45px rgba(37, 99, 235, 0.6) !important; }
+    .btn-main > div > button { 
+        background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%) !important; color: white !important; 
+        font-size: 1.6rem !important; height: 80px !important; width: 80% !important; border: none !important; 
+        box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4) !important; letter-spacing: 2px;
+        animation: pulse-btn 2.5s infinite;
+    }
+    .btn-main > div > button:hover { transform: scale(1.05) translateY(-3px) !important; box-shadow: 0 20px 45px rgba(37, 99, 235, 0.6) !important; animation: none; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -188,7 +199,7 @@ def live_clock():
     </script>
     """, height=180)
 
-# --- HÀM RENDER PDF (CHỐNG BLOCK CHROME 100% - ĐƯỢC GIỮ NGUYÊN HOÀN TOÀN TỪ V29/V33) ---
+# --- HÀM RENDER PDF (CHỐNG BLOCK CHROME 100% - ĐƯỢC GIỮ NGUYÊN HOÀN TOÀN TỪ V29/V33/V34) ---
 def render_pdf_unblockable(file_path):
     try:
         with open(file_path, "rb") as f:
@@ -273,16 +284,16 @@ def load_data():
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("<h1 style='text-align:center;'>🚀 GALACTIC ERA</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>🚀 COSMIC NEXUS</h1>", unsafe_allow_html=True)
     st.divider()
     menu = ["📊 Tra cứu C12-TS", "🤖 Trợ lý AI Thông Minh", "📂 Thư viện Văn bản", "📑 Cẩm nang Nghiệp vụ", "🧮 Máy tính BHXH", "📍 Liên hệ BHXH"]
     st.session_state.current_tab = st.radio("CHỨC NĂNG HỆ THỐNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v34.0 Galactic Era | Advanced Pro 3.1 Edition")
+    st.caption("v35.0 Cosmic Nexus | Advanced Pro 3.1 Edition")
 
 # --- HEADER LED ---
-marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v34.0 KỶ NGUYÊN NGÂN HÀ • GIAO DIỆN HOLOGRAPHIC 3.0 • SIÊU MÁY TÍNH TRỰC QUAN ĐA CHIỀU 🌟"
+marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v35.0 KỶ NGUYÊN KHÔNG GIAN • GIAO DIỆN HOLOGRAPHIC 3.0 • SIÊU MÁY TÍNH TRỰC QUAN ĐA CHIỀU 🌟"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -309,13 +320,13 @@ if df is not None:
                 total_units = len(df)
                 with e1: st.markdown(f"<div class='exec-widget'><div class='exec-title'>TỔNG SỐ ĐƠN VỊ QUẢN LÝ</div><div class='exec-number'>{total_units:,}</div><div style='color:#93c5fd;'>Doanh nghiệp đang hoạt động</div></div>", unsafe_allow_html=True)
                 with e2: st.markdown(f"<div class='exec-widget' style='background: linear-gradient(135deg, #047857 0%, #10b981 100%);'><div class='exec-title' style='color:#a7f3d0;'>TRẠNG THÁI HỆ THỐNG</div><div class='exec-number'>ONLINE</div><div style='color:#a7f3d0;'>Bảo mật cấp độ Enterprise</div></div>", unsafe_allow_html=True)
-                with e3: st.markdown(f"<div class='exec-widget' style='background: linear-gradient(135deg, #7e22ce 0%, #e11d48 100%);'><div class='exec-title' style='color:#fecdd3;'>TRỢ LÝ AI NỘI BỘ</div><div class='exec-number'>ACTIVE</div><div style='color:#fecdd3;'>Xử lý thông minh Offline 100%</div></div>", unsafe_allow_html=True)
+                with e3: st.markdown(f"<div class='exec-widget' style='background: linear-gradient(135deg, #8b5cf6 0%, #e11d48 100%);'><div class='exec-title' style='color:#fecdd3;'>TRỢ LÝ AI NỘI BỘ</div><div class='exec-number'>ACTIVE</div><div style='color:#fecdd3;'>Xử lý thông minh Offline 100%</div></div>", unsafe_allow_html=True)
                 st.write("<br>", unsafe_allow_html=True)
 
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
-                st.markdown("##### 📢 TIN TỨC V34")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 KỶ NGUYÊN NGÂN HÀ</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Cập nhật biểu đồ Donut 3D cho Siêu Máy Tính. Lời chào cá nhân hóa theo thời gian thực.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 34.0</small></div>", unsafe_allow_html=True)
+                st.markdown("##### 📢 TIN TỨC V35")
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 KỶ NGUYÊN KHÔNG GIAN</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Cập nhật giao diện Glowing Tương Lai. Nút bấm mang hiệu ứng nhịp thở và hoàn thiện thông tin địa chỉ.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 35.0</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -344,7 +355,7 @@ if df is not None:
                     """, unsafe_allow_html=True)
 
         else:
-            # --- DASHBOARD KẾT QUẢ v34 ---
+            # --- DASHBOARD KẾT QUẢ v35 ---
             if not st.session_state.welcome_done:
                 st.balloons(); st.session_state.welcome_done = True
             
@@ -353,7 +364,7 @@ if df is not None:
             
             st.button("⬅ QUAY LẠI TÌM KIẾM ĐƠN VỊ KHÁC", on_click=lambda: st.session_state.update(selected_unit=None))
             
-            # DYNAMIC GREETING (V34)
+            # DYNAMIC GREETING
             current_hour = datetime.now().hour
             if current_hour < 12: greeting = "🌅 CHÀO BUỔI SÁNG"
             elif current_hour < 18: greeting = "☀️ CHÀO BUỔI CHIỀU"
@@ -455,7 +466,7 @@ if df is not None:
                     st.success(f"📌 ĐANG XEM TÀI LIỆU AN TOÀN: {st.session_state.active_pdf}")
                     render_pdf_unblockable(st.session_state.active_pdf)
 
-    # --- TAB 4: CẨM NANG NGHIỆP VỤ (GIỮ NGUYÊN V33) ---
+    # --- TAB 4: CẨM NANG NGHIỆP VỤ ---
     elif st.session_state.current_tab == "📑 Cẩm nang Nghiệp vụ": 
         st.markdown("## 📑 CẨM NANG NGHIỆP VỤ SỐ HOÁ")
         st.markdown("<p style='font-size: 1.2rem; color: #475569; margin-bottom: 30px;'>Hướng dẫn chi tiết từng bước giải quyết các chế độ BHXH, BHYT, BHTN dành cho Đơn vị sử dụng lao động.</p>", unsafe_allow_html=True)
@@ -487,9 +498,9 @@ if df is not None:
             3. **Nộp hồ sơ giấy:** Đơn vị thu hồi Tờ bìa sổ và các tờ rời của NLĐ (kèm theo Mẫu TK1-TS nếu cần điều chỉnh thông tin) và gửi qua dịch vụ bưu chính về cơ quan BHXH để tiến hành in tờ rời chốt sổ.
             """)
 
-    # --- TAB 5: MÁY TÍNH BHXH (NÂNG CẤP V34 - CÓ DONUT CHART TRỰC QUAN) ---
+    # --- TAB 5: MÁY TÍNH BHXH ---
     elif st.session_state.current_tab == "🧮 Máy tính BHXH":
-        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V34")
+        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V35")
         st.markdown("<p style='font-size: 1.2rem; color: #475569; margin-bottom: 20px;'>Nhập mức lương cơ sở hoặc quỹ lương để hệ thống tự động phân tách nghĩa vụ tài chính bằng Biểu đồ trực quan.</p>", unsafe_allow_html=True)
         
         col1, col2 = st.columns([1, 1])
@@ -522,9 +533,9 @@ if df is not None:
             """, unsafe_allow_html=True)
         with c2:
             st.markdown(f"""
-            <div class='crystal-card' style='border-top: 6px solid #f43f5e; text-align: left;'>
+            <div class='crystal-card' style='border-top: 6px solid #8b5cf6; text-align: left;'>
                 <h4 style='color: #64748b; margin-top:0;'>🏢 DOANH NGHIỆP (21.5%)</h4>
-                <h2 style='color:#f43f5e; font-size: 2.8rem; margin: 10px 0;'>{dn_total:,.0f} <span style='font-size:1.2rem;'>VNĐ</span></h2>
+                <h2 style='color:#8b5cf6; font-size: 2.8rem; margin: 10px 0;'>{dn_total:,.0f} <span style='font-size:1.2rem;'>VNĐ</span></h2>
                 <hr>
                 <p style='font-size: 1.1rem;'><b>BHXH (17.5%):</b> {dn_bhxh:,.0f} VNĐ</p>
                 <p style='font-size: 1.1rem;'><b>BHYT (3%):</b> {dn_bhyt:,.0f} VNĐ</p>
@@ -532,13 +543,13 @@ if df is not None:
             </div>
             """, unsafe_allow_html=True)
             
-        # V34 NEW: BIỂU ĐỒ DONUT CHART CHO MÁY TÍNH
+        # BIỂU ĐỒ DONUT CHART MÀU SẮC CYBERPUNK (V35)
         st.write("<br>", unsafe_allow_html=True)
         fig_pie = go.Figure(data=[go.Pie(
             labels=['DOANH NGHIỆP (21.5%)', 'NGƯỜI LAO ĐỘNG (10.5%)'],
             values=[dn_total, nld_total],
             hole=.5,
-            marker_colors=['#f43f5e', '#0ea5e9'],
+            marker_colors=['#8b5cf6', '#0ea5e9'],
             textinfo='label+percent',
             textfont_size=15,
             textfont_color='white'
@@ -556,7 +567,6 @@ if df is not None:
         )
         st.plotly_chart(fig_pie, use_container_width=True)
 
-        # V34 NEW: BẢNG CHI TIẾT TỪNG QUỸ
         with st.expander("🔍 BẢNG TÓM TẮT CHI TIẾT TỪNG QUỸ BẢO HIỂM (Bấm để xem)"):
             df_breakdown = pd.DataFrame({
                 'Quỹ Bảo Hiểm': ['Hưu trí - Tử tuất', 'Ốm đau - Thai sản', 'TNLĐ - BNN', 'Bảo hiểm Y tế (BHYT)', 'Bảo hiểm Thất nghiệp (BHTN)'],
@@ -573,19 +583,19 @@ if df is not None:
             </div>
         """, unsafe_allow_html=True)
 
-    # --- TAB 6: LIÊN HỆ ---
+    # --- TAB 6: LIÊN HỆ (ĐÃ CẬP NHẬT CHUẨN XÁC V35) ---
     elif st.session_state.current_tab == "📍 Liên hệ BHXH":
         st.markdown("## 📍 TRUNG TÂM HỖ TRỢ & LIÊN HỆ")
         st.markdown("""
         <div class='crystal-card' style='text-align: center; border-bottom: 8px solid #2563eb; padding: 50px 20px; margin-top: 30px;'>
             <img src='https://cdn-icons-png.flaticon.com/512/8198/8198144.png' width='120' style='margin-bottom: 20px;'>
             <h1 style='color:#1e3a8a; font-size: 2.8rem; margin-bottom: 20px;'>BẢO HIỂM XÃ HỘI CƠ SỞ THUẬN AN</h1>
-            <p style='font-size: 1.4rem; color: #475569;'><b>📍 Cơ quan:</b> Thôn Thuận Sơn, xã Thuận An, huyện Đắk Mil, tỉnh Đắk Nông.</p>
-            <p style='font-size: 1.4rem; color: #475569;'><b>📞 Tổng đài CSKH:</b> <span style='color:#2563eb; font-weight:900;'>1900 9068</span></p>
-            <p style='font-size: 1.4rem; color: #475569;'><b>📧 Email:</b> thuanan@daknong.vss.gov.vn</p>
+            <p style='font-size: 1.4rem; color: #475569;'><b>📍 Địa chỉ:</b> Thôn Thuận Sơn, xã Thuận An, tỉnh Lâm Đồng.</p>
+            <p style='font-size: 1.4rem; color: #475569;'><b>📞 Điện thoại:</b> <span style='color:#2563eb; font-weight:900;'>02613. 741.255</span></p>
+            <p style='font-size: 1.4rem; color: #475569;'><b>📧 Email:</b> thuanan@lamdong.vss.gov.vn</p>
             <hr style='margin: 40px 0; border: 1px dashed #cbd5e1;'>
             <p style='font-size: 1.2rem; color: #64748b; font-style: italic;'>"Luôn đồng hành cùng sự phát triển bền vững của Doanh nghiệp và Người lao động"</p>
         </div>
         """, unsafe_allow_html=True)
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v34.0 Galactic Era (Advanced Edition)</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v35.0 Cosmic Nexus (Advanced Edition)</center>", unsafe_allow_html=True)
