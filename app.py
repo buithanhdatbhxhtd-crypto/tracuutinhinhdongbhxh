@@ -11,14 +11,14 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v32.0 Future Nexus",
+    page_title="BHXH Thuận An - v33.0 Quantum Horizon",
     page_icon="🚀",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # --- CẤU HÌNH AI NỘI BỘ (OFFLINE SMART ENGINE 2.0) ---
-# Bất tử trước mọi lỗi mạng, không cần API Key, phân tích ngữ cảnh xuất sắc.
+# ĐƯỢC GIỮ NGUYÊN 100% THEO YÊU CẦU: Bất tử trước mọi lỗi mạng, không cần API Key.
 
 def get_ai_response(prompt, context=""):
     prompt_lower = unidecode(prompt).lower()
@@ -35,7 +35,7 @@ def get_ai_response(prompt, context=""):
         else:
             response += "👉 **Phân tích thông minh:** Đơn vị hiện đang có khoản nợ/lệch so với dữ liệu trên hệ thống. Quý đơn vị vui lòng kiểm tra lại Ủy nhiệm chi (UNC) tháng gần nhất hoặc liên hệ Cán bộ chuyên quản qua Zalo để tiến hành đối chiếu, điều chỉnh kịp thời.\n\n---\n"
 
-    # 2. Bộ não tri thức BHXH (Knowledge Base v32)
+    # 2. Bộ não tri thức BHXH (Knowledge Base)
     if any(word in prompt_lower for word in ["muc dong", "bao nhieu phan tram", "ty le", "phan tram"]):
         response += "💡 **Quy định Mức đóng BHXH, BHYT, BHTN hiện hành (áp dụng trên quỹ Lương):**\n"
         response += "- **BHXH** (Hưu trí, tử tuất, ốm đau, thai sản): 25.5% (Doanh nghiệp: 17.5%, NLĐ: 8%)\n"
@@ -58,10 +58,10 @@ def get_ai_response(prompt, context=""):
 
     elif any(word in prompt_lower for word in ["c12", "tra cuu", "thong bao"]):
         response += "💡 **Về Thông báo C12-TS:**\n"
-        response += "Hệ thống Future Nexus hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị (VD: TA0001) để xem bảng Dashboard tài chính 3D trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
+        response += "Hệ thống Quantum Horizon hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị (VD: TA0001) để xem bảng Dashboard tài chính 3D trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
 
     elif any(word in prompt_lower for word in ["chao", "hello", "hi", "xin chao"]):
-        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v32.0. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
+        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v33.0. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
 
     else:
         if not response:
@@ -80,7 +80,7 @@ if 'active_pdf' not in st.session_state: st.session_state.active_pdf = None
 if 'search_query' not in st.session_state: st.session_state.search_query = ""
 if 'welcome_done' not in st.session_state: st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN FUTURE NEXUS v32.0 - ANIMATED UI) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN QUANTUM HORIZON v33.0 - ĐƯỢC TINH CHỈNH HOÀN MỸ HƠN) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
@@ -90,7 +90,7 @@ st.markdown("""
     }
 
     * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
-    .stApp { background: #f8fafc; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 20px 20px; }
+    .stApp { background: #f8fafc; background-image: radial-gradient(#e2e8f0 1px, transparent 1px); background-size: 25px 25px; }
 
     /* SIDEBAR ĐẲNG CẤP VŨ TRỤ */
     [data-testid="stSidebar"] { background: linear-gradient(180deg, #020617 0%, #1e3a8a 100%) !important; box-shadow: 5px 0 20px rgba(0,0,0,0.1); }
@@ -98,14 +98,14 @@ st.markdown("""
         color: #f8fafc !important; font-size: 1.25rem !important; font-weight: 800 !important;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5) !important; padding: 12px 0 !important; letter-spacing: 0.5px;
     }
-    [data-testid="stSidebar"] h1 { color: white !important; text-shadow: 0 0 20px var(--neon-blue); letter-spacing: 2px; }
+    [data-testid="stSidebar"] h1 { color: white !important; text-shadow: 0 0 25px var(--neon-blue); letter-spacing: 2px; }
 
     /* BẢNG LED RGB ANIMATION */
     @keyframes ledGlow { 0%, 100% { box-shadow: 0 0 20px #39ff14; } 50% { box-shadow: 0 0 40px #39ff14, 0 0 10px #39ff14 inset; } }
     .led-marquee {
         background: #000; color: #39ff14; padding: 15px 0; font-weight: 900; border-radius: 15px;
         border: 2px solid #111; margin-bottom: 25px; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase;
-        animation: ledGlow 2s infinite; border-top: 3px solid #39ff14; border-bottom: 3px solid #39ff14;
+        animation: ledGlow 2.5s infinite; border-top: 3px solid #39ff14; border-bottom: 3px solid #39ff14;
     }
 
     /* SIÊU Ô TÌM KIẾM GATEWAY - BÓNG ĐỔ ĐA TẦNG */
@@ -120,7 +120,7 @@ st.markdown("""
         background: white url('https://cdn-icons-png.flaticon.com/512/622/622669.png') no-repeat 35px center !important;
         background-size: 50px !important; color: var(--primary) !important;
         box-shadow: 0 20px 50px rgba(59, 130, 246, 0.2), inset 0 0 0 4px var(--secondary) !important;
-        transition: all 0.4s ease;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .stTextInput input:focus { transform: translateY(-5px); box-shadow: 0 30px 60px rgba(0, 242, 254, 0.4), inset 0 0 0 6px var(--neon-blue) !important; }
 
@@ -135,7 +135,7 @@ st.markdown("""
     .premium-header h1 { font-size: 3.8rem; font-weight: 900; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.3); }
     .premium-header p { font-size: 1.5rem; font-weight: 600; margin: 10px 0 0 0; color: #e0f2fe; }
 
-    /* RADIANT CARDS 3D */
+    /* RADIANT CARDS 3D MỚI NHẤT */
     .crystal-card {
         background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         border: 1px solid #f1f5f9; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
@@ -156,7 +156,7 @@ st.markdown("""
     }
 
     .bank-card { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 3px solid #fbbf24; border-radius: 25px; padding: 30px; margin-top: 25px; box-shadow: 0 15px 35px rgba(245, 158, 11, 0.15); }
-    .stCodeBlock code { font-size: 1.6rem !important; font-weight: 900 !important; color: #b45309 !important; background: white !important; }
+    .stCodeBlock code { font-size: 1.6rem !important; font-weight: 900 !important; color: #b45309 !important; background: white !important; border-radius: 10px !important;}
     
     .stButton>button { border-radius: 50px !important; font-weight: 800 !important; text-transform: uppercase; padding: 0.8rem 3rem !important; transition: all 0.3s ease !important; }
     .btn-main > div > button { background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%) !important; color: white !important; font-size: 1.6rem !important; height: 80px !important; width: 80% !important; border: none !important; box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4) !important; letter-spacing: 2px; }
@@ -181,7 +181,7 @@ def live_clock():
     </script>
     """, height=180)
 
-# --- HÀM RENDER PDF (CHỐNG BLOCK CHROME 100% - GIỮ NGUYÊN TỪ V29) ---
+# --- HÀM RENDER PDF (CHỐNG BLOCK CHROME 100% - ĐƯỢC GIỮ NGUYÊN HOÀN TOÀN TỪ V29) ---
 def render_pdf_unblockable(file_path):
     try:
         with open(file_path, "rb") as f:
@@ -266,16 +266,16 @@ def load_data():
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("<h1 style='text-align:center;'>🚀 FUTURE NEXUS</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>🚀 QUANTUM HORIZON</h1>", unsafe_allow_html=True)
     st.divider()
     menu = ["📊 Tra cứu C12-TS", "🤖 Trợ lý AI Thông Minh", "📂 Thư viện Văn bản", "📑 Cẩm nang Nghiệp vụ", "🧮 Máy tính BHXH", "📍 Liên hệ BHXH"]
     st.session_state.current_tab = st.radio("CHỨC NĂNG HỆ THỐNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v32.0 The Future | Powered by Offline AI")
+    st.caption("v33.0 The Horizon | Enterprise Edition")
 
 # --- HEADER LED ---
-marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v32.0 KỶ NGUYÊN TƯƠNG LAI • GIAO DIỆN HOLOGRAPHIC ĐỈNH CAO • TÍCH HỢP AI NỘI BỘ SIÊU TỐC - TÓM TẮT DỮ LIỆU TỰ ĐỘNG KHÔNG CẦN INTERNET 🌟"
+marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v33.0 BỨT PHÁ TƯƠNG LAI • GIAO DIỆN HOLOGRAPHIC ĐỈNH CAO • TÍCH HỢP SIÊU MÁY TÍNH DỰ TOÁN VÀ CẨM NANG SỐ HOÁ 🌟"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -307,8 +307,8 @@ if df is not None:
 
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
-                st.markdown("##### 📢 TIN TỨC V32")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 TƯƠNG LAI ĐÃ ĐẾN</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Giao diện Holographic hoàn toàn mới. AI Nội bộ nay đã có khả năng tự động tóm tắt dữ liệu siêu việt.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 32.0</small></div>", unsafe_allow_html=True)
+                st.markdown("##### 📢 TIN TỨC V33")
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 VƯƠN TỚI ĐỈNH CAO</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Nâng cấp toàn diện Siêu Máy Tính dự toán và Cẩm nang Nghiệp vụ tương tác trực quan.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 33.0</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -337,7 +337,7 @@ if df is not None:
                     """, unsafe_allow_html=True)
 
         else:
-            # --- DASHBOARD KẾT QUẢ v32 ---
+            # --- DASHBOARD KẾT QUẢ v33 ---
             if not st.session_state.welcome_done:
                 st.balloons(); st.session_state.welcome_done = True
             
@@ -353,7 +353,7 @@ if df is not None:
                 </div>
             """, unsafe_allow_html=True)
 
-            # TÍNH NĂNG MỚI: AI SMART SUMMARY
+            # AI SMART SUMMARY
             debt_val = unit_data.get('tien_cuoi_ky', 0)
             status_text = "✨ Đã hoàn thành 100% nghĩa vụ đóng BHXH, không có nợ đọng." if debt_val <= 0 else f"⚠️ Hiện đang lệch/nợ: {abs(debt_val):,.0f} VNĐ. Cần kiểm tra UNC để nộp bù."
             st.markdown(f"""
@@ -383,7 +383,6 @@ if df is not None:
 
             with cr:
                 rate = min(round((unit_data.get('so_da_dong', 0) / unit_data.get('so_phai_dong', 1)) * 100, 1), 100)
-                # Dùng progress bar hiện đại của Streamlit bên cạnh biểu đồ Plotly
                 st.markdown("<p style='font-weight: 800; color: #1e3a8a; text-align: center; font-size: 1.2rem; margin-bottom: 5px;'>THANH TIẾN ĐỘ</p>", unsafe_allow_html=True)
                 st.progress(int(rate))
 
@@ -402,7 +401,7 @@ if df is not None:
 
             render_vip_bank_accounts(unit_data.get('madvi'), unit_data.get('tendvi'))
 
-    # --- TAB 2: AI NỘI BỘ (KHÔNG CẦN MẠNG / KHÔNG CẦN API) ---
+    # --- TAB 2: AI NỘI BỘ (ĐƯỢC BẢO LƯU 100%) ---
     elif st.session_state.current_tab == "🤖 Trợ lý AI Thông Minh":
         st.markdown("## 🧠 TRỢ LÝ THÔNG MINH BHXH (CHẾ ĐỘ OFFLINE 2.0)")
         
@@ -426,7 +425,7 @@ if df is not None:
                     st.markdown(resp)
                     st.session_state.chat_history.append({"role": "assistant", "content": resp})
 
-    # --- TAB 3: PDF (GIỮ NGUYÊN V29.0) ---
+    # --- TAB 3: PDF (ĐƯỢC BẢO LƯU 100%) ---
     elif st.session_state.current_tab == "📂 Thư viện Văn bản":
         st.markdown("## 📂 THƯ VIỆN VĂN BẢN ĐIỀU HÀNH")
         pdfs = [f for f in os.listdir('.') if f.lower().endswith('.pdf')]
@@ -442,22 +441,103 @@ if df is not None:
                     st.success(f"📌 ĐANG XEM TÀI LIỆU AN TOÀN: {st.session_state.active_pdf}")
                     render_pdf_unblockable(st.session_state.active_pdf)
 
-    # --- CÁC TAB KHÁC ---
+    # --- TAB 4: CẨM NANG NGHIỆP VỤ (NÂNG CẤP V33) ---
     elif st.session_state.current_tab == "📑 Cẩm nang Nghiệp vụ": 
-        st.markdown("## 📑 CẨM NANG NGHIỆP VỤ")
-        st.info("Khu vực hướng dẫn giải quyết các chế độ BHXH, BHYT, BHTN.")
-    elif st.session_state.current_tab == "🧮 Máy tính BHXH":
-        st.markdown("## 🧮 MÁY TÍNH DỰ TOÁN ĐÓNG BHXH")
-        st.markdown("<div class='crystal-card'>", unsafe_allow_html=True)
-        sal = st.number_input("Nhập mức lương đóng (VNĐ):", value=5000000)
-        st.success(f"Tổng số tiền dự kiến nộp (32%): **{(sal*0.32):,.0f}đ**")
-        st.markdown("</div>", unsafe_allow_html=True)
-    elif st.session_state.current_tab == "📍 Liên hệ BHXH":
-        st.markdown("## 📍 THÔNG TIN LIÊN HỆ")
-        st.markdown("<div class='crystal-card' style='text-align: left;'>", unsafe_allow_html=True)
-        st.write("🏠 **Cơ quan:** Bảo hiểm xã hội cơ sở Thuận An")
-        st.write("📍 **Địa chỉ:** Thôn Thuận Sơn, xã Thuận An, huyện Đắk Mil, tỉnh Đắk Nông.")
-        st.write("📞 **Tổng đài:** 1900 9068")
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("## 📑 CẨM NANG NGHIỆP VỤ SỐ HOÁ")
+        st.markdown("<p style='font-size: 1.2rem; color: #475569; margin-bottom: 30px;'>Hướng dẫn chi tiết từng bước giải quyết các chế độ BHXH, BHYT, BHTN dành cho Đơn vị sử dụng lao động.</p>", unsafe_allow_html=True)
+        
+        with st.expander("🤰 1. Hồ sơ giải quyết chế độ THAI SẢN", expanded=True):
+            st.markdown("""
+            **Điều kiện hưởng:** Đóng đủ 6 tháng BHXH trở lên trong thời gian 12 tháng trước khi sinh con.
+            - **Hồ sơ gồm:**
+              1. Bản sao Giấy chứng sinh hoặc Bản sao Giấy khai sinh của con.
+              2. Danh sách đề nghị giải quyết hưởng chế độ (Mẫu 01B-HSB) do đơn vị lập.
+            - **Thời hạn nộp:** Trong vòng 45 ngày kể từ ngày NLĐ trở lại làm việc.
+            - **Mức hưởng:** 100% mức bình quân tiền lương tháng đóng BHXH của 6 tháng liền kề trước khi nghỉ.
+            """)
+            
+        with st.expander("🤒 2. Hồ sơ giải quyết chế độ ỐM ĐAU"):
+            st.markdown("""
+            **Điều kiện hưởng:** Bị ốm đau, tai nạn phải nghỉ việc và có xác nhận của cơ sở KCB có thẩm quyền.
+            - **Hồ sơ gồm:**
+              1. Giấy ra viện (nếu điều trị nội trú) hoặc Giấy chứng nhận nghỉ việc hưởng BHXH (mẫu C65-HD) nếu điều trị ngoại trú.
+              2. Danh sách đề nghị giải quyết hưởng chế độ (Mẫu 01B-HSB) do đơn vị lập.
+            - **Mức hưởng:** 75% mức tiền lương đóng BHXH của tháng liền kề trước khi nghỉ việc.
+            """)
+            
+        with st.expander("🛑 3. Trình tự CHỐT SỔ BHXH khi NLĐ nghỉ việc"):
+            st.markdown("""
+            **Trình tự thực hiện (Rất quan trọng):**
+            1. **Báo giảm lao động:** Đơn vị lập hồ sơ báo giảm trên phần mềm giao dịch điện tử (VNPT, Viettel, EFY...) vào tháng NLĐ chính thức nghỉ việc.
+            2. **Hoàn thành nghĩa vụ tài chính:** Đơn vị phải đóng đầy đủ tiền BHXH, BHYT, BHTN của toàn bộ NLĐ tính đến hết tháng báo giảm. Nếu còn nợ, cơ quan BHXH sẽ không thể chốt sổ.
+            3. **Nộp hồ sơ giấy:** Đơn vị thu hồi Tờ bìa sổ và các tờ rời của NLĐ (kèm theo Mẫu TK1-TS nếu cần điều chỉnh thông tin) và gửi qua dịch vụ bưu chính về cơ quan BHXH để tiến hành in tờ rời chốt sổ.
+            """)
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v32.0 Future Nexus (Offline AI Edition)</center>", unsafe_allow_html=True)
+    # --- TAB 5: MÁY TÍNH BHXH (NÂNG CẤP V33) ---
+    elif st.session_state.current_tab == "🧮 Máy tính BHXH":
+        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V33")
+        st.markdown("<p style='font-size: 1.2rem; color: #475569; margin-bottom: 20px;'>Nhập mức lương cơ sở hoặc quỹ lương để hệ thống tự động phân tách nghĩa vụ tài chính.</p>", unsafe_allow_html=True)
+        
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            sal = st.number_input("💰 Nhập mức lương đóng BHXH (VNĐ):", value=5000000, step=100000)
+            
+        # Tính toán
+        nld_bhxh = sal * 0.08
+        nld_bhyt = sal * 0.015
+        nld_bhtn = sal * 0.01
+        nld_total = nld_bhxh + nld_bhyt + nld_bhtn
+
+        dn_bhxh = sal * 0.175
+        dn_bhyt = sal * 0.03
+        dn_bhtn = sal * 0.01
+        dn_total = dn_bhxh + dn_bhyt + dn_bhtn
+        
+        st.markdown("### 📊 CHI TIẾT PHÂN BỔ TRÍCH NỘP (32%)")
+        c1, c2 = st.columns(2)
+        with c1:
+            st.markdown(f"""
+            <div class='crystal-card' style='border-top: 6px solid #0ea5e9; text-align: left;'>
+                <h4 style='color: #64748b; margin-top:0;'>👤 NGƯỜI LAO ĐỘNG (10.5%)</h4>
+                <h2 style='color:#0ea5e9; font-size: 2.8rem; margin: 10px 0;'>{nld_total:,.0f} <span style='font-size:1.2rem;'>VNĐ</span></h2>
+                <hr>
+                <p style='font-size: 1.1rem;'><b>BHXH (8%):</b> {nld_bhxh:,.0f} VNĐ</p>
+                <p style='font-size: 1.1rem;'><b>BHYT (1.5%):</b> {nld_bhyt:,.0f} VNĐ</p>
+                <p style='font-size: 1.1rem;'><b>BHTN (1%):</b> {nld_bhtn:,.0f} VNĐ</p>
+            </div>
+            """, unsafe_allow_html=True)
+        with c2:
+            st.markdown(f"""
+            <div class='crystal-card' style='border-top: 6px solid #f43f5e; text-align: left;'>
+                <h4 style='color: #64748b; margin-top:0;'>🏢 DOANH NGHIỆP (21.5%)</h4>
+                <h2 style='color:#f43f5e; font-size: 2.8rem; margin: 10px 0;'>{dn_total:,.0f} <span style='font-size:1.2rem;'>VNĐ</span></h2>
+                <hr>
+                <p style='font-size: 1.1rem;'><b>BHXH (17.5%):</b> {dn_bhxh:,.0f} VNĐ</p>
+                <p style='font-size: 1.1rem;'><b>BHYT (3%):</b> {dn_bhyt:,.0f} VNĐ</p>
+                <p style='font-size: 1.1rem;'><b>BHTN (1%):</b> {dn_bhtn:,.0f} VNĐ</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        st.markdown(f"""
+            <div class='ai-summary' style='text-align:center; padding: 30px; margin-top: 30px; border-left: none; background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%); border-bottom: 8px solid #1e3a8a;'>
+                <h3 style='margin:0; color:#475569;'>🚀 TỔNG CỘNG ĐƠN VỊ PHẢI CHUYỂN KHOẢN (32%)</h3>
+                <span style='font-size: 3.5rem; color: #1e3a8a; font-weight: 900;'>{(nld_total + dn_total):,.0f} VNĐ</span>
+            </div>
+        """, unsafe_allow_html=True)
+
+    # --- TAB 6: LIÊN HỆ (NÂNG CẤP V33) ---
+    elif st.session_state.current_tab == "📍 Liên hệ BHXH":
+        st.markdown("## 📍 TRUNG TÂM HỖ TRỢ & LIÊN HỆ")
+        st.markdown("""
+        <div class='crystal-card' style='text-align: center; border-bottom: 8px solid #2563eb; padding: 50px 20px; margin-top: 30px;'>
+            <img src='https://cdn-icons-png.flaticon.com/512/8198/8198144.png' width='120' style='margin-bottom: 20px;'>
+            <h1 style='color:#1e3a8a; font-size: 2.8rem; margin-bottom: 20px;'>BẢO HIỂM XÃ HỘI CƠ SỞ THUẬN AN</h1>
+            <p style='font-size: 1.4rem; color: #475569;'><b>📍 Cơ quan:</b> Thôn Thuận Sơn, xã Thuận An, huyện Đắk Mil, tỉnh Đắk Nông.</p>
+            <p style='font-size: 1.4rem; color: #475569;'><b>📞 Tổng đài CSKH:</b> <span style='color:#2563eb; font-weight:900;'>1900 9068</span></p>
+            <p style='font-size: 1.4rem; color: #475569;'><b>📧 Email:</b> thuanan@daknong.vss.gov.vn</p>
+            <hr style='margin: 40px 0; border: 1px dashed #cbd5e1;'>
+            <p style='font-size: 1.2rem; color: #64748b; font-style: italic;'>"Luôn đồng hành cùng sự phát triển bền vững của Doanh nghiệp và Người lao động"</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v33.0 Quantum Horizon (Enterprise Edition)</center>", unsafe_allow_html=True)
