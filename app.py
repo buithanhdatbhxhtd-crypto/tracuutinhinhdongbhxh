@@ -11,14 +11,14 @@ import base64
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v18.2 Quantum Nexus",
+    page_title="BHXH Thuận An - v19.0 Quantum Nexus Elite",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CẤU HÌNH AI GEMINI (TỐI ƯU CHO AI STUDIO KEY) ---
-# Cách lấy Key: Vào Streamlit Cloud -> Settings -> Secrets -> Nhập GOOGLE_API_KEY = "key_cua_ban"
+# --- CẤU HÌNH AI GEMINI (TỐI ƯU CHO AI STUDIO) ---
+# Secrets: Settings -> Secrets -> GOOGLE_API_KEY = "key_cua_ban"
 api_key = st.secrets.get("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
 
 if api_key:
@@ -26,18 +26,16 @@ if api_key:
 
 def get_ai_response(prompt):
     if not api_key:
-        return "⚠️ **Chưa cấu hình API Key:** Vui lòng liên hệ quản trị viên để tích hợp khóa AI từ Google Studio."
+        return "⚠️ **Cấu hình AI chưa hoàn tất:** Vui lòng thêm `GOOGLE_API_KEY` vào Streamlit Secrets."
     try:
-        # Sử dụng Model gemini-1.5-flash ổn định nhất cho API Studio hiện nay
+        # Sử dụng model gemini-1.5-flash để đảm bảo tính ổn định cao nhất
         model = genai.GenerativeModel('gemini-1.5-flash')
-        full_prompt = f"Bạn là chuyên gia tư vấn của cơ quan BHXH Thuận An, Lâm Đồng. Hãy trả lời câu hỏi sau của đơn vị sử dụng lao động một cách ngắn gọn, chính xác: {prompt}"
+        system_instruction = "Bạn là chuyên gia tư vấn cao cấp của cơ quan Bảo hiểm xã hội cơ sở Thuận An, Lâm Đồng. Hãy trả lời câu hỏi của đơn vị sử dụng lao động một cách ngắn gọn, chuyên nghiệp, hỗ trợ tối đa về thủ tục và mức đóng."
+        full_prompt = f"{system_instruction}\n\nCâu hỏi của đơn vị: {prompt}"
         response = model.generate_content(full_prompt)
         return response.text
     except Exception as e:
-        # Xử lý lỗi model không tồn tại hoặc lỗi API version
-        if "404" in str(e):
-            return "⚠️ **Lỗi phiên bản AI:** Model đang yêu cầu không tìm thấy. Hệ thống đang tự động điều chỉnh phiên bản tương thích."
-        return f"⚠️ **Trợ lý AI đang bận:** {str(e)[:150]}... Quý đơn vị vui lòng nhắn tin cho Cán bộ qua Zalo nhé!"
+        return f"⚠️ **Trợ lý AI đang bận:** {str(e)[:100]}... Quý đơn vị vui lòng thử lại sau hoặc chat Zalo với cán bộ phụ trách nhé!"
 
 # --- KHỞI TẠO STATE ---
 if 'selected_unit' not in st.session_state:
@@ -49,7 +47,7 @@ if "chat_history" not in st.session_state:
 if 'active_pdf' not in st.session_state:
     st.session_state.active_pdf = None
 
-# --- TỔNG LỰC CSS (GIAO DIỆN NEXUS v18.2 - FIXED) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN ELITE v19.0) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -69,56 +67,57 @@ st.markdown("""
         background: radial-gradient(circle at 10% 20%, #f1f5f9 0%, #cbd5e1 100%);
     }
 
-    /* BẢNG LED RGB QUANTUM */
+    /* BẢNG LED RGB QUANTUM v19 */
     .led-marquee {
         background: linear-gradient(90deg, #000, #111, #000);
         color: #00ff00;
         padding: 15px 0;
         font-weight: 800;
         border-radius: 15px;
-        box-shadow: 0 0 35px rgba(0, 255, 0, 0.4);
+        box-shadow: 0 0 40px rgba(0, 255, 0, 0.4);
         border: 2px solid #333;
         margin-bottom: 30px;
         font-family: 'Courier New', Courier, monospace;
-        font-size: 1.25rem;
-        text-shadow: 0 0 10px #00ff00;
-        border-top: 2px solid var(--neon-blue);
+        font-size: 1.3rem;
+        text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+        border-top: 3px solid var(--neon-blue);
     }
 
-    /* SIÊU Ô TÌM KIẾM GATEWAY - KHÔNG CHE CHỮ */
+    /* SIÊU Ô TÌM KIẾM GATEWAY v19 - CỰC ĐẠI */
     .gateway-container {
-        max-width: 1000px;
-        margin: 0 auto 3rem auto;
+        max-width: 1100px;
+        margin: 0 auto 3.5rem auto;
         text-align: center;
     }
 
     div[data-testid="stTextInput"] > div {
         height: auto !important;
         background: transparent !important;
-        padding: 10px 0 !important;
+        padding: 15px 0 !important;
     }
 
     .stTextInput input {
-        border-radius: 30px !important;
-        padding: 10px 45px !important; 
-        border: 10px solid var(--secondary) !important;
-        font-size: 2.8rem !important; 
+        border-radius: 35px !important;
+        padding: 15px 50px !important; 
+        border: 12px solid var(--secondary) !important;
+        font-size: 3rem !important; 
         font-weight: 900 !important;
-        height: 140px !important; 
+        height: 160px !important; 
         background: white !important;
         color: var(--primary) !important;
-        box-shadow: 0 50px 100px rgba(59, 130, 246, 0.4) !important;
+        box-shadow: 0 50px 100px rgba(59, 130, 246, 0.5) !important;
         text-align: center !important;
         line-height: normal !important;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
     }
     
     .stTextInput input:focus {
         border-color: var(--neon-blue) !important;
         transform: scale(1.03) translateY(-10px);
+        box-shadow: 0 70px 150px rgba(0, 210, 255, 0.6) !important;
     }
 
-    /* THẺ CÁN BỘ MATRIX - HIỆN THỊ XÃ RÕ RÀNG */
+    /* THẺ CÁN BỘ MATRIX */
     .matrix-card {
         background: #050505;
         padding: 25px;
@@ -128,31 +127,27 @@ st.markdown("""
         text-align: center;
         transition: all 0.4s;
     }
-    .matrix-card:hover { transform: translateY(-10px); }
+    .matrix-card:hover { transform: translateY(-12px); border-color: #333; }
     
-    .commune-label {
-        color: #aaa;
-        font-size: 0.85rem;
+    .commune-badge {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
         font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        margin-bottom: 10px;
+        display: inline-block;
     }
 
-    .online-indicator {
-        height: 12px; width: 12px; background: var(--neon-green); 
-        border-radius: 50%; display: inline-block; margin-right: 8px;
-        animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-    /* PDF VIEWER NEXUS - ANTI BLOCK */
-    .pdf-nexus-container {
-        border-radius: 30px;
-        border: 8px solid white;
-        box-shadow: 0 40px 100px rgba(0,0,0,0.2);
+    /* PDF VIEWER ELITE */
+    .pdf-elite-container {
+        border-radius: 35px;
+        border: 10px solid white;
+        box-shadow: 0 50px 120px rgba(0,0,0,0.2);
         overflow: hidden;
         background: #fff;
-        height: 800px;
+        height: 850px;
         width: 100%;
         margin-top: 20px;
     }
@@ -170,78 +165,66 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- DỮ LIỆU CÁN BỘ & ZALO (ĐỊNH NGHĨA XÃ RÕ RÀNG) ---
+# --- DỮ LIỆU CÁN BỘ & XÃ (CẬP NHẬT CHÍNH XÁC) ---
 OFFICERS = [
     {
         "name": "Bà NGUYỄN THỊ NHÀI", 
-        "communes": "Đức Lập, Đắk Mil", 
+        "communes": "Xã Đức Lập, Xã Đắk Mil", 
+        "areas": ["đức lập", "duc lap", "đắk mil", "đắc mil", "dak mil"],
         "phone": "0846.39.29.29", 
         "zalo": "https://zalo.me/0846392929", 
-        "color": "#00d2ff",
-        "keywords": ["duc lap", "đức lập", "dak mil", "đắk mil"]
+        "color": "#00d2ff"
     },
     {
         "name": "Ông BÙI THÀNH ĐẠT", 
-        "communes": "Đắk Sắk, Đắk Song", 
+        "communes": "Xã Đắk Sắk, Xã Đắk Song", 
+        "areas": ["đắk sắk", "đắc sắc", "dak sak", "đắk song", "đắc song", "dak song"],
         "phone": "0986.05.30.06", 
         "zalo": "https://zalo.me/0986053006", 
-        "color": "#ffaa00",
-        "keywords": ["dak sak", "đắk sắk", "dak song", "đắk song"]
+        "color": "#ffaa00"
     },
     {
         "name": "Ông HOÀNG SỸ HẢI", 
-        "communes": "Thuận An", 
+        "communes": "Xã Thuận An", 
+        "areas": ["thuận an", "thuan an"],
         "phone": "0919.06.11.53", 
         "zalo": "https://zalo.me/0919061153", 
-        "color": "#39ff14",
-        "keywords": ["thuan an", "thuận an"]
+        "color": "#39ff14"
     }
 ]
 
-BANKS = [
-    {"name": "BIDV", "number": "63510009867032"},
-    {"name": "AGRIBANK", "number": "5301202919045"},
-    {"name": "VIETINBANK", "number": "919035000003"}
-]
-
-# --- HÀM XỬ LÝ VĂN BẢN PDF (FIXED DISPLAY) ---
+# --- HÀM XỬ LÝ VĂN BẢN PDF (FIXED v19) ---
 def get_local_pdfs():
     return [f for f in os.listdir('.') if f.lower().endswith('.pdf')]
 
-def embed_pdf_nexus(file_path):
+def embed_pdf_elite(file_path):
     try:
         with open(file_path, "rb") as f:
-            pdf_data = f.read()
-            base64_pdf = base64.b64encode(pdf_data).decode('utf-8')
+            pdf_bytes = f.read()
+            base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
         
-        # Nhúng bằng iframe Nexus với Fallback Text
+        # Nhúng bằng thẻ object (ổn định nhất)
         pdf_display = f"""
-        <div class="pdf-nexus-container">
-            <iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="100%" style="border:none;">
-                Trình duyệt của bạn không hỗ trợ hiển thị trực tiếp. 
-                Vui lòng dùng nút tải xuống bên dưới.
-            </iframe>
+        <div class="pdf-elite-container">
+            <object data="data:application/pdf;base64,{base64_pdf}" type="application/pdf" width="100%" height="100%">
+                <div style="padding: 40px; text-align: center; color: var(--primary);">
+                    <h4>⚠️ Trình duyệt của bạn đang chặn hiển thị PDF trực tiếp.</h4>
+                    <p>Vui lòng nhấn nút <b>"TẢI VĂN BẢN VỀ MÁY"</b> bên dưới để xem nội dung.</p>
+                </div>
+            </object>
         </div>
         """
         st.markdown(pdf_display, unsafe_allow_html=True)
         
-        # Công cụ cứu cánh 100% nếu bị chặn
-        st.info("💡 Nếu không thấy văn bản hiện ra, vui lòng nhấn nút bên dưới:")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.download_button(
-                label="📥 TẢI VĂN BẢN VỀ MÁY",
-                data=pdf_data,
-                file_name=file_path,
-                mime="application/pdf",
-                use_container_width=True
-            )
-        with col2:
-            # Dùng kỹ thuật Blob URL để vượt qua Chrome Block
-            st.markdown(f'<a href="data:application/pdf;base64,{base64_pdf}" target="_blank" style="text-decoration:none; background:#2563eb; color:white; padding:12px; border-radius:50px; font-weight:900; display:block; text-align:center;">🚀 MỞ TRONG TAB MỚI</a>', unsafe_allow_html=True)
+        st.divider()
+        c1, c2 = st.columns(2)
+        with c1:
+            st.download_button(label="📥 TẢI VĂN BẢN VỀ MÁY", data=pdf_bytes, file_name=file_path, mime="application/pdf", use_container_width=True)
+        with c2:
+            st.markdown(f'<a href="data:application/pdf;base64,{base64_pdf}" target="_blank" style="text-decoration:none; background:#2563eb; color:white; padding:12px; border-radius:50px; font-weight:900; display:block; text-align:center;">🚀 XEM TOÀN MÀN HÌNH</a>', unsafe_allow_html=True)
         return True
     except Exception as e:
-        st.error(f"Lỗi đọc tệp PDF: {e}")
+        st.error(f"Lỗi hệ thống: {e}")
         return False
 
 # --- HÀM TẢI DỮ LIỆU EXCEL ---
@@ -259,37 +242,38 @@ def load_data_engine():
             return df
     except: return None
 
-# --- SIDEBAR NEXUS ---
+# --- SIDEBAR ELITE ---
 with st.sidebar:
     st.markdown("<h1 style='color:white; text-align:center;'>🛡️ QUANTUM HUB</h1>", unsafe_allow_html=True)
     st.divider()
-    menu = ["📊 Tra cứu C12-TS", "🤖 Trợ lý AI Gemini", "📂 Văn bản PDF Mới", "📑 Cẩm nang Thủ tục", "🧮 Máy tính BHXH", "📍 Vị trí & Liên hệ"]
-    selected_tab = st.radio("CHUYÊN MỤC", menu, label_visibility="collapsed")
+    menu = ["📊 Tra cứu C12-TS", "🤖 Trợ lý AI Gemini", "📂 Văn bản PDF Mới", "📑 Cẩm nang Thủ tục", "🧮 Máy tính BHXH", "📍 Liên hệ công sở"]
+    selected_tab = st.radio("MENU CHỨC NĂNG", menu, label_visibility="collapsed")
     st.session_state.current_tab = selected_tab
     st.divider()
-    st.caption("v18.2 Nexus Hub | Beyond Digital")
+    st.info(f"Cập nhật: {datetime.now().strftime('%d/%m/%Y')}")
+    st.caption("v19.0 Elite Hub | Quantum Nexus")
 
 # --- HEADER LED ---
-marquee_text = "💎 HỆ THỐNG TRA CỨU BHXH THUẬN AN PHIÊN BẢN v18.2 • ĐÃ FIX LỖI AI GEMINI VÀ XEM VĂN BẢN PDF • TRA CỨU NHANH - CHÍNH XÁC - MINH BẠCH •"
-st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_text}</marquee></div>", unsafe_allow_html=True)
+marquee_msg = "💎 CHÀO MỪNG ĐẾN VỚI HỆ THỐNG TRA CỨU BHXH THUẬN AN PHIÊN BẢN v19.0 QUANTUM ELITE • ĐÃ KHẮC PHỤC TRIỆT ĐỂ LỖI PDF VÀ AI GEMINI • TRA CỨU NHANH - NỘP TIỀN ĐÚNG CÚ PHÁP •"
+st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data_engine()
 
 if df is not None:
     
-    # --- TAB 1: TRA CỨU (CHÍNH) ---
+    # --- TAB 1: TRA CỨU (CHỨC NĂNG CHÍNH) ---
     if st.session_state.current_tab == "📊 Tra cứu C12-TS":
         if st.session_state.selected_unit is None:
             st.markdown("<div class='gateway-container'>", unsafe_allow_html=True)
             st.markdown("<h1 style='color:#1e3a8a; font-size:4rem; font-weight:900;'>🛡️ CỔNG TRA CỨU DỮ LIỆU</h1>", unsafe_allow_html=True)
-            st.markdown("<p style='color:#64748b; font-size:1.6rem; font-weight:700;'>NHẬP MÃ ĐƠN VỊ HOẶC TÊN CÔNG TY</p>", unsafe_allow_html=True)
+            st.markdown("<p style='color:#64748b; font-size:1.6rem; font-weight:700;'>MỜI NHẬP MÃ ĐƠN VỊ HOẶC TÊN CÔNG TY</p>", unsafe_allow_html=True)
             query = st.text_input("Gateway", placeholder="Gõ tìm kiếm...", label_visibility="collapsed")
             st.markdown("</div>", unsafe_allow_html=True)
 
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
                 st.markdown("##### 📢 TIN TỨC MỚI")
-                st.markdown("<div style='background:white; padding:40px; border-radius:35px; border:2.5px solid #e2e8f0; text-align:center; min-height:350px; display:flex; flex-direction:column; justify-content:center; box-shadow: 0 20px 40px rgba(0,0,0,0.06);'><h3 style='color:#1e3a8a;'>🛡️ AN SINH</h3><p style='font-size:1.1rem; color:#64748b;'>BHXH là điểm tựa vững chắc nhất của người lao động khi về già.</p><hr><small style='color:#ffaa00; font-weight:800;'>BHXH THUẬN AN</small></div>", unsafe_allow_html=True)
+                st.markdown("<div style='background:white; padding:40px; border-radius:35px; border:2px solid #e2e8f0; text-align:center; min-height:350px; display:flex; flex-direction:column; justify-content:center; box-shadow: 0 20px 40px rgba(0,0,0,0.06);'><h3 style='color:#1e3a8a;'>🛡️ AN SINH</h3><p style='font-size:1.1rem; color:#64748b;'>Hưởng lương hưu là sự bảo đảm vững chắc nhất cho tuổi già của bạn.</p><hr><small style='color:#ffaa00; font-weight:800;'>BHXH THUẬN AN ĐỒNG HÀNH</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 if query:
@@ -300,21 +284,20 @@ if df is not None:
                             ca.markdown(f"<div style='background:white; padding:25px; border-radius:25px; border-left:12px solid #2563eb; margin-bottom:15px; box-shadow:0 8px 20px rgba(0,0,0,0.04);'><small style='color:#2563eb; font-weight:800;'>MÃ: {row.get('madvi')}</small><br><b style='font-size:1.4rem; color:#1e293b;'>{row.get('tendvi')}</b></div>", unsafe_allow_html=True)
                             if cb.button("XÁC NHẬN ➔", key=f"sel_{row.get('madvi')}_{idx}", use_container_width=True):
                                 st.session_state.selected_unit = row.get('madvi'); st.rerun()
-                else: st.markdown("<br><center><img src='https://cdn-icons-png.flaticon.com/512/3772/3772274.png' width='160' style='opacity:0.2'></center>", unsafe_allow_html=True)
+                else: st.markdown("<br><center><img src='https://cdn-icons-png.flaticon.com/512/3772/3772274.png' width='160' style='opacity:0.25'></center>", unsafe_allow_html=True)
 
             with col_off:
-                st.markdown("##### 👨‍💼 LIÊN HỆ CÁN BỘ (XÃ)")
+                st.markdown("##### 👨‍💼 LIÊN HỆ CÁN BỘ THEO XÃ")
                 for off in OFFICERS:
                     st.markdown(f"""
                     <div class="matrix-card">
-                        <div class="online-indicator"></div><small style="color:white; font-weight:800;">ONLINE</small>
-                        <div style="color:{off['color']}; font-weight:900; font-size:1.2rem; margin-top:5px;">{off['name']}</div>
-                        <div class="commune-label">Phụ trách xã: {off['communes']}</div>
-                        <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:white; font-weight:800; font-size:1.1rem; display:block; margin:10px 0;">📱 {off['phone']}</a>
+                        <div class="commune-badge">{off['communes']}</div>
+                        <div style="color:{off['color']}; font-weight:900; font-size:1.2rem;">{off['name']}</div>
+                        <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:white; font-weight:800; font-size:1.2rem; display:block; margin:10px 0;">📱 {off['phone']}</a>
                         <a href="{off['zalo']}" target="_blank" style="background:#0068ff; color:white; padding:8px 25px; border-radius:50px; text-decoration:none; display:inline-block; font-weight:900; font-size:0.8rem;">💬 CHAT ZALO</a>
                     </div>
                     """, unsafe_allow_html=True)
-                st.markdown("##### 🏦 TÀI KHOẢN BHXH THUẬN AN")
+                st.markdown("##### 🏦 SỐ TÀI KHOẢN CỦA BHXH CƠ SỞ THUẬN AN")
                 st.markdown('<div style="background:#111; padding:15px; border-radius:15px; border-left:5px solid #00d2ff; color:#00d2ff; font-weight:800; font-size:0.85rem;">BIDV: 63510009867032<br>AGRIBANK: 5301202919045<br>VIETINBANK: 919035000003</div>', unsafe_allow_html=True)
 
         else:
@@ -326,6 +309,7 @@ if df is not None:
             cl, cr = st.columns([1.8, 1])
             with cl:
                 st.markdown("<div style='background:white; border-radius:40px; padding:40px; box-shadow:0 30px 60px rgba(0,0,0,0.05); margin-top:30px;'>", unsafe_allow_html=True)
+                st.write("#### 📉 PHÂN TÍCH TÀI CHÍNH")
                 m1, m2, m3 = st.columns(3)
                 m1.metric("Đầu kỳ", f"{unit_data.get('tien_dau_ky', 0):,.0f}đ")
                 m2.metric("Phải đóng", f"{unit_data.get('so_phai_dong', 0):,.0f}đ")
@@ -342,34 +326,34 @@ if df is not None:
                 rate = min(round((unit_data.get('so_da_dong', 0) / unit_data.get('so_phai_dong', 1)) * 100, 1), 100)
                 st.plotly_chart(go.Figure(go.Indicator(mode="gauge+number", value=rate, title={'text': "HOÀN THÀNH (%)"}, gauge={'axis': {'range': [0, 100]}, 'bar': {'color': "#1e40af"}})), use_container_width=True)
                 
-                # TỰ ĐỘNG HIỂN THỊ CÁN BỘ PHỤ TRÁCH TRỰC TIẾP
+                # HIỂN THỊ CHUYÊN QUẢN PHỤ TRÁCH TRỰC TIẾP
                 for off in OFFICERS:
-                    if any(kw in unit_addr for kw in off['keywords']):
+                    if any(area in unit_addr for area in off['areas']):
                         st.markdown(f"<div class='matrix-card' style='background:#000;'><small style='color:#39ff14; font-weight:900;'>PHỤ TRÁCH TRỰC TIẾP</small><h4 style='color:{off['color']}; margin:10px 0;'>{off['name']}</h4><a href='tel:{off['phone'].replace('.','')}' style='color:white; text-decoration:none; font-weight:800; font-size:1.5rem;'>📱 {off['phone']}</a><br><a href='{off['zalo']}' target='_blank' style='background:#0068ff; color:white; padding:8px 30px; border-radius:50px; text-decoration:none; display:inline-block; margin-top:10px; font-weight:800;'>CHAT ZALO</a></div>", unsafe_allow_html=True)
 
-    # --- TAB 2: AI GEMINI (FIXED MODEL v1.5 FLASH) ---
+    # --- TAB 2: AI GEMINI (FIXED v19) ---
     elif st.session_state.current_tab == "🤖 Trợ lý AI Gemini":
         st.markdown("## 🧠 TRỢ LÝ AI THÔNG MINH (GEMINI 1.5 FLASH)")
-        st.write("Đã nâng cấp phiên bản tương thích với Google AI Studio. Bạn có thể đặt câu hỏi ngay.")
+        st.write("Giải đáp thắc mắc về chính sách BHXH, BHYT. Phiên bản tối ưu cho API Studio.")
         
         for msg in st.session_state.chat_history:
             with st.chat_message(msg["role"]): st.markdown(msg["content"])
         
-        if prompt := st.chat_input("Ví dụ: Bhxh bắt buộc là gì?"):
+        if prompt := st.chat_input("Hỏi AI bất cứ điều gì..."):
             st.session_state.chat_history.append({"role": "user", "content": prompt})
             with st.chat_message("user"): st.markdown(prompt)
             with st.chat_message("assistant"):
-                with st.spinner("AI đang trích xuất dữ liệu..."):
+                with st.spinner("AI đang tư duy dữ liệu chính sách..."):
                     resp = get_ai_response(prompt)
                     st.markdown(resp)
                     st.session_state.chat_history.append({"role": "assistant", "content": resp})
 
-    # --- TAB 3: VĂN BẢN PDF (ANTI-BLOCK ENGINE) ---
+    # --- TAB 3: VĂN BẢN PDF (ELITE ENGINE) ---
     elif st.session_state.current_tab == "📂 Văn bản PDF Mới":
         st.markdown("## 📂 THƯ VIỆN VĂN BẢN KỸ THUẬT SỐ")
         pdfs = get_local_pdfs()
         if not pdfs:
-            st.warning("Hãy tải file .pdf lên thư mục cùng file app.py trên GitHub.")
+            st.warning("Hệ thống chưa tìm thấy văn bản nào (.pdf). Vui lòng upload file vào thư mục GitHub.")
         else:
             c1, c2 = st.columns([1, 2.5])
             with c1:
@@ -378,15 +362,15 @@ if df is not None:
                     if st.button(f"📄 {f}", use_container_width=True, key=f"pdf_{f}"):
                         st.session_state.active_pdf = f
             with c2:
-                if st.session_state.active_pdf and os.path.exists(st.session_state.active_pdf):
+                if st.session_state.active_pdf:
                     st.success(f"📌 ĐANG XEM: {st.session_state.active_pdf}")
-                    embed_pdf_nexus(st.session_state.active_pdf)
+                    embed_pdf_elite(st.session_state.active_pdf)
 
     # --- CÁC TAB KHÁC ---
     elif st.session_state.current_tab == "📑 Cẩm nang Thủ tục": st.markdown("## 📑 CẨM NANG NGHIỆP VỤ")
     elif st.session_state.current_tab == "🧮 Máy tính BHXH":
-        st.markdown("## 🧮 DỰ TOÁN ĐÓNG BHXH"); sal = st.number_input("Lương:", value=5000000); st.success(f"Tổng đóng: {(sal*0.32):,.0f}đ")
-    elif st.session_state.current_tab == "📍 Vị trí & Liên hệ":
+        st.markdown("## 🧮 DỰ TOÁN ĐÓNG BHXH"); sal = st.number_input("Lương đóng:", value=5000000); st.success(f"Tổng đóng: {(sal*0.32):,.0f}đ")
+    elif st.session_state.current_tab == "📍 Liên hệ công sở":
         st.markdown("## 📍 LIÊN HỆ"); st.write("🏠 Cơ sở: Thôn Thuận Sơn, Thuận An, Đắk Mil, Đắk Nông."); st.write("📞 Hotline: 1900 9068")
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.9rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | Elite Quantum Nexus v18.2</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.9rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | Elite Quantum Hub v19.0</center>", unsafe_allow_html=True)
