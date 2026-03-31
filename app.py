@@ -2,203 +2,210 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
+import plotly.graph_objects as go
 from unidecode import unidecode
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - Smart Lookup",
-    page_icon="⚡",
-    layout="wide"
+    page_title="BHXH Thuận An - Digital Dashboard",
+    page_icon="💎",
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
 
-# --- CSS TÙY CHỈNH: Giao diện Modern & Clean ---
+# --- TỔNG LỰC CSS (UI/UX TRẢI NGHIỆM NGƯỜI DÙNG) ---
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
     
-    html, body, [class*="st-"] {
-        font-family: 'Inter', sans-serif;
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    
+    .main { background-color: #f0f2f6; }
+    
+    /* Thiết kế thanh tìm kiếm kiểu Google */
+    .stTextInput input {
+        border-radius: 50px !important;
+        padding: 25px 30px !important;
+        border: none !important;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+        font-size: 1.2rem !important;
     }
     
-    .main {
-        background: #f8fafc;
-    }
-    
-    /* Hiệu ứng Glassmorphism cho Card */
-    .glass-card {
+    /* Thẻ kết quả gợi ý */
+    .suggestion-card {
         background: white;
-        padding: 30px;
-        border-radius: 24px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-        border: 1px solid #f1f5f9;
-        margin-bottom: 25px;
-        border-left: 8px solid #3b82f6;
-    }
-    
-    .status-badge {
-        padding: 6px 12px;
-        border-radius: 99px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        display: inline-block;
+        padding: 15px;
+        border-radius: 15px;
+        border: 1px solid #eef2f6;
+        cursor: pointer;
+        transition: all 0.3s ease;
         margin-bottom: 10px;
     }
-    
-    .status-ok { background: #dcfce7; color: #166534; }
-    .status-debt { background: #fee2e2; color: #991b1b; }
-    
-    /* Tùy chỉnh Metrics */
-    [data-testid="stMetricValue"] {
-        font-size: 1.8rem !important;
-        font-weight: 800 !important;
-        color: #1e293b;
+    .suggestion-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        border-left: 5px solid #0061ff;
     }
     
-    /* Search Bar Input */
-    .stTextInput input {
-        border-radius: 15px !important;
-        padding: 12px 20px !important;
-        border: 2px solid #e2e8f0 !important;
-        transition: all 0.3s ease;
-        font-size: 1.1rem !important;
+    /* Thẻ nội dung chính (Glassmorphism) */
+    .main-card {
+        background: white;
+        padding: 35px;
+        border-radius: 30px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+        border: 1px solid rgba(255,255,255,0.7);
     }
+    
+    /* Chỉ số Metric tinh tế */
+    .metric-box {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 20px;
+        border: 1px solid #edf2f7;
+    }
+    
+    h1, h2, h3 { color: #1e293b; font-weight: 800; }
     </style>
     """, unsafe_allow_html=True)
 
-# --- HÀM TẢI DỮ LIỆU ---
+# --- HÀM XỬ LÝ DỮ LIỆU ---
 @st.cache_data
 def load_data():
     file_path = 'c12.xls'
     if not os.path.exists(file_path):
-        if os.path.exists('c12.xlsx'):
-            file_path = 'c12.xlsx'
-        else:
-            return None
-    
+        if os.path.exists('c12.xlsx'): file_path = 'c12.xlsx'
+        else: return None
     try:
-        # Đọc file Excel
         df = pd.read_excel(file_path)
         df.columns = df.columns.astype(str).str.strip()
-        
-        # Tiền xử lý dữ liệu để tìm kiếm nhanh
-        if 'madvi' in df.columns and 'tendvi' in df.columns:
-            # Tạo cột tìm kiếm tổng hợp: Mã + Tên
-            df['search_content'] = df['madvi'].astype(str) + " " + df['tendvi'].astype(str)
-            # Tạo cột không dấu để tìm kiếm thông minh kiểu Google
-            df['search_no_accent'] = df['search_content'].apply(lambda x: unidecode(str(x)).lower())
-            
+        # Chuẩn hóa tìm kiếm
+        df['search_no_accent'] = (df['madvi'].astype(str) + " " + df['tendvi'].astype(str)).apply(lambda x: unidecode(str(x)).lower())
         return df
-    except Exception:
-        return None
+    except: return None
 
 df = load_data()
 
-# --- GIAO DIỆN CHÍNH ---
-col_head1, col_head2 = st.columns([2, 1])
+# --- GIAO DIỆN HEADER ---
+st.markdown("<h1 style='text-align: center; font-size: 3rem; margin-bottom: 0;'>💎 BHXH DIGITAL HUB</h1>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: #64748b; font-size: 1.1rem;'>Hệ thống tra cứu và quản lý số liệu đóng BHXH thông minh</p>", unsafe_allow_html=True)
 
-with col_head1:
-    st.title("🚀 BHXH Smart Search v3.0")
-    st.markdown("Nhập tên hoặc mã đơn vị để tra cứu kết quả đóng BHXH.")
-
-with col_head2:
-    st.info("💡 **Mẹo:** Bạn có thể gõ tiếng Việt không dấu (vd: 'cong ty thuan an')")
-
-# --- Ô TÌM KIẾM THÔNG MINH ---
-search_query = st.text_input("", placeholder="🔍 Nhập tên đơn vị hoặc mã số...", label_visibility="collapsed")
+# --- CÔNG CỤ TÌM KIẾM THỜI GIAN THỰC ---
+st.markdown("<br>", unsafe_allow_html=True)
+c_search, _ = st.columns([2, 1])
+with c_search:
+    query = st.text_input("Tìm kiếm", placeholder="Gõ tên đơn vị (vd: 'dak', 'thuan an'...) hoặc mã số", label_visibility="collapsed")
 
 if df is not None:
-    if search_query:
-        # Chuẩn hóa từ khóa tìm kiếm (bỏ dấu, viết thường)
-        query_processed = unidecode(search_query).lower()
-        
-        # Lọc dữ liệu ngay lập tức (Search-as-you-type)
-        filtered_df = df[df['search_no_accent'].str.contains(query_processed, na=False)]
-        
-        if not filtered_df.empty:
-            # Nếu có nhiều kết quả, cho người dùng chọn
-            if len(filtered_df) > 1:
-                st.write(f"✨ Tìm thấy **{len(filtered_df)}** kết quả phù hợp:")
-                list_options = filtered_df['madvi'] + " - " + filtered_df['tendvi']
-                selection = st.selectbox("Chọn chính xác đơn vị của bạn:", list_options)
-                selected_code = selection.split(" - ")[0]
-                final_data = filtered_df[filtered_df['madvi'] == selected_code].iloc[0]
-            else:
-                final_data = filtered_df.iloc[0]
-            
-            st.divider()
-            
-            # --- HIỂN THỊ THÔNG TIN CHI TIẾT ---
-            col_info, col_data = st.columns([1.2, 2])
-            
-            with col_info:
-                debt_val = final_data.get('tiền cuối kỳ', 0)
-                status_class = "status-debt" if debt_val > 0 else "status-ok"
-                status_text = "⚠️ Còn nợ" if debt_val > 0 else "✅ Đã đóng đủ"
-                
-                st.markdown(f"""
-                <div class="glass-card">
-                    <span class="status-badge {status_class}">{status_text}</span>
-                    <h2 style='color: #1e293b; margin: 10px 0;'>{final_data.get('tendvi', 'N/A')}</h2>
-                    <p style='color: #64748b;'>Mã đơn vị: <b>{final_data.get('madvi', 'N/A')}</b></p>
-                    <hr style='border: 0.5px solid #f1f5f9; margin: 20px 0;'>
-                    <p>📍 {final_data.get('diachi', 'N/A')}</p>
-                    <p>📞 {final_data.get('dienthoai', 'N/A')}</p>
-                    <p>👤 LH: {final_data.get('nguoilh', 'N/A')}</p>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # QR Code
-                qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=BHXH_{final_data.get('madvi')}_{debt_val}&color=1e3a8a"
-                st.markdown(f"""
-                <div style='text-align: center; background: white; padding: 20px; border-radius: 20px; border: 1px solid #f1f5f9;'>
-                    <img src="{qr_url}" width="160">
-                    <p style='margin-top:10px; font-size: 0.8rem; color: #64748b;'>Quét mã nộp tiền nhanh</p>
-                </div>
-                """, unsafe_allow_html=True)
+    if query:
+        processed_query = unidecode(query).lower()
+        results = df[df['search_no_accent'].str.contains(processed_query, na=False)].head(6) # Lấy 6 kết quả đầu tiên
 
-            with col_data:
-                # Metrics tài chính
-                c1, c2 = st.columns(2)
-                with c1:
-                    st.metric("Tiền đầu kỳ", f"{final_data.get('tiền đầu kỳ', 0):,.0f} đ")
-                with c2:
-                    st.metric("Số phải đóng", f"{final_data.get('số phải đóng', 0):,.0f} đ")
+        if not results.empty:
+            st.markdown(f"🔍 Đang hiển thị các kết quả liên quan đến: **{query}**")
+            
+            # Tạo danh sách gợi ý dạng lưới (Grid)
+            cols = st.columns(3)
+            selected_unit_idx = -1
+            
+            for idx, row in results.iterrows():
+                with cols[idx % 3]:
+                    st.markdown(f"""
+                    <div class="suggestion-card">
+                        <small style='color: #3b82f6; font-weight: bold;'>{row['madvi']}</small>
+                        <div style='font-weight: 600; font-size: 0.95rem; margin-top: 5px;'>{row['tendvi'][:40]}...</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    if st.button(f"Xem chi tiết {row['madvi']}", key=row['madvi']):
+                        st.session_state.selected_unit = row['madvi']
+            
+            # Hiển thị thông tin chi tiết khi đã chọn
+            if 'selected_unit' in st.session_state:
+                final_data = df[df['madvi'] == st.session_state.selected_unit].iloc[0]
                 
-                c3, c4 = st.columns(2)
-                with c3:
-                    da_dong = final_data.get('số đã đóng', 0)
-                    phai_dong = final_data.get('số phải đóng', 0)
-                    st.metric("Số đã đóng", f"{da_dong:,.0f} đ", delta=f"{da_dong - phai_dong:,.0f}")
-                with c4:
-                    st.metric("Dư nợ cuối kỳ", f"{debt_val:,.0f} đ", delta_color="inverse")
+                st.markdown("<br><div class='main-card'>", unsafe_allow_html=True)
                 
-                # Thanh tiến độ
-                st.write("---")
-                progress_val = 0
-                if phai_dong > 0:
-                    progress_val = min(float(da_dong / phai_dong), 1.0)
-                st.write(f"**Tỷ lệ hoàn thành: {progress_val*100:.1f}%**")
-                st.progress(progress_val)
+                col_left, col_right = st.columns([1.5, 1])
                 
-                # Nội dung chuyển khoản
-                st.markdown(f"""
-                <div style='background: #f1f5f9; padding: 20px; border-radius: 15px; margin-top: 20px; border-left: 5px solid #3b82f6;'>
-                    <p style='margin:0; font-size: 0.8rem; color: #64748b;'>NỘI DUNG CHUYỂN KHOẢN MẪU:</p>
-                    <code style='font-size: 1.1rem; color: #1e3a8a;'>BHXH {final_data.get('madvi')} {final_data.get('tendvi')}</code>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                if st.button("🎊 Xác nhận thông tin"):
-                    st.balloons()
-                    st.success("Thông tin đã được đơn vị ghi nhận!")
+                with col_left:
+                    st.markdown(f"<h3>🏢 {final_data['tendvi']}</h3>", unsafe_allow_html=True)
+                    st.markdown(f"📌 **Địa chỉ:** {final_data.get('diachi', 'N/A')}")
+                    
+                    # Metrics Grid
+                    m1, m2 = st.columns(2)
+                    with m1:
+                        st.markdown("<div class='metric-box'>", unsafe_allow_html=True)
+                        st.metric("Số phải đóng", f"{final_data.get('số phải đóng', 0):,.0f} đ")
+                        st.markdown("</div>", unsafe_allow_html=True)
+                    with m2:
+                        st.markdown("<div class='metric-box'>", unsafe_allow_html=True)
+                        st.metric("Số đã đóng", f"{final_data.get('số đã đóng', 0):,.0f} đ")
+                        st.markdown("</div>", unsafe_allow_html=True)
+                    
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    m3, m4 = st.columns(2)
+                    with m3:
+                        st.markdown("<div class='metric-box'>", unsafe_allow_html=True)
+                        debt = final_data.get('tiền cuối kỳ', 0)
+                        st.metric("Dư nợ / Thừa", f"{debt:,.0f} đ", delta=-debt, delta_color="inverse")
+                        st.markdown("</div>", unsafe_allow_html=True)
+                    with m4:
+                        st.markdown("<div class='metric-box'>", unsafe_allow_html=True)
+                        st.metric("Tỷ lệ nợ", f"{final_data.get('tyleno', 0)}%")
+                        st.markdown("</div>", unsafe_allow_html=True)
 
+                with col_right:
+                    # TÍNH NĂNG XỊN: Biểu đồ Health Score
+                    progress = 0
+                    if final_data['số phải đóng'] > 0:
+                        progress = (final_data['số đã đóng'] / final_data['số phải đóng']) * 100
+                    
+                    fig = go.Figure(go.Indicator(
+                        mode = "gauge+number",
+                        value = progress,
+                        title = {'text': "Độ hoàn thành (%)"},
+                        gauge = {
+                            'axis': {'range': [0, 100]},
+                            'bar': {'color': "#0061ff"},
+                            'steps': [
+                                {'range': [0, 50], 'color': "#fee2e2"},
+                                {'range': [50, 90], 'color': "#fef9c3"},
+                                {'range': [90, 100], 'color': "#dcfce7"}
+                            ],
+                        }
+                    ))
+                    fig.update_layout(height=300, margin=dict(l=20, r=20, t=50, b=20))
+                    st.plotly_chart(fig, use_container_width=True)
+                    
+                    # Nút tải báo cáo
+                    st.download_button(
+                        label="📥 Tải báo cáo chi tiết (CSV)",
+                        data=final_data.to_csv().encode('utf-8-sig'),
+                        file_name=f"Bao_cao_{final_data['madvi']}.csv",
+                        mime='text/csv',
+                    )
+                
+                st.markdown("</div>", unsafe_allow_html=True)
+                st.balloons()
         else:
-            st.error("😢 Không tìm thấy đơn vị nào khớp với từ khóa.")
+            st.error("Không tìm thấy đơn vị nào phù hợp.")
     else:
-        st.write("---")
-        st.info("👋 Chào bạn! Hãy nhập tên hoặc mã số của đơn vị để bắt đầu tra cứu.")
+        st.markdown("<br><br><center><img src='https://cdn-icons-png.flaticon.com/512/5069/5069162.png' width='100'><p style='color:#94a3b8;'>Hãy nhập từ khóa để khám phá dữ liệu</p></center>", unsafe_allow_html=True)
 else:
-    st.error("❌ Không tìm thấy file dữ liệu 'c12.xls' trên server GitHub.")
+    st.error("Lỗi: Không tìm thấy file c12.xls. Hãy đảm bảo bạn đã upload file lên GitHub.")
 
-st.markdown("---")
-st.caption("<center>© 2026 BHXH Thuận An - Công cụ hỗ trợ chuyển đổi số</center>", unsafe_allow_html=True)
+# --- FOOTER ---
+st.markdown("<br><br><hr>", unsafe_allow_html=True)
+st.caption("<center>Hệ thống được vận hành bởi AI & Streamlit Engine | 2026</center>", unsafe_allow_html=True)
+```
+
+### Cập nhật file `requirements.txt`:
+Để biểu đồ hoạt động, bạn cần thêm thư viện `plotly`. Hãy copy nội dung này vào file `requirements.txt` của bạn:
+
+```text
+streamlit
+pandas
+numpy
+xlrd
+openpyxl
+unidecode
+plotly
