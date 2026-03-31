@@ -12,13 +12,13 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v21.0 Radiant Elite",
+    page_title="BHXH Thuận An - v21.1 Precision Nexus",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CẤU HÌNH AI GEMINI (MODEL STABLE) ---
+# --- CẤU HÌNH AI GEMINI (MODEL STABLE v1.5 FLASH) ---
 api_key = st.secrets.get("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
 if api_key:
     try:
@@ -26,14 +26,16 @@ if api_key:
     except: pass
 
 def get_ai_response(prompt):
-    if not api_key: return "⚠️ **Chưa cấu hình API Key.**"
+    if not api_key: return "⚠️ **Chưa cấu hình API Key trong Streamlit Secrets.**"
     try:
+        # Sử dụng model ổn định nhất để tránh lỗi version 404
         model = genai.GenerativeModel('gemini-1.5-flash')
-        full_prompt = f"Bạn là chuyên gia tư vấn BHXH Thuận An. Hãy trả lời: {prompt}"
+        system_instruction = "Bạn là trợ lý ảo chuyên nghiệp của BHXH Thuận An. Hãy trả lời ngắn gọn và chính xác về chính sách bảo hiểm."
+        full_prompt = f"{system_instruction}\n\nĐơn vị hỏi: {prompt}"
         response = model.generate_content(full_prompt)
         return response.text
     except Exception as e:
-        return f"⚠️ **Lỗi:** {str(e)[:100]}"
+        return f"⚠️ **Trợ lý AI đang bận:** Vui lòng thử lại sau hoặc chat Zalo cho cán bộ nhé!"
 
 # --- KHỞI TẠO STATE ---
 if 'selected_unit' not in st.session_state:
@@ -49,7 +51,7 @@ if 'search_query' not in st.session_state:
 if 'welcome_done' not in st.session_state:
     st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN ELITE v21.0 - GLOSSY & MODERN) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN PRECISION v21.1) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -59,7 +61,6 @@ st.markdown("""
         --secondary: #2563eb;
         --accent: #0ea5e9;
         --neon-blue: #00d2ff;
-        --neon-green: #10b981;
         --glass: rgba(255, 255, 255, 0.8);
     }
 
@@ -95,23 +96,32 @@ st.markdown("""
         text-shadow: 0 0 10px #00ff00;
     }
 
-    /* SIÊU Ô TÌM KIẾM GATEWAY */
+    /* SIÊU Ô TÌM KIẾM GATEWAY - FIX LỖI CẮT CHỮ */
     .gateway-container {
         max-width: 1000px;
         margin: 0 auto 1rem auto;
         text-align: center;
     }
+
+    div[data-testid="stTextInput"] > div {
+        height: auto !important;
+        background: transparent !important;
+        padding: 0 !important;
+    }
+
     .stTextInput input {
         border-radius: 20px !important;
-        padding: 15px 45px 15px 85px !important; 
+        padding: 0 45px 0 85px !important; /* Reset padding dọc về 0 */
         border: 10px solid var(--secondary) !important;
-        font-size: 2.5rem !important; 
+        font-size: 2.8rem !important; 
         font-weight: 900 !important;
-        height: 130px !important; 
+        height: 140px !important; 
+        line-height: 140px !important; /* Ép line-height bằng height để căn giữa tuyệt đối */
         background: white url('https://cdn-icons-png.flaticon.com/512/622/622669.png') no-repeat 25px center !important;
-        background-size: 40px !important;
+        background-size: 45px !important;
         color: var(--primary) !important;
         box-shadow: 0 30px 60px rgba(59, 130, 246, 0.25) !important;
+        display: block !important;
     }
 
     /* NÚT TÌM KIẾM MAIN */
@@ -135,12 +145,6 @@ st.markdown("""
         border: 2px solid white;
         box-shadow: 0 25px 80px rgba(0,0,0,0.08);
         margin-top: 10px;
-        position: relative;
-        overflow: hidden;
-    }
-    .unit-header-card::before {
-        content: ""; position: absolute; top: 0; left: 0; width: 8px; height: 100%;
-        background: linear-gradient(to bottom, #1e3a8a, #00d2ff);
     }
 
     .crystal-card {
@@ -149,49 +153,21 @@ st.markdown("""
         border-radius: 30px;
         border: 1px solid #f1f5f9;
         box-shadow: 0 15px 35px rgba(0,0,0,0.04);
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: all 0.3s ease;
         text-align: center;
     }
-    .crystal-card:hover {
-        transform: translateY(-10px) scale(1.02);
-        box-shadow: 0 30px 60px rgba(37, 99, 235, 0.15);
-        border-color: var(--secondary);
-    }
+    .crystal-card:hover { transform: translateY(-10px); box-shadow: 0 30px 60px rgba(37, 99, 235, 0.15); }
 
-    .metric-value {
-        font-size: 2rem;
-        font-weight: 800;
-        color: var(--primary);
-        margin: 10px 0;
-    }
-    .metric-label {
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: #64748b;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
+    .metric-value { font-size: 2rem; font-weight: 800; color: var(--primary); }
+    .metric-label { font-size: 0.9rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
 
-    /* HIỆU ỨNG NHẤP NHÁY CHÀO MỪNG */
     @keyframes welcomeGlow {
-        0% { text-shadow: 0 0 5px #fff; }
-        50% { text-shadow: 0 0 25px #00d2ff, 0 0 40px #2563eb; }
-        100% { text-shadow: 0 0 5px #fff; }
+        0%, 100% { text-shadow: 0 0 5px #fff; }
+        50% { text-shadow: 0 0 20px #00d2ff; }
     }
     .welcome-text {
-        font-size: 2.2rem;
-        font-weight: 900;
-        color: #1e3a8a;
-        animation: welcomeGlow 2s infinite;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .stButton>button {
-        border-radius: 50px !important;
-        font-weight: 800 !important;
-        text-transform: uppercase;
-        padding: 0.6rem 2rem !important;
+        font-size: 2.2rem; font-weight: 900; color: #1e3a8a;
+        animation: welcomeGlow 2s infinite; text-align: center;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -258,10 +234,10 @@ with st.sidebar:
     st.session_state.current_tab = st.radio("MENU", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v21.0 Radiant Elite | 🛡️ BHXH Thuận An")
+    st.caption("v21.1 Precision | 🛡️ BHXH Thuận An")
 
 # --- HEADER LED ---
-marquee_msg = "💎 CHÀO MỪNG QUÝ ĐƠN VỊ ĐẾN VỚI HỆ THỐNG TRA CỨU BHXH THUẬN AN PHIÊN BẢN v21.0 RADIANT ELITE • CẢM ƠN QUÝ ĐƠN VỊ ĐÃ TIN DÙNG •"
+marquee_msg = "💎 CHÀO MỪNG QUÝ ĐƠN VỊ ĐẾN VỚI HỆ THỐNG TRA CỨU BHXH THUẬN AN PHIÊN BẢN v21.1 • ĐÃ FIX LỖI HIỂN THỊ Ô TÌM KIẾM VÀ AI •"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -317,7 +293,7 @@ if df is not None:
                     """, unsafe_allow_html=True)
 
         else:
-            # --- DASHBOARD CHI TIẾT (PHIÊN BẢN ELITE RADIANT) ---
+            # --- DASHBOARD CHI TIẾT ---
             if not st.session_state.welcome_done:
                 st.balloons()
                 st.session_state.welcome_done = True
@@ -332,19 +308,14 @@ if df is not None:
             st.markdown(f"""
                 <div class='welcome-text'>✨ CHÀO MỪNG QUÝ ĐƠN VỊ ĐẾN VỚI HỆ THỐNG ✨</div>
                 <div class='unit-header-card'>
-                    <div style='display: flex; align-items: center;'>
-                        <img src='https://cdn-icons-png.flaticon.com/512/3061/3061341.png' width='70' style='margin-right: 25px;'>
-                        <div>
-                            <h1 style='margin:0; color:#1e3a8a; font-size: 3rem;'>{unit_data.get('tendvi')}</h1>
-                            <p style='margin:5px 0; color:#64748b; font-size: 1.2rem;'>Mã đơn vị: <b style='color:#2563eb;'>{unit_data.get('madvi')}</b> | Địa chỉ: {unit_data.get('diachi', 'N/A')}</p>
-                        </div>
-                    </div>
+                    <h1 style='margin:0; color:#1e3a8a; font-size: 3rem;'>{unit_data.get('tendvi')}</h1>
+                    <p style='margin:5px 0; color:#64748b; font-size: 1.2rem;'>Mã đơn vị: <b style='color:#2563eb;'>{unit_data.get('madvi')}</b> | Địa chỉ: {unit_data.get('diachi', 'N/A')}</p>
                 </div>
             """, unsafe_allow_html=True)
             
             cl, cr = st.columns([1.8, 1])
             with cl:
-                st.markdown("<div class='unit-header-card' style='margin-top: 25px;'>", unsafe_allow_html=True)
+                st.markdown("<div style='margin-top: 25px;'>", unsafe_allow_html=True)
                 st.write("#### 📊 PHÂN TÍCH TÀI CHÍNH CHI TIẾT")
                 m1, m2, m3 = st.columns(3)
                 with m1: st.markdown(f"<div class='crystal-card'><div class='metric-label'>Đầu kỳ</div><div class='metric-value'>{unit_data.get('tien_dau_ky', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
@@ -356,11 +327,8 @@ if df is not None:
                 with m4: st.markdown(f"<div class='crystal-card'><div class='metric-label'>Đã đóng</div><div class='metric-value' style='color:#10b981;'>{unit_data.get('so_da_dong', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
                 with m5: st.markdown(f"<div class='crystal-card'><div class='metric-label'>Lệch</div><div class='metric-value' style='color:#ef4444;'>{unit_data.get('so_bi_lech', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
                 debt = unit_data.get('tien_cuoi_ky', 0)
-                status_color = "#ef4444" if debt > 0 else "#10b981"
                 status_label = "CÒN NỢ" if debt > 0 else "DƯ CÓ"
-                with m6: st.markdown(f"<div class='crystal-card' style='border: 2px solid {status_color};'><div class='metric-label'>{status_label}</div><div class='metric-value' style='color:{status_color};'>{abs(debt):,.0f}đ</div></div>", unsafe_allow_html=True)
-                
-                st.info(f"📝 NỘI DUNG CK: {unit_data.get('madvi')} {unit_data.get('tendvi')} đóng bhxh tháng {datetime.now().month} năm {datetime.now().year}")
+                with m6: st.markdown(f"<div class='crystal-card' style='border: 2px solid {'#ef4444' if debt > 0 else '#10b981'};'><div class='metric-label'>{status_label}</div><div class='metric-value' style='color:{'#ef4444' if debt > 0 else '#10b981'};'>{abs(debt):,.0f}đ</div></div>", unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
             
             with cr:
@@ -371,7 +339,7 @@ if df is not None:
                     number={'suffix': "%", 'font': {'color': '#2563eb', 'size': 60}},
                     gauge={'axis': {'range': [0, 100]}, 'bar': {'color': "#2563eb"}}
                 ))
-                fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=450)
+                fig.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=400)
                 st.plotly_chart(fig, use_container_width=True)
                 
                 # CHUYÊN QUẢN TRỰC TIẾP
@@ -379,19 +347,19 @@ if df is not None:
                     if any(kw in unit_addr for kw in off['keywords']):
                         st.markdown(f"""
                         <div class='crystal-card' style='background: #000; color: white;'>
-                            <small style='color:#39ff14; font-weight:900;'>CHUYÊN QUẢN PHỤ TRÁCH</small>
+                            <small style='color:#39ff14; font-weight:900;'>PHỤ TRÁCH TRỰC TIẾP</small>
                             <h3 style='color:{off['color']}; margin:10px 0;'>{off['name']}</h3>
-                            <a href='tel:{off['phone'].replace('.','')}' style='color:white; font-size: 1.5rem; text-decoration:none; font-weight:800;'>📱 {off['phone']}</a><br>
-                            <a href='{off['zalo']}' target='_blank' style='background:#0068ff; color:white; padding:10px 30px; border-radius:50px; text-decoration:none; display:inline-block; margin-top:15px; font-weight:800;'>GỬI TIN NHẮN ZALO</a>
+                            <a href='tel:{off['phone'].replace('.','')}' style='color:white; font-size: 1.4rem; text-decoration:none; font-weight:800;'>📱 {off['phone']}</a><br>
+                            <a href='{off['zalo']}' target='_blank' style='background:#0068ff; color:white; padding:10px 25px; border-radius:50px; text-decoration:none; display:inline-block; margin-top:10px; font-weight:800;'>CHAT ZALO</a>
                         </div>
                         """, unsafe_allow_html=True)
 
-    # --- CÁC TAB KHÁC ---
+    # --- TAB 2: AI ---
     elif st.session_state.current_tab == "🤖 Trợ lý AI Gemini":
         st.markdown("## 🧠 TRỢ LÝ AI THÔNG MINH")
         for msg in st.session_state.chat_history:
             with st.chat_message(msg["role"]): st.markdown(msg["content"])
-        if prompt := st.chat_input("Hỏi tôi bất cứ điều gì..."):
+        if prompt := st.chat_input("Hỏi tôi về chính sách BHXH..."):
             st.session_state.chat_history.append({"role": "user", "content": prompt})
             with st.chat_message("user"): st.markdown(prompt)
             with st.chat_message("assistant"):
@@ -399,6 +367,7 @@ if df is not None:
                     resp = get_ai_response(prompt)
                     st.markdown(resp); st.session_state.chat_history.append({"role": "assistant", "content": resp})
 
+    # --- TAB 3: PDF ---
     elif st.session_state.current_tab == "📂 Thư viện Văn bản":
         st.markdown("## 📂 THƯ VIỆN VĂN BẢN KỸ THUẬT SỐ")
         pdfs = [f for f in os.listdir('.') if f.lower().endswith('.pdf')]
@@ -415,4 +384,4 @@ if df is not None:
                         base64_pdf = base64.b64encode(f.read()).decode('utf-8')
                         st.markdown(f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="800px" style="border:10px solid white; border-radius:30px; box-shadow:0 20px 50px rgba(0,0,0,0.1);"></iframe>', unsafe_allow_html=True)
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.9rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | Elite Quantum Nexus v21.0</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.9rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | Precision Nexus v21.1</center>", unsafe_allow_html=True)
