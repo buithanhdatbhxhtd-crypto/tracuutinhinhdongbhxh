@@ -12,13 +12,13 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v22.0 Ultimate Masterpiece",
+    page_title="BHXH Thuận An - v23.0 Pro Masterpiece",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CẤU HÌNH AI GEMINI (MODEL STABLE v1.5 FLASH) ---
+# --- CẤU HÌNH AI GEMINI (NÂNG CẤP LÊN BẢN PRO 1.5) ---
 api_key = st.secrets.get("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
 if api_key:
     try:
@@ -28,14 +28,14 @@ if api_key:
 def get_ai_response(prompt):
     if not api_key: return "⚠️ **Chưa cấu hình API Key:** Vui lòng thêm `GOOGLE_API_KEY` vào Streamlit Secrets."
     try:
-        # Model 1.5 Flash là bản ổn định nhất, phản hồi nhanh nhất hiện nay
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        system_instruction = "Bạn là trợ lý AI cao cấp của Bảo hiểm xã hội cơ sở Thuận An, Lâm Đồng. Hãy tư vấn chính xác, ngắn gọn và tận tâm."
+        # SỬ DỤNG MODEL GEMINI 1.5 PRO - MẠNH MẼ NHẤT HIỆN NAY
+        model = genai.GenerativeModel('gemini-1.5-pro')
+        system_instruction = "Bạn là trợ lý AI cao cấp (Pro Edition) của Bảo hiểm xã hội cơ sở Thuận An, Lâm Đồng. Bạn am hiểu sâu sắc luật BHXH, BHYT, BHTN. Hãy tư vấn chính xác, ngắn gọn, thấu tình đạt lý và tận tâm."
         full_prompt = f"{system_instruction}\n\nĐơn vị hỏi: {prompt}"
         response = model.generate_content(full_prompt)
         return response.text
     except Exception as e:
-        return f"⚠️ **Trợ lý AI đang bận:** Vui lòng thử lại sau hoặc chat Zalo cho cán bộ nhé!"
+        return f"⚠️ **Trợ lý AI Pro đang bận:** {str(e)[:100]}... Vui lòng thử lại sau hoặc chat Zalo cho cán bộ nhé!"
 
 # --- KHỞI TẠO STATE ---
 if 'selected_unit' not in st.session_state:
@@ -51,7 +51,7 @@ if 'search_query' not in st.session_state:
 if 'welcome_done' not in st.session_state:
     st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN MASTERPIECE v22.0) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN PRO MASTERPIECE v23.0) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -61,30 +61,29 @@ st.markdown("""
         --secondary: #2563eb;
         --accent: #0ea5e9;
         --neon-blue: #00d2ff;
+        --neon-gold: #ffaa00;
         --glass: rgba(255, 255, 255, 0.85);
     }
 
-    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
     
     .stApp {
         background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
     }
 
-    /* --- SIDEBAR SIÊU RÕ NÉT (ULTRA CONTRAST) --- */
+    /* --- SIDEBAR PRO CONTRAST --- */
     [data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0f172a 0%, #1e3a8a 100%) !important;
     }
     
-    /* Ép chữ danh mục thành trắng tuyết, to và có bóng đổ */
     [data-testid="stSidebar"] .stRadio label p {
         color: #ffffff !important;
         font-size: 1.3rem !important;
         font-weight: 800 !important;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.6) !important;
-        padding: 8px 0 !important;
+        text-shadow: 2px 2px 5px rgba(0,0,0,0.8) !important;
+        padding: 10px 0 !important;
     }
     
-    /* Tiêu đề sidebar rực rỡ */
     [data-testid="stSidebar"] h1 {
         color: white !important;
         text-shadow: 0 0 15px var(--neon-blue);
@@ -105,7 +104,7 @@ st.markdown("""
         font-size: 1.35rem;
     }
 
-    /* SIÊU Ô TÌM KIẾM GATEWAY - CĂN GIỮA TUYỆT ĐỐI */
+    /* SIÊU Ô TÌM KIẾM GATEWAY - CĂN CHỈNH CHỐNG CẮT CHỮ */
     .gateway-container {
         max-width: 1000px;
         margin: 0 auto 1rem auto;
@@ -120,14 +119,15 @@ st.markdown("""
 
     .stTextInput input {
         border-radius: 20px !important;
-        padding: 0 45px 0 95px !important; /* Căn chỉnh cho icon kính lúp */
+        padding: 30px 45px 30px 100px !important; /* Tăng padding trên/dưới để tạo không gian thở */
         border: 10px solid var(--secondary) !important;
-        font-size: 3rem !important; 
+        font-size: 2.8rem !important; 
         font-weight: 900 !important;
-        height: 150px !important; 
-        line-height: 150px !important; /* CĂN GIỮA CHỮ THEO TRỤC DỌC */
+        height: auto !important; 
+        min-height: 140px !important; /* Dùng min-height thay vì height cố định */
+        line-height: 1.2 !important; /* Reset line-height để chữ tự nhiên */
         background: white url('https://cdn-icons-png.flaticon.com/512/622/622669.png') no-repeat 30px center !important;
-        background-size: 50px !important;
+        background-size: 45px !important;
         color: var(--primary) !important;
         box-shadow: 0 40px 100px rgba(59, 130, 246, 0.3) !important;
         display: block !important;
@@ -142,15 +142,16 @@ st.markdown("""
     .crystal-card {
         background: white;
         padding: 30px;
-        border-radius: 35px;
+        border-radius: 30px;
         box-shadow: 0 15px 45px rgba(0,0,0,0.05);
         border: 1px solid #f1f5f9;
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         text-align: center;
     }
     .crystal-card:hover {
-        transform: translateY(-12px);
+        transform: translateY(-10px);
         box-shadow: 0 35px 70px rgba(37, 99, 235, 0.12);
+        border-color: var(--neon-blue);
     }
 
     .metric-val { font-size: 2.2rem; font-weight: 900; color: var(--primary); margin-top: 5px; }
@@ -159,12 +160,13 @@ st.markdown("""
     /* HIỆU ỨNG CHÀO MỪNG */
     @keyframes welcomeFlash {
         0%, 100% { color: #1e3a8a; }
-        50% { color: #2563eb; text-shadow: 0 0 20px #00d2ff; }
+        50% { color: #2563eb; text-shadow: 0 0 25px #00d2ff; }
     }
     .welcome-banner {
-        font-size: 2.5rem; font-weight: 900; animation: welcomeFlash 2s infinite; text-align: center; margin-bottom: 20px;
+        font-size: 2.5rem; font-weight: 900; animation: welcomeFlash 2s infinite; text-align: center; margin-bottom: 20px; text-transform: uppercase;
     }
 
+    /* NÚT BẤM PRO */
     .stButton>button {
         border-radius: 50px !important;
         font-weight: 800 !important;
@@ -207,12 +209,27 @@ def live_clock():
     </script>
     """, height=160)
 
-# --- DATA HUB ---
+# --- DATA HUB (CÁN BỘ & NGÂN HÀNG) ---
 OFFICERS = [
     {"name": "Bà NGUYỄN THỊ NHÀI", "communes": "Xã Đức Lập, Xã Đắk Mil", "keywords": ["duc lap", "đức lập", "dak mil", "đắk mil"], "phone": "0846.39.29.29", "zalo": "https://zalo.me/0846392929", "color": "#00d2ff"},
     {"name": "Ông BÙI THÀNH ĐẠT", "communes": "Xã Đắk Sắk, Xã Đắk Song", "keywords": ["dak sak", "đắk sắk", "dak song", "đắk song"], "phone": "0986.05.30.06", "zalo": "https://zalo.me/0986053006", "color": "#ffaa00"},
     {"name": "Ông HOÀNG SỸ HẢI", "communes": "Xã Thuận An", "keywords": ["thuan an", "thuận an"], "phone": "0919.06.11.53", "zalo": "https://zalo.me/0919061153", "color": "#39ff14"}
 ]
+
+# THÊM LẠI DATA NGÂN HÀNG TRỊNH TRỌNG
+def display_bank_accounts():
+    st.markdown("""
+        <div class='crystal-card' style='padding: 25px; border-left: 8px solid #ffaa00; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; text-align: left;'>
+            <div style='color:#ffaa00; font-weight:900; font-size: 1.1rem; margin-bottom: 15px; text-transform: uppercase;'>🏦 SỐ TÀI KHOẢN BHXH THUẬN AN</div>
+            <div style='font-family: monospace; font-size: 1.3rem; font-weight: 700; letter-spacing: 1px; line-height: 1.6;'>
+                <span style='color:#00d2ff;'>BIDV:</span> 63510009867032<br>
+                <span style='color:#00d2ff;'>AGRIBANK:</span> 5301202919045<br>
+                <span style='color:#00d2ff;'>VIETINBANK:</span> 919035000003
+            </div>
+            <hr style='border-color: rgba(255,255,255,0.2); margin: 15px 0;'>
+            <small style='color: #cbd5e1; font-size: 0.85rem;'>💡 <b>Nội dung CK:</b> [Mã Đơn Vị] [Tên Đơn Vị] đóng BHXH tháng [X] năm [Y]</small>
+        </div>
+    """, unsafe_allow_html=True)
 
 # --- HÀM TẢI DỮ LIỆU ---
 @st.cache_data
@@ -231,16 +248,16 @@ def load_data():
 
 # --- SIDEBAR MASTER ---
 with st.sidebar:
-    st.markdown("<h1 style='text-align:center;'>🛡️ QUANTUM</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>🛡️ QUANTUM PRO</h1>", unsafe_allow_html=True)
     st.divider()
-    menu = ["📊 Tra cứu C12-TS", "🤖 Trợ lý AI Gemini", "📂 Thư viện Văn bản", "📑 Cẩm nang Nghiệp vụ", "🧮 Máy tính BHXH", "📍 Liên hệ BHXH"]
+    menu = ["📊 Tra cứu C12-TS", "🤖 Trợ lý AI Gemini Pro", "📂 Thư viện Văn bản", "📑 Cẩm nang Nghiệp vụ", "🧮 Máy tính BHXH", "📍 Liên hệ BHXH"]
     st.session_state.current_tab = st.radio("CHỨC NĂNG HỆ THỐNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v22.0 Ultimate Masterpiece | 🛡️ BHXH Thuận An")
+    st.caption("v23.0 Pro Masterpiece | 🛡️ BHXH Thuận An")
 
 # --- HEADER LED ---
-marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v22.0 • SỰ LỰA CHỌN TIN CẬY CỦA ĐƠN VỊ • TRA CỨU NHANH - NỘP TIỀN ĐÚNG CÚ PHÁP •"
+marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN PRO v23.0 • SỰ LỰA CHỌN TIN CẬY CỦA ĐƠN VỊ • TÍCH HỢP GEMINI 1.5 PRO MẠNH MẼ NHẤT •"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -264,8 +281,8 @@ if df is not None:
 
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
-                st.markdown("##### 📢 TIN TỨC")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a;'>🛡️ AN SINH</h4><p>Hệ thống hỗ trợ đơn vị tra cứu minh bạch số tiền đóng BHXH.</p><hr><small style='color:#f59e0b; font-weight:800;'>BHXH THUẬN AN ĐỒNG HÀNH</small></div>", unsafe_allow_html=True)
+                st.markdown("##### 📢 TIN TỨC TỔNG HỢP")
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a;'>🛡️ QUYỀN LỢI</h4><p>Hệ thống hỗ trợ đơn vị tra cứu minh bạch số tiền đóng BHXH hàng tháng.</p><hr><small style='color:#f59e0b; font-weight:800;'>BHXH THUẬN AN ĐỒNG HÀNH</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -278,23 +295,27 @@ if df is not None:
                                 ca.markdown(f"<div class='crystal-card' style='padding:22px; border-left:12px solid #2563eb; text-align:left;'><small style='color:#2563eb; font-weight:800;'>MÃ: {row.get('madvi')}</small><br><b style='font-size:1.3rem; color:#1e293b;'>{row.get('tendvi')}</b></div>", unsafe_allow_html=True)
                                 if cb.button("XÁC NHẬN ➔", key=f"sel_{row.get('madvi')}_{idx}", use_container_width=True):
                                     st.session_state.selected_unit = row.get('madvi'); st.session_state.welcome_done = False; st.rerun()
-                    else: st.error("Không tìm thấy đơn vị.")
+                    else: st.error("Không tìm thấy đơn vị hợp lệ.")
                 else: st.markdown("<br><center><img src='https://cdn-icons-png.flaticon.com/512/3772/3772274.png' width='160' style='opacity:0.25'></center>", unsafe_allow_html=True)
 
             with col_off:
-                st.markdown("##### 👨‍💼 LIÊN HỆ CÁN BỘ")
+                st.markdown("##### 👨‍💼 LIÊN HỆ CÁN BỘ & NGÂN HÀNG")
+                # Hiển thị Ngân Hàng
+                display_bank_accounts()
+                
+                # Hiển thị Cán Bộ
                 for off in OFFICERS:
                     st.markdown(f"""
-                    <div class='crystal-card' style='margin-bottom: 15px; padding: 18px;'>
+                    <div class='crystal-card' style='margin-top: 15px; padding: 20px;'>
                         <div style='color:var(--secondary); font-weight: 800; font-size: 0.85rem;'>{off['communes']}</div>
-                        <div style='color:var(--primary); font-weight: 900; font-size: 1.2rem; margin: 3px 0;'>{off['name']}</div>
+                        <div style='color:var(--primary); font-weight: 900; font-size: 1.2rem; margin: 5px 0;'>{off['name']}</div>
                         <a href='tel:{off['phone'].replace('.','')}' style='text-decoration:none; color:var(--primary); font-weight: 800; font-size: 1.2rem;'>📱 {off['phone']}</a><br>
-                        <a href='{off['zalo']}' target='_blank' style='background:#0068ff; color:white; padding:8px 25px; border-radius:50px; text-decoration:none; display:inline-block; margin-top: 10px; font-weight: 900; font-size: 0.8rem;'>💬 CHAT ZALO</a>
+                        <a href='{off['zalo']}' target='_blank' style='background:#0068ff; color:white; padding:10px 30px; border-radius:50px; text-decoration:none; display:inline-block; margin-top: 12px; font-weight: 900; font-size: 0.8rem;'>💬 CHAT ZALO</a>
                     </div>
                     """, unsafe_allow_html=True)
 
         else:
-            # --- DASHBOARD CHI TIẾT MASTER ---
+            # --- DASHBOARD CHI TIẾT PRO ---
             if not st.session_state.welcome_done:
                 st.balloons(); st.session_state.welcome_done = True
             
@@ -314,7 +335,7 @@ if df is not None:
             cl, cr = st.columns([1.8, 1])
             with cl:
                 st.markdown("<div style='margin-top: 30px;'>", unsafe_allow_html=True)
-                st.write("#### 📊 BÁO CÁO TÌNH HÌNH TÀI CHÍNH CHI TIẾT")
+                st.write("#### 📊 BÁO CÁO TÌNH HÌNH TÀI CHÍNH")
                 m1, m2, m3 = st.columns(3)
                 with m1: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Đầu kỳ</div><div class='metric-val'>{unit_data.get('tien_dau_ky', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
                 with m2: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Phải đóng</div><div class='metric-val'>{unit_data.get('so_phai_dong', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
@@ -326,32 +347,35 @@ if df is not None:
                 with m5: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Lệch</div><div class='metric-val' style='color:#ef4444;'>{unit_data.get('so_bi_lech', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
                 debt = unit_data.get('tien_cuoi_ky', 0)
                 status_clr = '#ef4444' if debt > 0 else '#10b981'
-                with m6: st.markdown(f"<div class='crystal-card' style='border: 3px solid {status_clr};'><div class='metric-lbl'>{'CÒN NỢ' if debt > 0 else 'DƯ CÓ'}</div><div class='metric-val' style='color:{status_clr};'>{abs(debt):,.0f}đ</div></div>", unsafe_allow_html=True)
+                with m6: st.markdown(f"<div class='crystal-card' style='border: 4px solid {status_clr};'><div class='metric-lbl'>{'CÒN NỢ' if debt > 0 else 'DƯ CÓ'}</div><div class='metric-val' style='color:{status_clr};'>{abs(debt):,.0f}đ</div></div>", unsafe_allow_html=True)
                 
-                st.info(f"📝 NỘI DUNG CK CHUẨN: {unit_data.get('madvi')} {unit_data.get('tendvi')} đóng bhxh tháng {datetime.now().month} năm {datetime.now().year}")
                 st.markdown("</div>", unsafe_allow_html=True)
             
             with cr:
                 rate = min(round((unit_data.get('so_da_dong', 0) / unit_data.get('so_phai_dong', 1)) * 100, 1), 100)
-                st.plotly_chart(go.Figure(go.Indicator(mode="gauge+number", value=rate, title={'text': "TỶ LỆ HOÀN THÀNH (%)", 'font': {'size': 20, 'color': '#1e3a8a', 'weight': 'bold'}}, number={'suffix': "%", 'font': {'color': '#2563eb', 'size': 60}}, gauge={'axis': {'range': [0, 100]}, 'bar': {'color': "#2563eb"}})).update_layout(paper_bgcolor="rgba(0,0,0,0)", height=420), use_container_width=True)
+                st.plotly_chart(go.Figure(go.Indicator(mode="gauge+number", value=rate, title={'text': "TỶ LỆ HOÀN THÀNH (%)", 'font': {'size': 20, 'color': '#1e3a8a', 'weight': 'bold'}}, number={'suffix': "%", 'font': {'color': '#2563eb', 'size': 60}}, gauge={'axis': {'range': [0, 100]}, 'bar': {'color': "#2563eb"}})).update_layout(paper_bgcolor="rgba(0,0,0,0)", height=350), use_container_width=True)
+                
+                st.markdown("##### 👩‍💼 LIÊN HỆ ĐÓNG TIỀN")
+                display_bank_accounts()
                 
                 for off in OFFICERS:
                     if any(kw in unit_addr for kw in off['keywords']):
-                        st.markdown(f"<div class='crystal-card' style='background: #000; color: white;'><small style='color:#39ff14; font-weight:900;'>PHỤ TRÁCH TRỰC TIẾP</small><h3 style='color:{off['color']}; margin:10px 0;'>{off['name']}</h3><a href='tel:{off['phone'].replace('.','')}' style='color:white; font-size: 1.5rem; text-decoration:none; font-weight:800;'>📱 {off['phone']}</a><br><a href='{off['zalo']}' target='_blank' style='background:#0068ff; color:white; padding:10px 30px; border-radius:50px; text-decoration:none; display:inline-block; margin-top:15px; font-weight:800;'>GỬI TIN NHẮN ZALO</a></div>", unsafe_allow_html=True)
+                        st.markdown(f"<div class='crystal-card' style='background: #000; color: white; margin-top:15px;'><small style='color:#39ff14; font-weight:900;'>CÁN BỘ PHỤ TRÁCH TRỰC TIẾP</small><h3 style='color:{off['color']}; margin:10px 0;'>{off['name']}</h3><a href='tel:{off['phone'].replace('.','')}' style='color:white; font-size: 1.5rem; text-decoration:none; font-weight:800;'>📱 {off['phone']}</a><br><a href='{off['zalo']}' target='_blank' style='background:#0068ff; color:white; padding:10px 30px; border-radius:50px; text-decoration:none; display:inline-block; margin-top:15px; font-weight:800;'>GỬI TIN NHẮN ZALO</a></div>", unsafe_allow_html=True)
 
-    # --- TAB 2: AI ---
-    elif st.session_state.current_tab == "🤖 Trợ lý AI Gemini":
-        st.markdown("## 🧠 TRỢ LÝ AI THÔNG MINH (GEMINI 1.5 FLASH)"); st.info("Sử dụng model ổn định nhất để tránh lỗi version.")
+    # --- TAB 2: AI (PRO MODE) ---
+    elif st.session_state.current_tab == "🤖 Trợ lý AI Gemini Pro":
+        st.markdown("## 🧠 TRỢ LÝ AI CAO CẤP (GEMINI 1.5 PRO)")
+        st.info("Hệ thống đã nâng cấp lên trí tuệ nhân tạo Gemini 1.5 Pro. Trả lời sắc bén và chuyên sâu hơn.")
         for msg in st.session_state.chat_history:
             with st.chat_message(msg["role"]): st.markdown(msg["content"])
-        if prompt := st.chat_input("Hỏi tôi bất cứ điều gì..."):
+        if prompt := st.chat_input("Hỏi tôi bất cứ điều gì về luật BHXH..."):
             st.session_state.chat_history.append({"role": "user", "content": prompt})
             with st.chat_message("user"): st.markdown(prompt)
             with st.chat_message("assistant"):
-                with st.spinner("AI đang tư duy..."):
+                with st.spinner("AI Pro đang phân tích dữ liệu..."):
                     resp = get_ai_response(prompt); st.markdown(resp); st.session_state.chat_history.append({"role": "assistant", "content": resp})
 
-    # --- TAB 3: PDF ---
+    # --- TAB 3: PDF (ANTI BLOCK KÈM NÚT TẢI) ---
     elif st.session_state.current_tab == "📂 Thư viện Văn bản":
         st.markdown("## 📂 THƯ VIỆN VĂN BẢN KỸ THUẬT SỐ")
         pdfs = [f for f in os.listdir('.') if f.lower().endswith('.pdf')]
@@ -365,8 +389,19 @@ if df is not None:
                 if st.session_state.active_pdf:
                     st.success(f"📌 ĐANG XEM: {st.session_state.active_pdf}")
                     with open(st.session_state.active_pdf, "rb") as f:
-                        b64 = base64.b64encode(f.read()).decode('utf-8')
-                        st.markdown(f'<iframe src="data:application/pdf;base64,{b64}" width="100%" height="850px" style="border:10px solid white; border-radius:35px; box-shadow:0 30px 80px rgba(0,0,0,0.1);"></iframe>', unsafe_allow_html=True)
+                        pdf_data = f.read()
+                        b64 = base64.b64encode(pdf_data).decode('utf-8')
+                        
+                        # Khung xem PDF
+                        st.markdown(f'<iframe src="data:application/pdf;base64,{b64}" width="100%" height="800px" style="border:8px solid white; border-radius:30px; box-shadow:0 30px 80px rgba(0,0,0,0.15);"></iframe>', unsafe_allow_html=True)
+                        
+                        st.write("<br>", unsafe_allow_html=True)
+                        # KHÔI PHỤC 2 NÚT THẦN THÁNH
+                        col_dl, col_open = st.columns(2)
+                        with col_dl:
+                            st.download_button(label="📥 TẢI VĂN BẢN VỀ MÁY", data=pdf_data, file_name=st.session_state.active_pdf, mime="application/pdf", use_container_width=True)
+                        with col_open:
+                            st.markdown(f'<a href="data:application/pdf;base64,{b64}" target="_blank" style="text-decoration:none; background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color:white; padding:15px; border-radius:50px; font-weight:900; display:block; text-align:center; box-shadow: 0 10px 20px rgba(30,58,138,0.3); text-transform:uppercase;">🚀 MỞ TOÀN MÀN HÌNH</a>', unsafe_allow_html=True)
 
     # --- CÁC TAB KHÁC ---
     elif st.session_state.current_tab == "📑 Cẩm nang Nghiệp vụ": st.markdown("## 📑 CẨM NANG NGHIỆP VỤ")
@@ -375,4 +410,4 @@ if df is not None:
     elif st.session_state.current_tab == "📍 Liên hệ BHXH":
         st.markdown("## 📍 LIÊN HỆ"); st.write("🏠 Cơ sở: Thôn Thuận Sơn, Thuận An, Đắk Mil, Đắk Nông.")
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v22.0 Ultimate Masterpiece</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v23.0 Pro Masterpiece</center>", unsafe_allow_html=True)
