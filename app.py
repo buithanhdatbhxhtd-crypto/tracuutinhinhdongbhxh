@@ -2,160 +2,203 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import os
+from unidecode import unidecode
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - Tra cứu C12",
-    page_icon="🏥",
-    layout="centered"
+    page_title="BHXH Thuận An - Smart Lookup",
+    page_icon="⚡",
+    layout="wide"
 )
 
-# --- CSS TÙY CHỈNH CHO GIAO DIỆN HIỆN ĐẠI ---
+# --- CSS TÙY CHỈNH: Giao diện Modern & Clean ---
 st.markdown("""
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    
+    html, body, [class*="st-"] {
+        font-family: 'Inter', sans-serif;
+    }
+    
     .main {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        background: #f8fafc;
     }
-    .stMetric {
-        background-color: #ffffff;
-        padding: 15px;
-        border-radius: 15px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    }
-    .unit-card {
-        background-color: white;
-        padding: 2rem;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-        border-left: 10px solid #1e3a8a;
-    }
-    .qr-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 20px;
+    
+    /* Hiệu ứng Glassmorphism cho Card */
+    .glass-card {
         background: white;
-        border-radius: 20px;
-        border: 2px dashed #1e3a8a;
+        padding: 30px;
+        border-radius: 24px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        border: 1px solid #f1f5f9;
+        margin-bottom: 25px;
+        border-left: 8px solid #3b82f6;
     }
-    .stButton>button {
-        background-color: #1e3a8a;
-        color: white;
-        border-radius: 10px;
-        font-weight: bold;
+    
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 99px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+    
+    .status-ok { background: #dcfce7; color: #166534; }
+    .status-debt { background: #fee2e2; color: #991b1b; }
+    
+    /* Tùy chỉnh Metrics */
+    [data-testid="stMetricValue"] {
+        font-size: 1.8rem !important;
+        font-weight: 800 !important;
+        color: #1e293b;
+    }
+    
+    /* Search Bar Input */
+    .stTextInput input {
+        border-radius: 15px !important;
+        padding: 12px 20px !important;
+        border: 2px solid #e2e8f0 !important;
+        transition: all 0.3s ease;
+        font-size: 1.1rem !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- HÀM TẢI DỮ LIỆU TỪ EXCEL (XLS/XLSX) ---
+# --- HÀM TẢI DỮ LIỆU ---
 @st.cache_data
 def load_data():
-    # Tên file mặc định theo yêu cầu của bạn
     file_path = 'c12.xls'
-    
-    # Kiểm tra file tồn tại
     if not os.path.exists(file_path):
         if os.path.exists('c12.xlsx'):
             file_path = 'c12.xlsx'
         else:
-            st.warning("⚠️ Đang chờ file dữ liệu 'c12.xls'...")
             return None
     
     try:
         # Đọc file Excel
         df = pd.read_excel(file_path)
-        
-        # Làm sạch tên cột
         df.columns = df.columns.astype(str).str.strip()
         
-        # Chuyển mã đơn vị về dạng chuỗi để tìm kiếm chính xác
-        if 'madvi' in df.columns:
-            df['madvi'] = df['madvi'].astype(str).str.strip()
+        # Tiền xử lý dữ liệu để tìm kiếm nhanh
+        if 'madvi' in df.columns and 'tendvi' in df.columns:
+            # Tạo cột tìm kiếm tổng hợp: Mã + Tên
+            df['search_content'] = df['madvi'].astype(str) + " " + df['tendvi'].astype(str)
+            # Tạo cột không dấu để tìm kiếm thông minh kiểu Google
+            df['search_no_accent'] = df['search_content'].apply(lambda x: unidecode(str(x)).lower())
             
         return df
-    except Exception as e:
-        st.error(f"❌ Lỗi khi đọc file: {e}")
+    except Exception:
         return None
 
 df = load_data()
 
-# --- GIAO DIỆN NGƯỜI DÙNG ---
-st.title("🏥 Tra cứu kết quả đóng BHXH")
-st.info("Hệ thống hỗ trợ đơn vị tra cứu thông báo kết quả đóng bảo hiểm (Mẫu C12-TS).")
+# --- GIAO DIỆN CHÍNH ---
+col_head1, col_head2 = st.columns([2, 1])
 
-# Ô nhập liệu tìm kiếm
-search_code = st.text_input("🔍 Nhập Mã đơn vị cần tra cứu:", placeholder="Ví dụ: TC0243C...").strip()
+with col_head1:
+    st.title("🚀 BHXH Smart Search v3.0")
+    st.markdown("Nhập tên hoặc mã đơn vị để tra cứu kết quả đóng BHXH.")
 
-if search_code:
-    if df is not None:
-        # Tìm kiếm không phân biệt hoa thường
-        result = df[df['madvi'].str.upper() == search_code.upper()]
+with col_head2:
+    st.info("💡 **Mẹo:** Bạn có thể gõ tiếng Việt không dấu (vd: 'cong ty thuan an')")
+
+# --- Ô TÌM KIẾM THÔNG MINH ---
+search_query = st.text_input("", placeholder="🔍 Nhập tên đơn vị hoặc mã số...", label_visibility="collapsed")
+
+if df is not None:
+    if search_query:
+        # Chuẩn hóa từ khóa tìm kiếm (bỏ dấu, viết thường)
+        query_processed = unidecode(search_query).lower()
         
-        if not result.empty:
-            row = result.iloc[0]
-            st.balloons()
+        # Lọc dữ liệu ngay lập tức (Search-as-you-type)
+        filtered_df = df[df['search_no_accent'].str.contains(query_processed, na=False)]
+        
+        if not filtered_df.empty:
+            # Nếu có nhiều kết quả, cho người dùng chọn
+            if len(filtered_df) > 1:
+                st.write(f"✨ Tìm thấy **{len(filtered_df)}** kết quả phù hợp:")
+                list_options = filtered_df['madvi'] + " - " + filtered_df['tendvi']
+                selection = st.selectbox("Chọn chính xác đơn vị của bạn:", list_options)
+                selected_code = selection.split(" - ")[0]
+                final_data = filtered_df[filtered_df['madvi'] == selected_code].iloc[0]
+            else:
+                final_data = filtered_df.iloc[0]
             
-            # 1. Thẻ thông tin đơn vị
-            st.markdown(f"""
-            <div class="unit-card">
-                <h2 style='color: #1e3a8a; margin-top:0;'>🏢 {row.get('tendvi', 'N/A')}</h2>
-                <p style='font-size: 1.1em;'>📍 <b>Địa chỉ:</b> {row.get('diachi', 'N/A')}</p>
-                <p>📞 <b>Điện thoại:</b> {row.get('dienthoai', 'N/A')} | 👤 <b>Người liên hệ:</b> {row.get('nguoilh', 'N/A')}</p>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            # 2. Các chỉ số tài chính (Metrics)
-            st.subheader("📊 Số liệu đóng BHXH")
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                st.metric("Tiền đầu kỳ", f"{row.get('tiền đầu kỳ', 0):,.0f} đ")
-            with c2:
-                st.metric("Số phải đóng", f"{row.get('số phải đóng', 0):,.0f} đ")
-            with c3:
-                da_dong = row.get('số đã đóng', 0)
-                phai_dong = row.get('số phải đóng', 0)
-                st.metric("Số đã đóng", f"{da_dong:,.0f} đ", delta=f"{da_dong - phai_dong:,.0f}")
-            
-            c4, c5, c6 = st.columns(3)
-            with c4:
-                cuoi_ky = row.get('tiền cuối kỳ', 0)
-                label = "Tiền cuối kỳ (Nợ)" if cuoi_ky > 0 else "Tiền cuối kỳ (Dư)"
-                st.metric(label, f"{abs(cuoi_ky):,.0f} đ", delta_color="inverse")
-            with c5:
-                st.metric("Số bị lệch", f"{row.get('số bị lệch', 0):,.0f} đ")
-            with c6:
-                st.metric("Tỷ lệ nợ", f"{row.get('tyleno', 0)}%")
-                
             st.divider()
             
-            # 3. QR Code và Hướng dẫn thanh toán
-            col_left, col_right = st.columns([1, 1])
+            # --- HIỂN THỊ THÔNG TIN CHI TIẾT ---
+            col_info, col_data = st.columns([1.2, 2])
             
-            with col_left:
-                st.subheader("💳 Hướng dẫn nộp tiền")
-                noi_dung = f"BHXH {row['madvi']} {row.get('tendvi', '')}"
-                st.code(noi_dung, language="text")
-                st.caption("Sao chép nội dung trên để thực hiện chuyển khoản chính xác.")
-                st.warning("Ghi chú: Đơn vị vui lòng nộp tiền trước ngày 25 hàng tháng.")
-                
-            with col_right:
-                st.subheader("📲 Quét mã nhanh")
-                # Tạo mã QR chứa thông tin đơn vị và số tiền nợ
-                qr_info = f"BHXH_THUANAN|DVI:{row['madvi']}|TIEN:{row.get('tiền cuối kỳ', 0)}"
-                qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={qr_info}&color=1e3a8a"
+            with col_info:
+                debt_val = final_data.get('tiền cuối kỳ', 0)
+                status_class = "status-debt" if debt_val > 0 else "status-ok"
+                status_text = "⚠️ Còn nợ" if debt_val > 0 else "✅ Đã đóng đủ"
                 
                 st.markdown(f"""
-                <div class="qr-container">
-                    <img src="{qr_url}" width="180" title="Quét mã để tra cứu nhanh">
+                <div class="glass-card">
+                    <span class="status-badge {status_class}">{status_text}</span>
+                    <h2 style='color: #1e293b; margin: 10px 0;'>{final_data.get('tendvi', 'N/A')}</h2>
+                    <p style='color: #64748b;'>Mã đơn vị: <b>{final_data.get('madvi', 'N/A')}</b></p>
+                    <hr style='border: 0.5px solid #f1f5f9; margin: 20px 0;'>
+                    <p>📍 {final_data.get('diachi', 'N/A')}</p>
+                    <p>📞 {final_data.get('dienthoai', 'N/A')}</p>
+                    <p>👤 LH: {final_data.get('nguoilh', 'N/A')}</p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # QR Code
+                qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=BHXH_{final_data.get('madvi')}_{debt_val}&color=1e3a8a"
+                st.markdown(f"""
+                <div style='text-align: center; background: white; padding: 20px; border-radius: 20px; border: 1px solid #f1f5f9;'>
+                    <img src="{qr_url}" width="160">
+                    <p style='margin-top:10px; font-size: 0.8rem; color: #64748b;'>Quét mã nộp tiền nhanh</p>
                 </div>
                 """, unsafe_allow_html=True)
 
-        else:
-            st.error(f"❌ Không tìm thấy thông tin cho mã đơn vị: **{search_code}**")
-    else:
-        st.warning("Dữ liệu đang được cập nhật, vui lòng quay lại sau.")
+            with col_data:
+                # Metrics tài chính
+                c1, c2 = st.columns(2)
+                with c1:
+                    st.metric("Tiền đầu kỳ", f"{final_data.get('tiền đầu kỳ', 0):,.0f} đ")
+                with c2:
+                    st.metric("Số phải đóng", f"{final_data.get('số phải đóng', 0):,.0f} đ")
+                
+                c3, c4 = st.columns(2)
+                with c3:
+                    da_dong = final_data.get('số đã đóng', 0)
+                    phai_dong = final_data.get('số phải đóng', 0)
+                    st.metric("Số đã đóng", f"{da_dong:,.0f} đ", delta=f"{da_dong - phai_dong:,.0f}")
+                with c4:
+                    st.metric("Dư nợ cuối kỳ", f"{debt_val:,.0f} đ", delta_color="inverse")
+                
+                # Thanh tiến độ
+                st.write("---")
+                progress_val = 0
+                if phai_dong > 0:
+                    progress_val = min(float(da_dong / phai_dong), 1.0)
+                st.write(f"**Tỷ lệ hoàn thành: {progress_val*100:.1f}%**")
+                st.progress(progress_val)
+                
+                # Nội dung chuyển khoản
+                st.markdown(f"""
+                <div style='background: #f1f5f9; padding: 20px; border-radius: 15px; margin-top: 20px; border-left: 5px solid #3b82f6;'>
+                    <p style='margin:0; font-size: 0.8rem; color: #64748b;'>NỘI DUNG CHUYỂN KHOẢN MẪU:</p>
+                    <code style='font-size: 1.1rem; color: #1e3a8a;'>BHXH {final_data.get('madvi')} {final_data.get('tendvi')}</code>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                if st.button("🎊 Xác nhận thông tin"):
+                    st.balloons()
+                    st.success("Thông tin đã được đơn vị ghi nhận!")
 
-# --- FOOTER ---
-st.markdown("<br><hr>", unsafe_allow_html=True)
-st.markdown("<center style='color: #666;'>© 2024 BHXH Thuận An - Hệ thống tra cứu trực tuyến thông minh</center>", unsafe_allow_html=True)
+        else:
+            st.error("😢 Không tìm thấy đơn vị nào khớp với từ khóa.")
+    else:
+        st.write("---")
+        st.info("👋 Chào bạn! Hãy nhập tên hoặc mã số của đơn vị để bắt đầu tra cứu.")
+else:
+    st.error("❌ Không tìm thấy file dữ liệu 'c12.xls' trên server GitHub.")
+
+st.markdown("---")
+st.caption("<center>© 2026 BHXH Thuận An - Công cụ hỗ trợ chuyển đổi số</center>", unsafe_allow_html=True)
