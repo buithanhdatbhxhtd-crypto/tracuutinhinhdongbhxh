@@ -12,7 +12,7 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v24.0 Ultimate Pro",
+    page_title="BHXH Thuận An - v24.1 Ultimate Pro",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -56,7 +56,7 @@ if 'search_query' not in st.session_state:
 if 'welcome_done' not in st.session_state:
     st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN PRO MASTERPIECE v24.0) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN PRO MASTERPIECE v24.1) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -189,7 +189,7 @@ def render_vip_bank_accounts(unit_code="[Mã Đơn Vị]", unit_name="[Tên Đơ
         
     st.markdown(f"""
         <div style='background:#eff6ff; padding:20px; border-radius:15px; border:2px dashed #3b82f6; text-align:center; margin-top: 10px;'>
-            <div style='color:#1e40af; font-weight:800; font-size:1rem; margin-bottom: 10px;'>📝 NỘI DUNG CHUYỂN KHOẢN CHUẨN XÁC NẤT:</div>
+            <div style='color:#1e40af; font-weight:800; font-size:1rem; margin-bottom: 10px;'>📝 NỘI DUNG CHUYỂN KHOẢN CHUẨN XÁC NHẤT:</div>
             <code style='font-size: 1.5rem; color: #1e3a8a; font-weight: 900; background: white; padding: 10px 20px; border-radius: 10px;'>{unit_code} {unit_name} dong bhxh thang {datetime.now().month} nam {datetime.now().year}</code>
         </div>
     """, unsafe_allow_html=True)
@@ -222,10 +222,10 @@ with st.sidebar:
     st.session_state.current_tab = st.radio("CHỨC NĂNG HỆ THỐNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v24.0 Ultimate Pro | Powered by Gemini 1.5")
+    st.caption("v24.1 Ultimate Pro | Powered by Gemini 1.5")
 
 # --- HEADER LED ---
-marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN PRO v24.0 • TÍCH HỢP TRÍ TUỆ NHÂN TẠO NHẬN THỨC NGỮ CẢNH • NÚT COPY TÀI KHOẢN NGÂN HÀNG THÔNG MINH •"
+marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN PRO v24.1 • TÍCH HỢP TRÍ TUỆ NHÂN TẠO NHẬN THỨC NGỮ CẢNH • NÚT COPY TÀI KHOẢN NGÂN HÀNG THÔNG MINH •"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -248,7 +248,7 @@ if df is not None:
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
                 st.markdown("##### 📢 TIN TỨC")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a;'>🛡️ ĐẶC QUYỀN</h4><p>Tính năng Copy số tài khoản ngân hàng bằng 1 click đã được cập nhật ở trang kết quả.</p><hr><small style='color:#10b981; font-weight:900;'>PHIÊN BẢN v24.0</small></div>", unsafe_allow_html=True)
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a;'>🛡️ ĐẶC QUYỀN</h4><p>Tính năng Copy số tài khoản ngân hàng bằng 1 click đã được cập nhật ở trang kết quả.</p><hr><small style='color:#10b981; font-weight:900;'>PHIÊN BẢN v24.1</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -315,7 +315,16 @@ if df is not None:
 
             with cr:
                 rate = min(round((unit_data.get('so_da_dong', 0) / unit_data.get('so_phai_dong', 1)) * 100, 1), 100)
-                fig = go.Figure(go.Indicator(mode="gauge+number", value=rate, title={'text': "TỶ LỆ HOÀN THÀNH (%)", 'font': {'size': 22, 'color': '#1e3a8a', 'weight': '900'}}, number={'suffix': "%", 'font': {'color': '#2563eb', 'size': 65}}, gauge={'axis': {'range': [0, 100]}, 'bar': {'color': "#2563eb"}})).update_layout(paper_bgcolor="rgba(0,0,0,0)", height=350, margin=dict(t=50, b=0))
+                
+                # FIXED PLOTLY FONT WEIGHT ERROR
+                fig = go.Figure(go.Indicator(
+                    mode="gauge+number", 
+                    value=rate, 
+                    title={'text': "<b>TỶ LỆ HOÀN THÀNH (%)</b>", 'font': {'size': 22, 'color': '#1e3a8a'}}, 
+                    number={'suffix': "%", 'font': {'color': '#2563eb', 'size': 65}}, 
+                    gauge={'axis': {'range': [0, 100]}, 'bar': {'color': "#2563eb"}}
+                )).update_layout(paper_bgcolor="rgba(0,0,0,0)", height=350, margin=dict(t=50, b=0))
+                
                 st.plotly_chart(fig, use_container_width=True)
                 
                 for off in OFFICERS:
@@ -384,4 +393,4 @@ if df is not None:
     elif st.session_state.current_tab == "📍 Liên hệ BHXH":
         st.markdown("## 📍 LIÊN HỆ"); st.write("🏠 Cơ sở: Thôn Thuận Sơn, Thuận An, Đắk Mil, Đắk Nông.")
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v24.0 Ultimate Pro Masterpiece</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v24.1 Ultimate Pro Fixed</center>", unsafe_allow_html=True)
