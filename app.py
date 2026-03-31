@@ -18,7 +18,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- CẤU HÌNH AI GEMINI BẰNG REST API (PHƯƠNG PHÁP MỚI TỐI GIẢN) ---
+# --- CẤU HÌNH AI GEMINI BẰNG REST API (ROUTER ĐA MODEL CHỐNG LỖI 404) ---
 raw_api_key = st.secrets.get("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
 api_key = str(raw_api_key).strip().strip('"').strip("'") if raw_api_key else ""
 
@@ -32,46 +32,58 @@ def get_ai_response(prompt, context=""):
     else:
         full_prompt = f"{system_instruction}\n\n[CÂU HỎI]: {prompt}"
         
-    # PHƯƠNG PHÁP KHẢ THI HƠN: Payload "sạch" hoàn toàn
-    # Đã loại bỏ safetySettings (Nguyên nhân gây lỗi HTTP 400 ở tài khoản miễn phí khiến model nhảy lung tung sinh ra 404)
     headers = {'Content-Type': 'application/json'}
+    # Tắt bộ lọc an toàn để tránh bị chặn nhầm và lỗi KeyError
     data = {
-        "contents": [{"parts": [{"text": full_prompt}]}]
+        "contents": [{"parts": [{"text": full_prompt}]}],
+        "safetySettings": [
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
+        ]
     }
     
-    # Chỉ gọi đích danh 1 model chuẩn, phổ biến và ổn định nhất của Google hiện hành
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    # HỆ THỐNG ĐỊNH TUYẾN MODEL: Quét các model khả dụng nhất hiện hành
+    available_models = [
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-1.5-flash-latest",
+        "gemini-1.0-pro"
+    ]
     
-    try:
-        response = requests.post(url, headers=headers, json=data, timeout=20)
-        
-        if response.status_code == 200:
-            res_json = response.json()
-            candidates = res_json.get('candidates', [])
-            if not candidates:
-                return "⚠️ **AI:** Câu hỏi bị từ chối do vi phạm chính sách nội dung của Google."
-            
-            cand = candidates[0]
-            if 'content' in cand and 'parts' in cand['content']:
-                return cand['content']['parts'][0]['text']
-            elif cand.get('finishReason') == 'SAFETY':
-                return "⚠️ **AI:** Nội dung câu trả lời bị hệ thống an toàn của Google chặn."
+    last_error = ""
+    for model in available_models:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+        try:
+            response = requests.post(url, headers=headers, json=data, timeout=15)
+            if response.status_code == 200:
+                res_json = response.json()
+                candidates = res_json.get('candidates', [])
+                if not candidates:
+                    return "⚠️ **AI:** Câu hỏi bị từ chối do chính sách của Google."
+                
+                cand = candidates[0]
+                if 'content' in cand and 'parts' in cand['content']:
+                    return cand['content']['parts'][0]['text']
+                elif cand.get('finishReason') == 'SAFETY':
+                    return "⚠️ **AI:** Nội dung bị bộ lọc an toàn chặn."
+                else:
+                    last_error = "Cấu trúc phản hồi không hợp lệ."
+                    continue
             else:
-                return "⚠️ **AI:** Cấu trúc dữ liệu phản hồi bị rỗng."
-        else:
-            # Nếu API báo lỗi, hiển thị đích danh lỗi của chính gemini-1.5-flash để không bị mù mờ thông tin
-            err_msg = response.json().get('error', {}).get('message', 'Lỗi không xác định')
-            if "API key not valid" in err_msg:
-                return "⚠️ **Lỗi API Key:** Khóa API không hợp lệ hoặc đã bị xoá trên Google AI Studio."
-            if "429" in str(response.status_code) or "quota" in err_msg.lower():
-                return "⚠️ **Hệ thống AI đang quá tải:** Đã hết lượt hỏi trong phút này. Vui lòng chờ 1 phút!"
+                err_msg = response.json().get('error', {}).get('message', 'Lỗi không xác định')
+                last_error = f"[{model}] {err_msg}"
+                # Nếu API key sai, thoát ngay lập tức
+                if "API key not valid" in err_msg:
+                    return "⚠️ **Lỗi API Key:** Khóa API của bạn không hợp lệ hoặc đã bị xoá trên Google AI Studio."
+                if "429" in str(response.status_code) or "quota" in err_msg.lower():
+                    return "⚠️ **Hệ thống AI đang quá tải:** Vui lòng đợi 1 phút và thử lại."
+                # Nếu lỗi 404 thì tiếp tục vòng lặp sang model khác
+        except Exception as e:
+            last_error = str(e)
             
-            return f"⚠️ **Lỗi từ Google API:** {err_msg}"
-            
-    except requests.exceptions.RequestException as e:
-        return f"⚠️ **Lỗi kết nối mạng:** Không thể kết nối đến máy chủ Google."
-    except Exception as e:
-        return f"⚠️ **Lỗi xử lý nội bộ:** {str(e)}"
+    return f"⚠️ **Trợ lý AI đang bận (Lỗi hệ thống Google):** {last_error[:150]}"
 
 # --- KHỞI TẠO STATE ---
 if 'selected_unit' not in st.session_state:
@@ -178,6 +190,71 @@ def live_clock():
     </script>
     """, height=180)
 
+# --- HÀM RENDER PDF PRO (CHỐNG BLOCK CHROME 100%) ---
+def render_pdf_unblockable(file_path):
+    try:
+        with open(file_path, "rb") as f:
+            pdf_data = f.read()
+            # Xoá ký tự xuống dòng trong base64 để JS đọc không bị lỗi
+            base64_pdf = base64.b64encode(pdf_data).decode('utf-8').replace('\n', '')
+            
+        # JS vẽ PDF thành ảnh Canvas bằng PDF.js v3.11 mới nhất
+        js_code = f"""
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+        <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
+        
+        <div id="pdf-container" style="display: flex; flex-direction: column; align-items: center; background-color: #e2e8f0; padding: 30px; border-radius: 20px; border: 5px solid white;">
+            <h3 id="loading-msg" style="color: #2563eb; font-family: 'Plus Jakarta Sans', sans-serif;">⏳ Đang giải mã văn bản kỹ thuật số...</h3>
+        </div>
+        
+        <script>
+            try {{
+                const pdfData = atob('{base64_pdf}');
+                const loadingTask = pdfjsLib.getDocument({{data: pdfData}});
+                loadingTask.promise.then(pdf => {{
+                    const container = document.getElementById('pdf-container');
+                    container.innerHTML = ''; 
+                    
+                    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {{
+                        pdf.getPage(pageNum).then(page => {{
+                            const scale = 1.5;
+                            const viewport = page.getViewport({{scale: scale}});
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+                            canvas.style.maxWidth = '100%';
+                            canvas.style.marginBottom = '25px';
+                            canvas.style.boxShadow = '0 15px 30px rgba(0,0,0,0.2)';
+                            canvas.style.borderRadius = '10px';
+                            
+                            container.appendChild(canvas);
+                            page.render({{canvasContext: ctx, viewport: viewport}});
+                        }});
+                    }}
+                }}).catch(err => {{
+                    document.getElementById('loading-msg').innerHTML = '⚠️ Không thể vẽ tài liệu. Vui lòng tải về máy.';
+                }});
+            }} catch (e) {{
+                document.getElementById('loading-msg').innerHTML = '⚠️ Lỗi giải mã Dữ liệu. Vui lòng tải về máy.';
+            }}
+        </script>
+        """
+        components.html(js_code, height=900, scrolling=True)
+        
+        st.write("<br>", unsafe_allow_html=True)
+        # Nút Download vĩ đại
+        col_dl, col_open = st.columns(2)
+        with col_dl:
+            st.download_button(label="📥 TẢI BẢN GỐC VỀ MÁY TÍNH", data=pdf_data, file_name=file_path, mime="application/pdf", use_container_width=True)
+        with col_open:
+            st.markdown(f'<a href="data:application/pdf;base64,{base64_pdf}" download="{file_path}" style="text-decoration:none; background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color:white; padding:15px; border-radius:50px; font-weight:900; display:block; text-align:center; box-shadow: 0 10px 20px rgba(30,58,138,0.3); font-size: 1.1rem; border: 2px solid white;">🚀 LƯU TRỮ TRỰC TIẾP TỪ TRÌNH DUYỆT</a>', unsafe_allow_html=True)
+        return True
+    except Exception as e:
+        st.error(f"Lỗi hệ thống: {e}")
+        return False
+
 # --- DATA HUB (CÁN BỘ) ---
 OFFICERS = [
     {"name": "Bà NGUYỄN THỊ NHÀI", "communes": "Xã Đức Lập, Xã Đắk Mil", "keywords": ["duc lap", "đức lập", "dak mil", "đắk mil", "dc0039c", "đức hòa", "duc hoa"], "phone": "0846.39.29.29", "zalo": "https://zalo.me/0846392929", "color": "#00d2ff"},
@@ -243,6 +320,7 @@ if df is not None:
                 st.session_state.search_query = user_input
             st.markdown('</div>', unsafe_allow_html=True)
 
+            # CHỨC NĂNG MỚI: EXECUTIVE DASHBOARD (CHỈ BẬT KHI CHƯA TÌM KIẾM)
             if not st.session_state.search_query and not user_input:
                 st.markdown("<h3 style='color:#1e3a8a; text-align:center; margin-bottom: 20px; font-weight:900;'>📈 TỔNG QUAN HỆ THỐNG BHXH THUẬN AN</h3>", unsafe_allow_html=True)
                 e1, e2, e3 = st.columns(3)
@@ -348,7 +426,7 @@ if df is not None:
             context = f"Đơn vị: {unit['tendvi']}, Mã: {unit['madvi']}, Nợ: {unit['tien_cuoi_ky']} VNĐ."
             st.success(f"🤖 AI đã liên kết với dữ liệu của **{unit['tendvi']}**. Bạn có thể hỏi về số nợ hiện tại!")
         else:
-            st.info("🤖 AI đã nâng cấp hệ thống REST API cực kỳ an toàn. Hãy đặt câu hỏi!")
+            st.info("🤖 AI đã nâng cấp hệ thống REST API chống sập. Hãy đặt câu hỏi!")
 
         for msg in st.session_state.chat_history:
             with st.chat_message(msg["role"]): st.markdown(msg["content"])
@@ -376,14 +454,7 @@ if df is not None:
             with c2:
                 if st.session_state.active_pdf:
                     st.success(f"📌 ĐANG XEM TÀI LIỆU AN TOÀN: {st.session_state.active_pdf}")
-                    # GIỮ NGUYÊN HOÀN TOÀN CƠ CHẾ HIỂN THỊ PDF Ở BẢN V29 CỦA BẠN (KHÔNG CHỈNH SỬA GÌ)
-                    with open(st.session_state.active_pdf, "rb") as f_pdf:
-                        b64_pdf = base64.b64encode(f_pdf.read()).decode('utf-8')
-                        st.markdown(f'<div style="border-radius: 35px; border: 15px solid white; box-shadow: 0 50px 150px rgba(0,0,0,0.15); background: white; height: 850px; width: 100%; margin-top: 10px;"><object data="data:application/pdf;base64,{b64_pdf}" type="application/pdf" width="100%" height="100%"><div style="padding: 100px 40px; text-align: center; background: white; height: 100%;"><h2 style="color: #ef4444;">⚠️ TRÌNH DUYỆT CHẶN XEM TRỰC TIẾP</h2><p style="font-size: 1.2rem; color: #64748b;">Quý đơn vị vui lòng nhấn nút <b>"MỞ TRONG TAB MỚI"</b> hoặc <b>"TẢI VỀ"</b> bên dưới để xem văn bản.</p></div></object></div>', unsafe_allow_html=True)
-                        st.write("<br>", unsafe_allow_html=True)
-                        c1_pdf, c2_pdf = st.columns(2)
-                        with c1_pdf: st.download_button(label="📥 TẢI VĂN BẢN VỀ MÁY", data=base64.b64decode(b64_pdf), file_name=st.session_state.active_pdf, mime="application/pdf", use_container_width=True)
-                        with c2_pdf: st.markdown(f'<a href="data:application/pdf;base64,{b64_pdf}" target="_blank" style="text-decoration:none; background:#1e3a8a; color:white; padding:12px; border-radius:50px; font-weight:900; display:block; text-align:center; box-shadow: 0 10px 20px rgba(30,58,138,0.2);">🚀 XEM TRÊN TAB MỚI</a>', unsafe_allow_html=True)
+                    render_pdf_unblockable(st.session_state.active_pdf)
 
     # --- CÁC TAB KHÁC ---
     elif st.session_state.current_tab == "📑 Cẩm nang Nghiệp vụ": 
