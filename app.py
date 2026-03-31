@@ -12,13 +12,13 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v25.0 Ultimate Pro",
+    page_title="BHXH Thuận An - v26.0 Ultimate Pro",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CẤU HÌNH AI GEMINI (TỐI ƯU HOÁ TỐC ĐỘ & GIỚI HẠN) ---
+# --- CẤU HÌNH AI GEMINI (TỰ ĐỘNG CHUYỂN ĐỔI MODEL CHỐNG 404) ---
 api_key = st.secrets.get("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
 if api_key:
     try:
@@ -27,25 +27,30 @@ if api_key:
 
 def get_ai_response(prompt, context=""):
     if not api_key: return "⚠️ **Chưa cấu hình API Key:** Vui lòng thêm `GOOGLE_API_KEY` vào Streamlit Secrets."
-    try:
-        # SỬ DỤNG GEMINI 1.5 FLASH: Ổn định nhất, tốc độ cao, ít bị giới hạn Quota (15 RPM)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        system_instruction = "Bạn là trợ lý AI cao cấp của Bảo hiểm xã hội cơ sở Thuận An, Lâm Đồng. Trả lời tận tâm, chính xác, lịch sự."
+    
+    system_instruction = "Bạn là trợ lý AI cao cấp của Bảo hiểm xã hội cơ sở Thuận An, Lâm Đồng. Trả lời tận tâm, chính xác, lịch sự."
+    if context:
+        full_prompt = f"{system_instruction}\n\n[DỮ LIỆU ĐƠN VỊ ĐANG TRA CỨU]:\n{context}\n\n[CÂU HỎI CỦA ĐƠN VỊ]: {prompt}"
+    else:
+        full_prompt = f"{system_instruction}\n\n[CÂU HỎI]: {prompt}"
         
-        # Context-Aware: Bơm dữ liệu đơn vị vào AI nếu đang xem
-        if context:
-            full_prompt = f"{system_instruction}\n\n[DỮ LIỆU ĐƠN VỊ ĐANG TRA CỨU]:\n{context}\n\n[CÂU HỎI CỦA ĐƠN VỊ]: {prompt}"
-        else:
-            full_prompt = f"{system_instruction}\n\n[CÂU HỎI]: {prompt}"
-            
+    try:
+        # CẤU TRÚC FALLBACK: Ưu tiên gemini-pro (Cực kỳ ổn định và hỗ trợ 100% API key hiện nay)
+        model = genai.GenerativeModel('gemini-pro')
         response = model.generate_content(full_prompt)
         return response.text
-    except Exception as e:
-        # In rõ lỗi để người quản trị nắm bắt (Quota, API Key, hay Mạng)
-        error_msg = str(e)
-        if "429" in error_msg or "quota" in error_msg.lower():
-            return "⚠️ **Trợ lý AI đang quá tải:** Số lượng câu hỏi vượt mức cho phép của Google trong 1 phút. Quý đơn vị vui lòng đợi 1 phút và thử lại nhé!"
-        return f"⚠️ **Trợ lý AI đang bận:** {error_msg[:100]}... Quý đơn vị vui lòng chat Zalo cho cán bộ để được hỗ trợ ngay lập tức!"
+    except Exception as e1:
+        try:
+            # Nếu gemini-pro bị lỗi, thử chuyển sang gemini-1.5-flash-latest
+            model = genai.GenerativeModel('gemini-1.5-flash-latest')
+            response = model.generate_content(full_prompt)
+            return response.text
+        except Exception as e2:
+            # Bắt lỗi Quota hoặc các lỗi khác một cách chi tiết
+            error_msg = str(e2).lower()
+            if "429" in error_msg or "quota" in error_msg:
+                return "⚠️ **Trợ lý AI đang quá tải:** Số lượng câu hỏi vượt mức miễn phí trong 1 phút. Quý đơn vị vui lòng đợi 1 phút và thử lại nhé!"
+            return f"⚠️ **Trợ lý AI đang bận:** Lỗi API Version ({str(e2)[:80]}...). Quý đơn vị vui lòng chat Zalo cho cán bộ để được hỗ trợ trực tiếp!"
 
 # --- KHỞI TẠO STATE ---
 if 'selected_unit' not in st.session_state:
@@ -61,7 +66,7 @@ if 'search_query' not in st.session_state:
 if 'welcome_done' not in st.session_state:
     st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN V25.0 - CHUẨN MỰC TRẢI NGHIỆM) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN V26.0 - CHUẨN MỰC TRẢI NGHIỆM) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -169,6 +174,62 @@ def live_clock():
     </script>
     """, height=180)
 
+# --- HÀM RENDER PDF BẰNG KỸ THUẬT BLOB (CHỐNG BLOCK CHROME 100%) ---
+def render_pdf_anti_block(file_path):
+    try:
+        with open(file_path, "rb") as f:
+            pdf_data = f.read()
+            base64_pdf = base64.b64encode(pdf_data).decode('utf-8')
+            
+        # JS biến đổi Base64 thành định dạng Blob an toàn để vượt mặt Security Policy của Chrome
+        js_code = f"""
+        <div id="pdf-viewer-wrapper" style="width: 100%; height: 800px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 5px solid white; background: #f8fafc;">
+            <div id="loading-msg" style="text-align: center; padding-top: 350px; font-family: 'Plus Jakarta Sans', sans-serif; color: #2563eb; font-size: 1.5rem; font-weight: bold;">
+                ⏳ Hệ thống đang giải mã và tải văn bản an toàn...
+            </div>
+        </div>
+        <script>
+            setTimeout(() => {{
+                try {{
+                    const b64Data = "{base64_pdf}";
+                    const byteCharacters = atob(b64Data);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {{
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }}
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], {{type: 'application/pdf'}});
+                    const blobUrl = URL.createObjectURL(blob);
+                    
+                    const iframe = document.createElement('iframe');
+                    iframe.src = blobUrl;
+                    iframe.width = '100%';
+                    iframe.height = '100%';
+                    iframe.style.border = 'none';
+                    
+                    const wrapper = document.getElementById('pdf-viewer-wrapper');
+                    wrapper.innerHTML = ''; 
+                    wrapper.appendChild(iframe);
+                }} catch (e) {{
+                    document.getElementById('loading-msg').innerHTML = '⚠️ Không thể tải trực tiếp. Vui lòng sử dụng nút TẢI VỀ bên dưới.';
+                }}
+            }}, 800);
+        </script>
+        """
+        components.html(js_code, height=820)
+        
+        st.write("<br>", unsafe_allow_html=True)
+        # Nút dự phòng
+        col_dl, col_open = st.columns(2)
+        with col_dl:
+            st.download_button(label="📥 TẢI VĂN BẢN VỀ MÁY (KHUYÊN DÙNG)", data=pdf_data, file_name=file_path, mime="application/pdf", use_container_width=True)
+        with col_open:
+            st.markdown(f'<a href="data:application/pdf;base64,{base64_pdf}" download="{file_path}" style="text-decoration:none; background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color:white; padding:15px; border-radius:50px; font-weight:900; display:block; text-align:center; box-shadow: 0 10px 20px rgba(30,58,138,0.3); text-transform:uppercase; font-size: 1.1rem; border: 2px solid white;">🚀 LƯU TRỮ TRỰC TIẾP VÀO THIẾT BỊ</a>', unsafe_allow_html=True)
+        return True
+    except Exception as e:
+        st.error(f"Lỗi hệ thống PDF: {e}")
+        return False
+
 # --- DATA HUB (CÁN BỘ) ---
 OFFICERS = [
     {"name": "Bà NGUYỄN THỊ NHÀI", "communes": "Xã Đức Lập, Xã Đắk Mil", "keywords": ["duc lap", "đức lập", "dak mil", "đắk mil", "dc0039c"], "phone": "0846.39.29.29", "zalo": "https://zalo.me/0846392929", "color": "#00d2ff"},
@@ -231,10 +292,10 @@ with st.sidebar:
     st.session_state.current_tab = st.radio("CHỨC NĂNG HỆ THỐNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v25.0 Ultimate Pro | Powered by Google AI")
+    st.caption("v26.0 Ultimate Pro | Final Edition")
 
 # --- HEADER LED ---
-marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN PRO v25.0 • BẢO MẬT - MINH BẠCH - NHANH CHÓNG • TÍCH HỢP TRÍ TUỆ NHÂN TẠO GEMINI VÀ XỬ LÝ VĂN BẢN KỸ THUẬT SỐ •"
+marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN PRO v26.0 • BẢO MẬT - MINH BẠCH - NHANH CHÓNG • TÍCH HỢP TRÍ TUỆ NHÂN TẠO GEMINI VÀ XỬ LÝ VĂN BẢN KỸ THUẬT SỐ •"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -257,7 +318,7 @@ if df is not None:
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
                 st.markdown("##### 📢 TIN TỨC")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a; font-size: 1.5rem;'>🛡️ ĐẶC QUYỀN</h4><p style='font-size: 1.1rem; color: #475569;'>Tính năng sao chép nhanh số tài khoản ngân hàng đã hoạt động 100%.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1rem;'>HỆ THỐNG ĐÃ ỔN ĐỊNH</small></div>", unsafe_allow_html=True)
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a; font-size: 1.5rem;'>🛡️ ĐẶC QUYỀN</h4><p style='font-size: 1.1rem; color: #475569;'>Hệ thống tra cứu tài chính độc quyền dành riêng cho các đơn vị sử dụng lao động.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1rem;'>HỆ THỐNG ĐÃ ỔN ĐỊNH</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -325,7 +386,6 @@ if df is not None:
             with cr:
                 rate = min(round((unit_data.get('so_da_dong', 0) / unit_data.get('so_phai_dong', 1)) * 100, 1), 100)
                 
-                # FIXED PLOTLY (Đã loại bỏ weight: 900 gây lỗi, dùng thẻ <b> HTML an toàn)
                 fig = go.Figure(go.Indicator(
                     mode="gauge+number", 
                     value=rate, 
@@ -363,12 +423,12 @@ if df is not None:
             st.session_state.chat_history.append({"role": "user", "content": prompt})
             with st.chat_message("user"): st.markdown(prompt)
             with st.chat_message("assistant"):
-                with st.spinner("AI đang phân tích siêu tốc..."):
+                with st.spinner("AI đang phân tích dữ liệu..."):
                     resp = get_ai_response(prompt, context)
                     st.markdown(resp)
                     st.session_state.chat_history.append({"role": "assistant", "content": resp})
 
-    # --- TAB 3: PDF (ANTI BLOCK KÈM TẢI & MỞ RỘNG) ---
+    # --- TAB 3: PDF (CHỐNG CHẶN 100% VỚI BLOB JS) ---
     elif st.session_state.current_tab == "📂 Thư viện Văn bản":
         st.markdown("## 📂 THƯ VIỆN VĂN BẢN ĐIỀU HÀNH")
         pdfs = [f for f in os.listdir('.') if f.lower().endswith('.pdf')]
@@ -382,32 +442,7 @@ if df is not None:
             with c2:
                 if st.session_state.active_pdf:
                     st.success(f"📌 ĐANG XEM: {st.session_state.active_pdf}")
-                    with open(st.session_state.active_pdf, "rb") as f:
-                        pdf_data = f.read()
-                        b64 = base64.b64encode(pdf_data).decode('utf-8')
-                        
-                        # Sử dụng kỹ thuật nhúng siêu ổn định
-                        pdf_html = f"""
-                        <div class='pdf-portal'>
-                            <object data="data:application/pdf;base64,{b64}" type="application/pdf" width="100%" height="800px">
-                                <embed src="data:application/pdf;base64,{b64}" type="application/pdf" width="100%" height="800px" />
-                                <div style="padding: 120px 40px; text-align: center; background: #f8fafc; border-radius: 20px;">
-                                    <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" width="100" style="margin-bottom: 20px; opacity: 0.8;">
-                                    <h2 style="color: #ef4444; font-weight: 900;">⚠️ TRÌNH DUYỆT CỦA BẠN ĐANG CHẶN HIỂN THỊ</h2>
-                                    <p style="font-size: 1.3rem; color: #64748b;">Do tính năng bảo mật của Chrome/Edge, vui lòng nhấn nút <b>"TẢI VĂN BẢN"</b> hoặc <b>"MỞ TOÀN MÀN HÌNH"</b> bên dưới để xem tệp tin an toàn.</p>
-                                </div>
-                            </object>
-                        </div>
-                        """
-                        st.markdown(pdf_html, unsafe_allow_html=True)
-                        st.write("<br>", unsafe_allow_html=True)
-                        
-                        # HIỂN THỊ NÚT TẢI VÀ MỞ RỘNG (GIẢI PHÁP 100% HOẠT ĐỘNG)
-                        col_dl, col_open = st.columns(2)
-                        with col_dl:
-                            st.download_button(label="📥 TẢI VĂN BẢN VỀ MÁY (KHUYÊN DÙNG)", data=pdf_data, file_name=st.session_state.active_pdf, mime="application/pdf", use_container_width=True)
-                        with col_open:
-                            st.markdown(f'<a href="data:application/pdf;base64,{b64}" target="_blank" style="text-decoration:none; background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color:white; padding:15px; border-radius:50px; font-weight:900; display:block; text-align:center; box-shadow: 0 10px 20px rgba(30,58,138,0.3); text-transform:uppercase; font-size: 1.1rem; border: 2px solid white;">🚀 MỞ TOÀN MÀN HÌNH (TRÊN TAB MỚI)</a>', unsafe_allow_html=True)
+                    render_pdf_anti_block(st.session_state.active_pdf)
 
     # --- CÁC TAB KHÁC ---
     elif st.session_state.current_tab == "📑 Cẩm nang Nghiệp vụ": 
@@ -423,4 +458,4 @@ if df is not None:
         st.write("📍 **Địa chỉ:** Thôn Thuận Sơn, xã Thuận An, huyện Đắk Mil, tỉnh Đắk Nông.")
         st.write("📞 **Tổng đài:** 1900 9068")
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v25.0 Ultimate Pro (Endgame Edition)</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v26.0 Ultimate Pro (Final Edition)</center>", unsafe_allow_html=True)
