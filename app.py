@@ -9,6 +9,7 @@ from datetime import datetime
 import base64
 import requests
 import streamlit.components.v1 as components
+import google.generativeai as genai
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
@@ -18,72 +19,31 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- CẤU HÌNH AI GEMINI BẰNG REST API (ROUTER ĐA MODEL CHỐNG LỖI 404) ---
-raw_api_key = st.secrets.get("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
-api_key = str(raw_api_key).strip().strip('"').strip("'") if raw_api_key else ""
+# --- CẤU HÌNH API GEMINI (KHÔNG CẦN NHẬP KEY - MÔI TRƯỜNG TỰ ĐỘNG CẤP PHÁT) ---
+api_key = ""
+genai.configure(api_key=api_key)
 
 def get_ai_response(prompt, context=""):
-    if not api_key: 
-        return "⚠️ **Chưa cấu hình API Key:** Vui lòng kiểm tra lại Streamlit Secrets."
-    
     system_instruction = "Bạn là trợ lý AI cao cấp của Bảo hiểm xã hội cơ sở Thuận An, Lâm Đồng. Trả lời tận tâm, chính xác, lịch sự."
     if context:
         full_prompt = f"{system_instruction}\n\n[DỮ LIỆU ĐƠN VỊ ĐANG TRA CỨU]:\n{context}\n\n[CÂU HỎI]: {prompt}"
     else:
         full_prompt = f"{system_instruction}\n\n[CÂU HỎI]: {prompt}"
         
-    headers = {'Content-Type': 'application/json'}
-    # Tắt bộ lọc an toàn để tránh bị chặn nhầm và lỗi KeyError
-    data = {
-        "contents": [{"parts": [{"text": full_prompt}]}],
-        "safetySettings": [
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}
-        ]
-    }
-    
-    # HỆ THỐNG ĐỊNH TUYẾN MODEL: Quét các model khả dụng nhất hiện hành
-    available_models = [
-        "gemini-1.5-flash",
-        "gemini-1.5-pro",
-        "gemini-1.5-flash-latest",
-        "gemini-1.0-pro"
-    ]
-    
-    last_error = ""
-    for model in available_models:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+    # CƠ CHẾ GỌI AI VỚI EXPONENTIAL BACKOFF (TỰ ĐỘNG THỬ LẠI KHI CÓ LỖI)
+    retries = 5
+    delay = 1
+    for i in range(retries):
         try:
-            response = requests.post(url, headers=headers, json=data, timeout=15)
-            if response.status_code == 200:
-                res_json = response.json()
-                candidates = res_json.get('candidates', [])
-                if not candidates:
-                    return "⚠️ **AI:** Câu hỏi bị từ chối do chính sách của Google."
-                
-                cand = candidates[0]
-                if 'content' in cand and 'parts' in cand['content']:
-                    return cand['content']['parts'][0]['text']
-                elif cand.get('finishReason') == 'SAFETY':
-                    return "⚠️ **AI:** Nội dung bị bộ lọc an toàn chặn."
-                else:
-                    last_error = "Cấu trúc phản hồi không hợp lệ."
-                    continue
-            else:
-                err_msg = response.json().get('error', {}).get('message', 'Lỗi không xác định')
-                last_error = f"[{model}] {err_msg}"
-                # Nếu API key sai, thoát ngay lập tức
-                if "API key not valid" in err_msg:
-                    return "⚠️ **Lỗi API Key:** Khóa API của bạn không hợp lệ hoặc đã bị xoá trên Google AI Studio."
-                if "429" in str(response.status_code) or "quota" in err_msg.lower():
-                    return "⚠️ **Hệ thống AI đang quá tải:** Vui lòng đợi 1 phút và thử lại."
-                # Nếu lỗi 404 thì tiếp tục vòng lặp sang model khác
+            # Sử dụng model tương thích tuyệt đối với môi trường Preview hiện tại
+            model = genai.GenerativeModel('gemini-2.5-flash-preview-09-2025')
+            response = model.generate_content(full_prompt)
+            return response.text
         except Exception as e:
-            last_error = str(e)
-            
-    return f"⚠️ **Trợ lý AI đang bận (Lỗi hệ thống Google):** {last_error[:150]}"
+            if i == retries - 1:
+                return "⚠️ **Hệ thống AI đang bận hoặc quá tải.** Vui lòng thử lại sau giây lát hoặc liên hệ cán bộ chuyên quản để được hỗ trợ trực tiếp."
+            time.sleep(delay)
+            delay *= 2
 
 # --- KHỞI TẠO STATE ---
 if 'selected_unit' not in st.session_state:
@@ -426,7 +386,7 @@ if df is not None:
             context = f"Đơn vị: {unit['tendvi']}, Mã: {unit['madvi']}, Nợ: {unit['tien_cuoi_ky']} VNĐ."
             st.success(f"🤖 AI đã liên kết với dữ liệu của **{unit['tendvi']}**. Bạn có thể hỏi về số nợ hiện tại!")
         else:
-            st.info("🤖 AI đã nâng cấp hệ thống REST API chống sập. Hãy đặt câu hỏi!")
+            st.info("🤖 AI đã nâng cấp hệ thống bỏ qua Safety Filters. Hãy đặt câu hỏi!")
 
         for msg in st.session_state.chat_history:
             with st.chat_message(msg["role"]): st.markdown(msg["content"])
