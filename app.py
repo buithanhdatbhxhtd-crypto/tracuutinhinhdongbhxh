@@ -9,19 +9,18 @@ from datetime import datetime
 import base64
 import requests
 import streamlit.components.v1 as components
-import google.generativeai as genai
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v29.0 The Apex",
+    page_title="BHXH Thuận An - v30.0 The Evolution",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CẤU HÌNH API GEMINI (KHÔNG CẦN NHẬP KEY - MÔI TRƯỜNG TỰ ĐỘNG CẤP PHÁT) ---
-api_key = ""
-genai.configure(api_key=api_key)
+# --- CẤU HÌNH AI GEMINI BẰNG REST API TRỰC TIẾP (KHÔNG DÙNG THƯ VIỆN GENAI) ---
+# Cách này giúp vượt qua cơ chế kiểm tra API Key rỗng cục bộ của thư viện, 
+# cho phép môi trường mạng tự động cấp phát Key khi gửi request.
 
 def get_ai_response(prompt, context=""):
     system_instruction = "Bạn là trợ lý AI cao cấp của Bảo hiểm xã hội cơ sở Thuận An, Lâm Đồng. Trả lời tận tâm, chính xác, lịch sự."
@@ -30,20 +29,36 @@ def get_ai_response(prompt, context=""):
     else:
         full_prompt = f"{system_instruction}\n\n[CÂU HỎI]: {prompt}"
         
+    # Endpoint chuẩn cho môi trường cấp phát tự động
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key="
+    headers = {'Content-Type': 'application/json'}
+    payload = {
+        "contents": [{"parts": [{"text": full_prompt}]}]
+    }
+    
     # CƠ CHẾ GỌI AI VỚI EXPONENTIAL BACKOFF (TỰ ĐỘNG THỬ LẠI KHI CÓ LỖI)
     retries = 5
     delay = 1
+    last_error = ""
+    
     for i in range(retries):
         try:
-            # Sử dụng model tương thích tuyệt đối với môi trường Preview hiện tại
-            model = genai.GenerativeModel('gemini-2.5-flash-preview-09-2025')
-            response = model.generate_content(full_prompt)
-            return response.text
+            response = requests.post(url, headers=headers, json=payload, timeout=15)
+            if response.status_code == 200:
+                res_data = response.json()
+                # Trích xuất văn bản trả về an toàn
+                return res_data['candidates'][0]['content']['parts'][0]['text']
+            else:
+                last_error = f"HTTP {response.status_code}: {response.text}"
+                time.sleep(delay)
+                delay *= 2
         except Exception as e:
-            if i == retries - 1:
-                return "⚠️ **Hệ thống AI đang bận hoặc quá tải.** Vui lòng thử lại sau giây lát hoặc liên hệ cán bộ chuyên quản để được hỗ trợ trực tiếp."
+            last_error = str(e)
             time.sleep(delay)
             delay *= 2
+            
+    # Nếu thử 5 lần vẫn thất bại, in ra chi tiết lỗi để dễ dàng debug
+    return f"⚠️ **Hệ thống AI đang bận hoặc quá tải.** Vui lòng thử lại sau giây lát. (Chi tiết kỹ thuật: {last_error[:150]}...)"
 
 # --- KHỞI TẠO STATE ---
 if 'selected_unit' not in st.session_state:
@@ -59,7 +74,7 @@ if 'search_query' not in st.session_state:
 if 'welcome_done' not in st.session_state:
     st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN THE APEX v29.0) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN THE EVOLUTION v30.0) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -151,6 +166,7 @@ def live_clock():
     """, height=180)
 
 # --- HÀM RENDER PDF PRO (CHỐNG BLOCK CHROME 100%) ---
+# Tuyệt đối giữ nguyên tính năng PDF đã hoàn thiện ở v29.0
 def render_pdf_unblockable(file_path):
     try:
         with open(file_path, "rb") as f:
@@ -257,10 +273,10 @@ with st.sidebar:
     st.session_state.current_tab = st.radio("CHỨC NĂNG HỆ THỐNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v29.0 The Apex | Powered by Google API")
+    st.caption("v30.0 The Evolution | Powered by Google API")
 
 # --- HEADER LED ---
-marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN ĐỈNH CAO v29.0 • HOẠT ĐỘNG ỔN ĐỊNH - BẢO MẬT - MINH BẠCH • TÍCH HỢP TRÍ TUỆ NHÂN TẠO GEMINI REST API •"
+marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN ĐỈNH CAO v30.0 • HOẠT ĐỘNG ỔN ĐỊNH - BẢO MẬT - MINH BẠCH • TÍCH HỢP TRÍ TUỆ NHÂN TẠO GEMINI MỚI NHẤT •"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -280,7 +296,7 @@ if df is not None:
                 st.session_state.search_query = user_input
             st.markdown('</div>', unsafe_allow_html=True)
 
-            # CHỨC NĂNG MỚI: EXECUTIVE DASHBOARD (CHỈ BẬT KHI CHƯA TÌM KIẾM)
+            # EXECUTIVE DASHBOARD
             if not st.session_state.search_query and not user_input:
                 st.markdown("<h3 style='color:#1e3a8a; text-align:center; margin-bottom: 20px; font-weight:900;'>📈 TỔNG QUAN HỆ THỐNG BHXH THUẬN AN</h3>", unsafe_allow_html=True)
                 e1, e2, e3 = st.columns(3)
@@ -294,7 +310,7 @@ if df is not None:
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
                 st.markdown("##### 📢 TIN TỨC")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a; font-size: 1.5rem;'>🛡️ BẢO MẬT PRO</h4><p style='font-size: 1.1rem; color: #475569;'>Hệ thống tra cứu đã được bọc lõi REST API, loại bỏ toàn bộ lỗi cắt chữ và lỗi kết nối.</p><hr><small style='color:#10b981; font-weight:900;'>PHIÊN BẢN v29.0</small></div>", unsafe_allow_html=True)
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a; font-size: 1.5rem;'>🛡️ ĐỘT PHÁ</h4><p style='font-size: 1.1rem; color: #475569;'>AI Gemini đã được thiết kế lại sử dụng REST API, tương thích hoàn toàn với nền tảng mới.</p><hr><small style='color:#10b981; font-weight:900;'>PHIÊN BẢN v30.0</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -386,7 +402,7 @@ if df is not None:
             context = f"Đơn vị: {unit['tendvi']}, Mã: {unit['madvi']}, Nợ: {unit['tien_cuoi_ky']} VNĐ."
             st.success(f"🤖 AI đã liên kết với dữ liệu của **{unit['tendvi']}**. Bạn có thể hỏi về số nợ hiện tại!")
         else:
-            st.info("🤖 AI đã nâng cấp hệ thống bỏ qua Safety Filters. Hãy đặt câu hỏi!")
+            st.info("🤖 AI đã cập nhật hệ thống Giao tiếp Trực tiếp. Đảm bảo phản hồi nhanh chóng.")
 
         for msg in st.session_state.chat_history:
             with st.chat_message(msg["role"]): st.markdown(msg["content"])
@@ -430,4 +446,4 @@ if df is not None:
         st.write("📍 **Địa chỉ:** Thôn Thuận Sơn, xã Thuận An, huyện Đắk Mil, tỉnh Đắk Nông.")
         st.write("📞 **Tổng đài:** 1900 9068")
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v29.0 The Apex</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v30.0 The Evolution</center>", unsafe_allow_html=True)
