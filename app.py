@@ -9,7 +9,7 @@ from datetime import datetime
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH cơ sở Thuận An - Elite Connect v11.0",
+    page_title="BHXH cơ sở Thuận An - Elite Digital v12.0",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -23,7 +23,7 @@ if 'last_query' not in st.session_state:
 if 'show_loading' not in st.session_state:
     st.session_state.show_loading = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN ELITE v11.0.1) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN ELITE v12.0) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -42,50 +42,14 @@ st.markdown("""
     .stApp {
         background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
     }
-    
-    /* FIX Ô TÌM KIẾM BỊ CHE CHỮ */
-    .stTextInput input {
-        border-radius: 50px !important;
-        padding: 1rem 2.5rem !important; /* Giảm padding dọc để tránh che chữ */
-        border: 3px solid #3b82f6 !important;
-        font-size: 1.5rem !important;
-        line-height: 1.2 !important;
-        height: auto !important;
-        box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2) !important;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .stTextInput input:focus {
-        transform: scale(1.02);
-        border-color: #2563eb !important;
-    }
 
-    /* HIỆU ỨNG ĐÈN NEON NHẤP NHÁY CHO CÁN BỘ */
-    @keyframes neon-blue-blink {
-        0%, 100% { border-color: #00d2ff; box-shadow: 0 0 5px #00d2ff, inset 0 0 5px #00d2ff; }
-        50% { border-color: #ffffff; box-shadow: 0 0 20px #00d2ff, inset 0 0 10px #00d2ff; }
-    }
-    @keyframes neon-gold-blink {
-        0%, 100% { border-color: #ffaa00; box-shadow: 0 0 5px #ffaa00, inset 0 0 5px #ffaa00; }
-        50% { border-color: #ffffff; box-shadow: 0 0 20px #ffaa00, inset 0 0 10px #ffaa00; }
-    }
-    @keyframes neon-green-blink {
-        0%, 100% { border-color: #39ff14; box-shadow: 0 0 5px #39ff14, inset 0 0 5px #39ff14; }
-        50% { border-color: #ffffff; box-shadow: 0 0 20px #39ff14, inset 0 0 10px #39ff14; }
-    }
-
-    .officer-card {
-        background: white;
-        padding: 20px;
-        border-radius: 20px;
-        border: 4px solid #e2e8f0;
-        margin-bottom: 20px;
+    /* BANNER HERO SECTION */
+    .hero-banner {
         text-align: center;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
     }
-    .card-nhai { animation: neon-blue-blink 2s infinite; }
-    .card-dat { animation: neon-gold-blink 2.5s infinite; }
-    .card-hai { animation: neon-green-blink 3s infinite; }
 
-    /* Hero Title */
     .hero-title {
         background: linear-gradient(90deg, #1e3a8a, #2563eb, #0ea5e9);
         -webkit-background-clip: text;
@@ -93,54 +57,116 @@ st.markdown("""
         font-size: 5rem;
         font-weight: 800;
         letter-spacing: -4px;
-        text-align: center;
-        margin-bottom: 10px;
+        margin-bottom: 0px;
+        line-height: 1.1;
     }
 
-    /* Marquee */
-    .marquee-wrapper {
-        background: #1e3a8a;
-        color: white;
-        padding: 12px 0;
-        border-radius: 12px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    /* BẢNG LED CHẠY CHỮ (CYBER MARQUEE) */
+    .led-marquee {
+        background: #000;
+        color: #00ff00;
+        padding: 10px 0;
+        font-weight: 700;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        border: 2px solid #333;
         margin-bottom: 30px;
+        font-family: 'Courier New', Courier, monospace;
+        text-transform: uppercase;
     }
 
-    /* Premium Design */
-    .premium-panel {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-radius: 40px;
-        padding: 40px;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.06);
-        border: 1px solid rgba(255,255,255,0.7);
-    }
-
-    /* Metric UI */
-    .metric-box {
+    /* Ô TÌM KIẾM CỬA NGÕ (SIÊU NỔI BẬT) */
+    .gateway-container {
+        max-width: 900px;
+        margin: 0 auto 3rem auto;
         text-align: center;
-        background: #f8fafc;
-        padding: 20px;
-        border-radius: 25px;
-        border: 1px solid #edf2f7;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-    }
-    .metric-val { font-size: 1.8rem; font-weight: 800; color: #1e3a8a; }
-    .metric-lab { font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase; }
-
-    .badge-flash {
-        background: #ff3131;
-        color: white;
-        padding: 4px 12px;
+        background: rgba(255, 255, 255, 0.4);
+        padding: 40px;
         border-radius: 50px;
-        font-size: 0.7rem;
-        font-weight: 800;
-        animation: pulse 1s infinite;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.05);
+        border: 1px solid rgba(255,255,255,0.8);
     }
-    @keyframes pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.7; transform: scale(0.95); }
+
+    .stTextInput input {
+        border-radius: 50px !important;
+        padding: 1.2rem 3rem !important; /* Fix lỗi che chữ */
+        border: 4px solid #3b82f6 !important;
+        font-size: 1.6rem !important;
+        background: white !important;
+        box-shadow: 0 15px 35px rgba(59, 130, 246, 0.15) !important;
+        transition: all 0.4s ease;
+    }
+    
+    .stTextInput input:hover {
+        transform: scale(1.02);
+        box-shadow: 0 20px 45px rgba(59, 130, 246, 0.25) !important;
+    }
+
+    /* THẺ CÁN BỘ NEON */
+    .officer-card {
+        background: #111;
+        padding: 25px;
+        border-radius: 25px;
+        border: 3px solid #333;
+        margin-bottom: 25px;
+        text-align: center;
+        transition: all 0.4s ease;
+        position: relative;
+    }
+    
+    .officer-card:hover {
+        transform: translateY(-10px) rotate(1deg);
+    }
+
+    @keyframes blink-blue { 0%, 100% { border-color: #00d2ff; box-shadow: 0 0 15px #00d2ff; } 50% { border-color: #333; box-shadow: 0 0 0px #000; } }
+    @keyframes blink-gold { 0%, 100% { border-color: #ffaa00; box-shadow: 0 0 15px #ffaa00; } 50% { border-color: #333; box-shadow: 0 0 0px #000; } }
+    @keyframes blink-green { 0%, 100% { border-color: #39ff14; box-shadow: 0 0 15px #39ff14; } 50% { border-color: #333; box-shadow: 0 0 0px #000; } }
+
+    .card-nhai { animation: blink-blue 2s infinite; }
+    .card-dat { animation: blink-gold 2.5s infinite; }
+    .card-hai { animation: blink-green 3s infinite; }
+
+    /* DASHBOARD PANEL */
+    .dashboard-panel {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(25px);
+        border-radius: 40px;
+        padding: 45px;
+        box-shadow: 0 35px 70px rgba(0,0,0,0.08);
+        border: 1px solid #fff;
+    }
+
+    .metric-card {
+        background: #f8fafc;
+        padding: 24px;
+        border-radius: 28px;
+        border: 1px solid #edf2f7;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    .metric-card:hover { transform: scale(1.05); background: #fff; }
+
+    /* BUTTONS */
+    .stButton>button {
+        border-radius: 50px !important;
+        font-weight: 800 !important;
+        padding: 0.8rem 2rem !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    }
+    .stButton>button:active { transform: scale(0.9); }
+
+    /* BANNER POSTER */
+    .poster-box {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 40px;
+        text-align: center;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: 0 25px 50px rgba(30, 58, 138, 0.25);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -150,25 +176,28 @@ OFFICERS = [
     {
         "name": "Bà NGUYỄN THỊ NHÀI",
         "title": "Chuyên viên BHXH",
-        "scope": "Xã Đức Lập, Xã Đắk Mil",
+        "scope": "Đức Lập, Đắk Mil",
         "phone": "0846.39.29.29",
         "class": "card-nhai",
+        "color": "#00d2ff",
         "areas": ["duc lap", "dak mil", "đức lập", "đắk mil"]
     },
     {
         "name": "Ông BÙI THÀNH ĐẠT",
         "title": "Chuyên viên BHXH",
-        "scope": "Xã Đắk Sắk, Xã Đắk Song",
+        "scope": "Đắk Sắk, Đắk Song",
         "phone": "0986.05.30.06",
         "class": "card-dat",
+        "color": "#ffaa00",
         "areas": ["dak sak", "dak song", "đắk sắk", "đắk song"]
     },
     {
         "name": "Ông HOÀNG SỸ HẢI",
         "title": "Chuyên viên BHXH",
-        "scope": "Xã Thuận An",
+        "scope": "Thuận An",
         "phone": "0919.06.11.53",
         "class": "card-hai",
+        "color": "#39ff14",
         "areas": ["thuan an", "thuận an"]
     }
 ]
@@ -186,46 +215,41 @@ def load_data(uploaded_file=None):
             df = pd.read_csv(target) if target.lower().endswith('.csv') else pd.read_excel(target)
         
         if df is not None:
-            # Chuẩn hóa tên cột chính xác theo file
             df.columns = [unidecode(str(c)).lower().strip().replace(' ', '_') for c in df.columns]
             if 'madvi' in df.columns: df['madvi'] = df['madvi'].astype(str).str.strip()
             df['search_index'] = df.apply(lambda x: unidecode(str(x.get('madvi', '')) + " " + str(x.get('tendvi', ''))).lower(), axis=1)
             return df
     except Exception as e:
-        st.error(f"Lỗi đọc dữ liệu: {e}")
+        st.error(f"Lỗi: {e}")
     return None
 
-# --- BANNER TUYÊN TRUYỀN ---
-def get_rotating_poster():
+# --- BANNER TUYÊN TRUYỀN TỰ ĐỘNG ---
+def get_dynamic_poster():
     posters = [
-        {"t": "🛡️ AN SINH HÔM NAY", "c": "Tham gia BHXH là hình thức đầu tư an toàn nhất cho tuổi già. Lương hưu giúp bạn tự chủ tài chính khi về già.", "s": "Vững bước tương lai"},
-        {"t": "🏥 SỨC KHỎE VÀNG", "c": "Thẻ BHYT là 'bùa hộ mệnh' giúp chi trả viện phí khi ốm đau. Đừng để bệnh tật làm khánh kiệt gia đình.", "s": "BHYT - Lá chắn y tế"},
-        {"t": "🤰 HẠNH PHÚC LÀM MẸ", "c": "Chế độ thai sản hỗ trợ 100% lương giúp các mẹ an tâm chăm sóc bé yêu trong những tháng đầu đời.", "s": "Đồng hành cùng gia đình"},
-        {"t": "⚖️ TRÁCH NHIỆM DOANH NGHIỆP", "c": "Đóng BHXH đầy đủ là bảo vệ quyền lợi hợp pháp của NLĐ và xây dựng uy tín bền vững cho doanh nghiệp.", "s": "Doanh nghiệp nhân văn"}
+        {"t": "🛡️ AN SINH HÀNG ĐẦU", "c": "Tham gia BHXH là hình thức tích lũy tài chính an toàn nhất cho tuổi già của bạn.", "s": "Vững bước tương lai"},
+        {"t": "🏥 BẢO HIỂM Y TẾ", "c": "Thẻ BHYT chi trả tới 80-100% chi phí khám chữa bệnh. Giảm bớt nỗi lo tài chính.", "s": "Chăm sóc sức khỏe vàng"},
+        {"t": "🤰 QUYỀN LỢI THAI SẢN", "c": "Hỗ trợ 100% lương bình quân đóng BHXH giúp các mẹ an tâm chăm sóc bé yêu.", "s": "Đồng hành cùng gia đình"},
+        {"t": "💼 TRỢ CẤP THẤT NGHIỆP", "c": "Hỗ trợ thu nhập và đào tạo nghề mới giúp bạn sớm quay lại thị trường lao động.", "s": "Điểm tựa khi khó khăn"}
     ]
     return posters[datetime.now().minute % len(posters)]
 
-# --- HEADER ---
-st.markdown("<h1 class='hero-title'>BHXH cơ sở Thuận An</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; color:#64748b; font-size:1.2rem; font-weight:600; margin-top:-10px;'>Cổng Kết Nối & Tra Cứu Dữ Liệu Chuyên Nghiệp</p>", unsafe_allow_html=True)
+# --- HEADER & LED MARQUEE ---
+st.markdown("<div class='hero-banner'><h1 class='hero-title'>BHXH cơ sở Thuận An</h1></div>", unsafe_allow_html=True)
 
-# Bảng tin chạy
-marquee_text = "🛡️ BHXH Thuận An: Thôn Thuận Sơn, xã Thuận An, Lâm Đồng. | 🏦 BIDV: 63510009867032 | 🏦 Agribank: 5301202919045 | 🏦 Vietinbank: 919035000003. | Vui lòng liên hệ cán bộ chuyên quản để được hỗ trợ tốt nhất."
-st.markdown(f"<div class='marquee-wrapper'><marquee scrollamount='9'>{marquee_text}</marquee></div>", unsafe_allow_html=True)
+marquee_msg = "📍 ĐỊA CHỈ: THÔN THUẬN SƠN, XÃ THUẬN AN, TỈNH LÂM ĐỒNG • 🏦 BIDV: 63510009867032 • 🏦 AGRIBANK: 5301202919045 • 🏦 VIETINBANK: 919035000003 • CHÚC QUÝ ĐƠN VỊ SỨC KHỎE VÀ THÀNH CÔNG! •"
+st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
 
-# --- XỬ LÝ HIỂN THỊ ---
+# --- GIAO DIỆN CHÍNH ---
 if df is not None:
-    # MÀN HÌNH 1: TRANG CHỦ & TÌM KIẾM
+    # MÀN HÌNH 1: CỬA NGÕ TÌM KIẾM
     if st.session_state.selected_unit is None:
-        # Cửa ngõ tìm kiếm nổi bật
-        _, c_search, _ = st.columns([0.1, 0.8, 0.1])
-        with c_search:
-            st.markdown("<h3 style='text-align:center; color:#1e3a8a; margin-bottom:10px;'>🔍 NHẬP MÃ HOẶC TÊN ĐƠN VỊ</h3>", unsafe_allow_html=True)
-            query = st.text_input("Gateway", placeholder="Gõ tìm kiếm tại đây...", label_visibility="collapsed")
-        
-        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div class='gateway-container'>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color:#1e3a8a; margin-top:0;'>🔍 BẮT ĐẦU TRA CỨU</h2>", unsafe_allow_html=True)
+        query = st.text_input("Gateway", placeholder="Nhập tên hoặc mã đơn vị để lọc kết quả ngay...", label_visibility="collapsed")
+        st.markdown("</div>", unsafe_allow_html=True)
+
         col_main, col_officers = st.columns([1.8, 1])
 
         with col_main:
@@ -233,61 +257,60 @@ if df is not None:
                 clean_query = unidecode(query).lower()
                 results = df[df['search_index'].str.contains(clean_query, na=False)].head(10)
                 if not results.empty:
-                    st.write(f"✨ Tìm thấy **{len(results)}** kết quả:")
+                    st.write(f"✨ Tìm thấy **{len(results)}** đơn vị phù hợp:")
                     for idx, row in results.iterrows():
                         with st.container():
                             ca, cb = st.columns([4, 1.5])
                             ca.markdown(f"""
-                                <div style='background:white; padding:20px; border-radius:25px; border-left:12px solid #e2e8f0; margin-bottom:15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);'>
+                                <div style='background:white; padding:25px; border-radius:30px; border-left:12px solid #e2e8f0; margin-bottom:15px; box-shadow:0 10px 20px rgba(0,0,0,0.05);'>
                                     <small style='color:#2563eb; font-weight:800;'>MÃ: {row.get('madvi')}</small><br>
-                                    <b style='font-size:1.4rem; color:#1e293b;'>{row.get('tendvi')}</b>
+                                    <b style='font-size:1.5rem; color:#1e293b;'>{row.get('tendvi')}</b>
                                 </div>
                             """, unsafe_allow_html=True)
-                            
-                            # FIX LỖI XÁC NHẬN: Sử dụng logic state thay vì status trực tiếp trong button
-                            if cb.button("Xác nhận tra cứu ➔", key=f"btn_{row.get('madvi')}_{idx}", use_container_width=True):
+                            if cb.button("Tra cứu chi tiết ➔", key=f"sel_{row.get('madvi')}_{idx}", use_container_width=True):
                                 st.session_state.selected_unit = row.get('madvi')
                                 st.session_state.show_loading = True
                                 st.rerun()
                 else:
                     st.error("Không tìm thấy đơn vị. Hãy kiểm tra lại từ khóa.")
             else:
-                p = get_rotating_poster()
+                # Banner Poster Tự động
+                p = get_dynamic_poster()
                 st.markdown(f"""
-                    <div class="poster-area">
+                    <div class="poster-box">
                         <h1 style='color:white; margin:0;'>{p['t']}</h1>
-                        <p style='font-size:1.3rem; opacity:0.9; line-height:1.6; margin:20px 0;'>{p['c']}</p>
+                        <p style='font-size:1.5rem; opacity:0.9; line-height:1.7; margin:25px 0;'>{p['c']}</p>
                         <hr style='border: 0.5px solid rgba(255,255,255,0.3);'>
                         <h2 style='color:#ffaa00; margin:0;'>{p['s']}</h2>
                     </div>
                 """, unsafe_allow_html=True)
+                st.caption(f"🕒 Banner tự động cập nhật nội dung hàng phút (Nội dung: {p['t']})")
 
         with col_officers:
             st.markdown("<h3 style='text-align:center;'>📞 Cán bộ Chuyên quản</h3>", unsafe_allow_html=True)
             for off in OFFICERS:
                 st.markdown(f"""
                 <div class="officer-card {off['class']}">
-                    <span class="badge-flash">ONLINE</span>
-                    <h4 style="margin:0; color:#1e3a8a;">{off['name']}</h4>
-                    <p style="margin:5px 0; font-size:0.85rem; color:#64748b;"><b>{off['title']}</b></p>
-                    <p style="margin:5px 0; font-size:0.8rem;">Phụ trách: {off['scope']}</p>
-                    <div style="background:#f0f9ff; padding:10px; border-radius:12px; margin-top:10px; border:1px solid #e2e8f0; text-align:center;">
-                        <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:#2563eb; font-weight:800; font-size:1.2rem;">📱 {off['phone']}</a>
+                    <h4 style="margin:0; color:{off['color']}; text-shadow: 0 0 5px {off['color']};">{off['name']}</h4>
+                    <p style="margin:8px 0; font-size:0.9rem; color:#aaa;">{off['title']}</p>
+                    <p style="margin:5px 0; font-size:0.8rem; color:#fff;">Khu vực: {off['scope']}</p>
+                    <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:15px; margin-top:15px;">
+                        <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:white; font-weight:800; font-size:1.3rem;">📱 {off['phone']}</a>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
 
-    # MÀN HÌNH LOADING KHI XÁC NHẬN
+    # MÀN HÌNH LOADING
     elif st.session_state.show_loading:
         st.markdown("<br><br><br>", unsafe_allow_html=True)
         with st.status("💎 Đang phân tích dữ liệu chuyên sâu...", expanded=True) as status:
-            st.write("🔄 Đang kết nối máy chủ dữ liệu...")
+            st.write("🔄 Đang kết nối máy chủ BHXH...")
             time.sleep(0.5)
-            st.write("📊 Đang tổng hợp số liệu C12-TS...")
+            st.write("📊 Đang tổng hợp số liệu C12-TS mới nhất...")
             time.sleep(0.5)
-            st.write("✨ Đang tạo Dashboard báo cáo...")
+            st.write("✨ Đang khởi tạo Dashboard cá nhân...")
             time.sleep(0.5)
-            status.update(label="Hoàn tất!", state="complete")
+            status.update(label="Tải dữ liệu hoàn tất!", state="complete")
         
         st.session_state.show_loading = False
         st.balloons()
@@ -299,48 +322,47 @@ if df is not None:
         unit_data = df[df['madvi'] == st.session_state.selected_unit].iloc[0]
         unit_addr = unidecode(str(unit_data.get('diachi', ''))).lower()
         
-        if st.button("⬅ QUAY LẠI TÌM KIẾM"):
+        if st.button("⬅ QUAY LẠI CỬA NGÕ TÌM KIẾM"):
             st.session_state.selected_unit = None
             st.rerun()
 
         st.markdown(f"""
-            <div style='background:white; padding:40px; border-radius:40px; border-left:20px solid #1e3a8a; box-shadow: 0 25px 60px rgba(0,0,0,0.08);'>
-                <h1 style='margin:0; color:#1e3a8a; font-size:3rem;'>🏢 {unit_data.get('tendvi')}</h1>
-                <p style='margin:10px 0 0 0; color:#64748b; font-size:1.2rem;'>Mã đơn vị: <b style='color:#1e3a8a;'>{unit_data.get('madvi')}</b> | Địa chỉ: {unit_data.get('diachi', 'N/A')}</p>
+            <div style='background:white; padding:45px; border-radius:45px; border-left:25px solid #1e3a8a; box-shadow: 0 30px 70px rgba(0,0,0,0.1); margin-top:20px;'>
+                <h1 style='margin:0; color:#1e3a8a; font-size:3.5rem;'>🏢 {unit_data.get('tendvi')}</h1>
+                <p style='margin:12px 0 0 0; color:#64748b; font-size:1.4rem;'>Mã: <b style='color:#1e3a8a;'>{unit_data.get('madvi')}</b> | Địa chỉ: {unit_data.get('diachi', 'N/A')}</p>
             </div>
         """, unsafe_allow_html=True)
 
         col_left, col_right = st.columns([1.9, 1])
 
         with col_left:
-            st.markdown("<div class='premium-panel' style='margin-top:30px;'>", unsafe_allow_html=True)
-            st.write("### 📈 Phân tích Số liệu C12-TS")
+            st.markdown("<div class='dashboard-panel' style='margin-top:30px;'>", unsafe_allow_html=True)
+            st.write("### 📉 Phân tích Số liệu đóng BHXH")
             
-            # Metric Grid với đầy đủ các cột yêu cầu
+            # Metric Grid
             m1, m2, m3 = st.columns(3)
-            with m1: st.markdown(f"<div class='metric-box'><p class='metric-lab'>Tiền đầu kỳ</p><p class='metric-val'>{unit_data.get('tien_dau_ky', 0):,.0f}đ</p></div>", unsafe_allow_html=True)
-            with m2: st.markdown(f"<div class='metric-box'><p class='metric-lab'>Số phải đóng</p><p class='metric-val'>{unit_data.get('so_phai_dong', 0):,.0f}đ</p></div>", unsafe_allow_html=True)
-            with m3: st.markdown(f"<div class='metric-box'><p class='metric-lab'>Điều chỉnh</p><p class='metric-val'>{unit_data.get('dieu_chinh_ky_truoc', 0):,.0f}đ</p></div>", unsafe_allow_html=True)
+            with m1: st.markdown(f"<div class='metric-card'><small>TIỀN ĐẦU KỲ</small><div style='font-size:1.8rem; font-weight:800;'>{unit_data.get('tien_dau_ky', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
+            with m2: st.markdown(f"<div class='metric-card'><small>SỐ PHẢI ĐÓNG</small><div style='font-size:1.8rem; font-weight:800;'>{unit_data.get('so_phai_dong', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
+            with m3: st.markdown(f"<div class='metric-card'><small>ĐIỀU CHỈNH</small><div style='font-size:1.8rem; font-weight:800;'>{unit_data.get('dieu_chinh_ky_truoc', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
             
             st.write("<br>", unsafe_allow_html=True)
             m4, m5, m6 = st.columns(3)
-            with m4: st.markdown(f"<div class='metric-box'><p class='metric-lab'>Số đã đóng</p><p class='metric-val' style='color:#10b981;'>{unit_data.get('so_da_dong', 0):,.0f}đ</p></div>", unsafe_allow_html=True)
-            with m5: st.markdown(f"<div class='metric-box'><p class='metric-lab'>Số bị lệch</p><p class='metric-val' style='color:#f59e0b;'>{unit_data.get('so_bi_lech', 0):,.0f}đ</p></div>", unsafe_allow_html=True)
+            with m4: st.markdown(f"<div class='metric-card'><small>SỐ ĐÃ ĐÓNG</small><div style='font-size:1.8rem; font-weight:800; color:#10b981;'>{unit_data.get('so_da_dong', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
+            with m5: st.markdown(f"<div class='metric-card'><small>SỐ BỊ LỆCH</small><div style='font-size:1.8rem; font-weight:800; color:#f59e0b;'>{unit_data.get('so_bi_lech', 0):,.0f}đ</div></div>", unsafe_allow_html=True)
             with m6:
                 debt = unit_data.get('tien_cuoi_ky', 0)
                 color = "#ef4444" if debt > 0 else "#3b82f6"
-                st.markdown(f"<div class='metric-box'><p class='metric-lab'>Còn nợ/Dư</p><p class='metric-val' style='color:{color};'>{abs(debt):,.0f}đ</p></div>", unsafe_allow_html=True)
-            
-            st.write(f"**Tỷ lệ nợ hiện tại:** `{unit_data.get('tyleno', 0)}%`")
+                label = "CÒN NỢ" if debt > 0 else "DƯ CÓ"
+                st.markdown(f"<div class='metric-card'><small>{label}</small><div style='font-size:1.8rem; font-weight:800; color:{color};'>{abs(debt):,.0f}đ</div></div>", unsafe_allow_html=True)
             
             # Cú pháp nộp tiền chuẩn
             now = datetime.now()
             transfer_note = f"{unit_data.get('madvi')} {unit_data.get('tendvi')} đóng bhxh tháng {now.month} năm {now.year}"
             st.markdown(f"""
-                <div style='background:#f0f9ff; padding:35px; border-radius:30px; border:3px dashed #3b82f6; margin-top:30px;'>
+                <div style='background:#f0f9ff; padding:35px; border-radius:35px; border:3px dashed #3b82f6; margin-top:35px;'>
                     <p style='color:#1e40af; font-weight:800; margin:0; font-size:1.1rem; text-transform:uppercase;'>📝 Nội dung nộp tiền chuyển khoản:</p>
-                    <h2 style='color:#1e3a8a; font-family:monospace; margin:15px 0; font-size:1.8rem; background:white; padding:15px; border-radius:15px; border:1px solid #e2e8f0;'>{transfer_note}</h2>
-                    <p style='margin:0; font-size:0.9rem; color:#64748b;'><i>Vui lòng ghi đúng nội dung để hệ thống ghi nhận tự động.</i></p>
+                    <h2 style='color:#1e3a8a; font-family:monospace; margin:15px 0; font-size:1.9rem; background:white; padding:15px; border-radius:15px; border:1px solid #e2e8f0;'>{transfer_note}</h2>
+                    <p style='margin:0; font-size:0.9rem; color:#64748b;'><i>Vui lòng sao chép đúng nội dung để hệ thống ghi nhận chính xác.</i></p>
                 </div>
             """, unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
@@ -352,8 +374,8 @@ if df is not None:
             rate = min(round((da_dong / phai_dong) * 100, 1), 100) if phai_dong > 0 else 0
             fig = go.Figure(go.Indicator(
                 mode = "gauge+number", value = rate,
-                title = {'text': "Tỷ lệ hoàn thành (%)", 'font': {'size': 20}},
-                number = {'suffix': "%", 'font': {'color': '#1e40af', 'size': 50}},
+                title = {'text': "Tỷ lệ hoàn thành (%)", 'font': {'size': 22, 'color': '#64748b'}},
+                number = {'suffix': "%", 'font': {'color': '#1e40af', 'size': 60}},
                 gauge = {
                     'axis': {'range': [0, 100]},
                     'bar': {'color': "#1e40af"},
@@ -361,33 +383,32 @@ if df is not None:
                     'steps': [{'range': [0, 50], 'color': '#fee2e2'}, {'range': [50, 90], 'color': '#fef9c3'}, {'range': [90, 100], 'color': '#dcfce7'}]
                 }
             ))
-            fig.update_layout(height=400, margin=dict(l=35, r=35, t=70, b=35), paper_bgcolor="rgba(0,0,0,0)")
+            fig.update_layout(height=450, margin=dict(l=35, r=35, t=70, b=35), paper_bgcolor="rgba(0,0,0,0)")
             st.plotly_chart(fig, use_container_width=True)
             
-            # Cán bộ phụ trách
-            st.markdown("### 👨‍💼 Cán bộ Chuyên quản phụ trách")
+            # Cán bộ phụ trách (Highlight nhấp nháy)
+            st.markdown("### 👨‍💼 Cán bộ Phụ trách Đơn vị")
             found_officer = False
             for off in OFFICERS:
                 is_assigned = any(area in unit_addr for area in off['areas'])
                 blink_class = off['class'] if is_assigned else ""
-                badge = '<span class="badge-flash">PHỤ TRÁCH TRỰC TIẾP</span>' if is_assigned else ""
                 
                 if is_assigned:
                     found_officer = True
                     st.markdown(f"""
-                    <div class="officer-card {blink_class}" style="background:#f0f9ff;">
-                        {badge}
-                        <h4 style="margin:0; color:#1e3a8a;">{off['name']}</h4>
-                        <p style="margin:5px 0; font-size:0.85rem;">{off['title']}</p>
-                        <div style="background:white; padding:10px; border-radius:12px; margin-top:10px; border:2px solid #3b82f6; text-align:center;">
-                            <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:#2563eb; font-weight:800; font-size:1.4rem;">📱 {off['phone']}</a>
+                    <div class="officer-card {blink_class}" style="background:#000;">
+                        <span style="color:#39ff14; font-weight:800; font-size:0.7rem; border:1px solid #39ff14; padding:2px 8px; border-radius:50px;">PHỤ TRÁCH TRỰC TIẾP</span>
+                        <h4 style="margin:10px 0; color:{off['color']}; text-shadow: 0 0 10px {off['color']};">{off['name']}</h4>
+                        <p style="margin:5px 0; font-size:0.85rem; color:#fff;">{off['title']}</p>
+                        <div style="background:#222; padding:10px; border-radius:15px; margin-top:15px; border:1px solid #444;">
+                            <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:white; font-weight:800; font-size:1.4rem;">📱 {off['phone']}</a>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
             
             if not found_officer:
-                st.warning("Hệ thống không nhận diện được cán bộ khu vực. Vui lòng liên hệ tổng đài.")
+                st.warning("Hệ thống không nhận diện được vùng quản lý. Vui lòng liên hệ bất kỳ cán bộ nào.")
 
 # --- FOOTER ---
 st.markdown("<br><hr>", unsafe_allow_html=True)
-st.markdown(f"<center style='color:#94a3b8; font-size:0.9rem; padding-bottom:60px;'>© {datetime.now().year} BHXH CƠ SỞ THUẬN AN - LÂM ĐỒNG | Elite Connect v11.0.1</center>", unsafe_allow_html=True)
+st.markdown(f"<center style='color:#94a3b8; font-size:0.9rem; padding-bottom:60px;'>© {datetime.now().year} BHXH CƠ SỞ THUẬN AN - LÂM ĐỒNG | Elite Digital Hub v12.0</center>", unsafe_allow_html=True)
