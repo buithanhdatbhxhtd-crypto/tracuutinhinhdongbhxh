@@ -12,13 +12,13 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v26.0 Ultimate Pro",
+    page_title="BHXH Thuận An - v27.0 Pro Masterpiece",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CẤU HÌNH AI GEMINI (TỰ ĐỘNG CHUYỂN ĐỔI MODEL CHỐNG 404) ---
+# --- CẤU HÌNH AI GEMINI (THUẬT TOÁN SURVIVAL LOOP CHỐNG LỖI 404) ---
 api_key = st.secrets.get("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
 if api_key:
     try:
@@ -34,23 +34,22 @@ def get_ai_response(prompt, context=""):
     else:
         full_prompt = f"{system_instruction}\n\n[CÂU HỎI]: {prompt}"
         
-    try:
-        # CẤU TRÚC FALLBACK: Ưu tiên gemini-pro (Cực kỳ ổn định và hỗ trợ 100% API key hiện nay)
-        model = genai.GenerativeModel('gemini-pro')
-        response = model.generate_content(full_prompt)
-        return response.text
-    except Exception as e1:
+    # Vòng lặp Sinh tồn: Thử lần lượt các model từ mới nhất đến cũ nhất để đảm bảo không bị lỗi 404
+    stable_models = ['gemini-1.5-flash', 'gemini-1.0-pro', 'gemini-pro']
+    last_error = ""
+    
+    for model_name in stable_models:
         try:
-            # Nếu gemini-pro bị lỗi, thử chuyển sang gemini-1.5-flash-latest
-            model = genai.GenerativeModel('gemini-1.5-flash-latest')
+            model = genai.GenerativeModel(model_name)
             response = model.generate_content(full_prompt)
             return response.text
-        except Exception as e2:
-            # Bắt lỗi Quota hoặc các lỗi khác một cách chi tiết
-            error_msg = str(e2).lower()
-            if "429" in error_msg or "quota" in error_msg:
+        except Exception as e:
+            last_error = str(e).lower()
+            if "429" in last_error or "quota" in last_error:
                 return "⚠️ **Trợ lý AI đang quá tải:** Số lượng câu hỏi vượt mức miễn phí trong 1 phút. Quý đơn vị vui lòng đợi 1 phút và thử lại nhé!"
-            return f"⚠️ **Trợ lý AI đang bận:** Lỗi API Version ({str(e2)[:80]}...). Quý đơn vị vui lòng chat Zalo cho cán bộ để được hỗ trợ trực tiếp!"
+            continue # Nếu lỗi 404 (Không tìm thấy model), tiếp tục thử model khác
+            
+    return f"⚠️ **Trợ lý AI đang bận:** Các model AI đều không khả dụng cho API Key của bạn. Vui lòng chat Zalo cho cán bộ để được hỗ trợ! (Lỗi: {last_error[:80]}...)"
 
 # --- KHỞI TẠO STATE ---
 if 'selected_unit' not in st.session_state:
@@ -66,7 +65,7 @@ if 'search_query' not in st.session_state:
 if 'welcome_done' not in st.session_state:
     st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN V26.0 - CHUẨN MỰC TRẢI NGHIỆM) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN V27.0 - CHUẨN MỰC) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -80,7 +79,6 @@ st.markdown("""
     }
 
     * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
-    
     .stApp { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); }
 
     /* --- SIDEBAR ĐẲNG CẤP --- */
@@ -134,12 +132,6 @@ st.markdown("""
     .stCodeBlock { background: transparent !important; }
     .stCodeBlock code { font-size: 1.5rem !important; font-weight: 900 !important; color: #1e3a8a !important; }
 
-    /* PDF DOC PORTAL */
-    .pdf-portal {
-        background: white; border-radius: 30px; padding: 30px; border: 4px solid #e2e8f0;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.1); margin-top: 20px;
-    }
-
     .stButton>button {
         border-radius: 50px !important; font-weight: 800 !important; text-transform: uppercase;
         padding: 0.8rem 3rem !important; transition: all 0.3s ease !important;
@@ -174,57 +166,62 @@ def live_clock():
     </script>
     """, height=180)
 
-# --- HÀM RENDER PDF BẰNG KỸ THUẬT BLOB (CHỐNG BLOCK CHROME 100%) ---
-def render_pdf_anti_block(file_path):
+# --- HÀM RENDER PDF BẰNG KỸ THUẬT CANVAS PDF.JS (CHỐNG CHROME BLOCK 100%) ---
+def render_pdf_unblockable(file_path):
     try:
         with open(file_path, "rb") as f:
             pdf_data = f.read()
             base64_pdf = base64.b64encode(pdf_data).decode('utf-8')
             
-        # JS biến đổi Base64 thành định dạng Blob an toàn để vượt mặt Security Policy của Chrome
+        # JS vẽ PDF thành ảnh Canvas (Chrome không thể chặn vì đây không phải là Plugin PDF)
         js_code = f"""
-        <div id="pdf-viewer-wrapper" style="width: 100%; height: 800px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1); border: 5px solid white; background: #f8fafc;">
-            <div id="loading-msg" style="text-align: center; padding-top: 350px; font-family: 'Plus Jakarta Sans', sans-serif; color: #2563eb; font-size: 1.5rem; font-weight: bold;">
-                ⏳ Hệ thống đang giải mã và tải văn bản an toàn...
-            </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+        <script>
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        </script>
+        <div id="pdf-container" style="display: flex; flex-direction: column; align-items: center; background-color: #f1f5f9; padding: 30px; border-radius: 20px; border: 5px solid white; box-shadow: 0 20px 50px rgba(0,0,0,0.1);">
+            <h3 id="loading-msg" style="color: #2563eb; font-family: 'Plus Jakarta Sans', sans-serif;">⏳ Đang giải mã văn bản kỹ thuật số...</h3>
         </div>
         <script>
-            setTimeout(() => {{
-                try {{
-                    const b64Data = "{base64_pdf}";
-                    const byteCharacters = atob(b64Data);
-                    const byteNumbers = new Array(byteCharacters.length);
-                    for (let i = 0; i < byteCharacters.length; i++) {{
-                        byteNumbers[i] = byteCharacters.charCodeAt(i);
-                    }}
-                    const byteArray = new Uint8Array(byteNumbers);
-                    const blob = new Blob([byteArray], {{type: 'application/pdf'}});
-                    const blobUrl = URL.createObjectURL(blob);
-                    
-                    const iframe = document.createElement('iframe');
-                    iframe.src = blobUrl;
-                    iframe.width = '100%';
-                    iframe.height = '100%';
-                    iframe.style.border = 'none';
-                    
-                    const wrapper = document.getElementById('pdf-viewer-wrapper');
-                    wrapper.innerHTML = ''; 
-                    wrapper.appendChild(iframe);
-                }} catch (e) {{
-                    document.getElementById('loading-msg').innerHTML = '⚠️ Không thể tải trực tiếp. Vui lòng sử dụng nút TẢI VỀ bên dưới.';
+            const pdfData = atob('{base64_pdf}');
+            const loadingTask = pdfjsLib.getDocument({{data: pdfData}});
+            loadingTask.promise.then(pdf => {{
+                const container = document.getElementById('pdf-container');
+                container.innerHTML = ''; // Xoá chữ loading
+                
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {{
+                    pdf.getPage(pageNum).then(page => {{
+                        const scale = 1.5;
+                        const viewport = page.getViewport({{scale: scale}});
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        canvas.style.maxWidth = '100%';
+                        canvas.style.marginBottom = '25px';
+                        canvas.style.boxShadow = '0 15px 30px rgba(0,0,0,0.15)';
+                        canvas.style.borderRadius = '10px';
+                        
+                        container.appendChild(canvas);
+                        page.render({{canvasContext: ctx, viewport: viewport}});
+                    }});
                 }}
-            }}, 800);
+            }}).catch(err => {{
+                document.getElementById('pdf-container').innerHTML = '<h3 style="color:red; font-family: sans-serif;">⚠️ Lỗi hiển thị tài liệu. Vui lòng tải về máy.</h3>';
+            }});
         </script>
         """
-        components.html(js_code, height=820)
+        # Sử dụng scrolling=True để cuộn các trang Canvas
+        components.html(js_code, height=850, scrolling=True)
         
         st.write("<br>", unsafe_allow_html=True)
         # Nút dự phòng
         col_dl, col_open = st.columns(2)
         with col_dl:
-            st.download_button(label="📥 TẢI VĂN BẢN VỀ MÁY (KHUYÊN DÙNG)", data=pdf_data, file_name=file_path, mime="application/pdf", use_container_width=True)
+            st.download_button(label="📥 TẢI BẢN GỐC VỀ MÁY TÍNH", data=pdf_data, file_name=file_path, mime="application/pdf", use_container_width=True)
         with col_open:
-            st.markdown(f'<a href="data:application/pdf;base64,{base64_pdf}" download="{file_path}" style="text-decoration:none; background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color:white; padding:15px; border-radius:50px; font-weight:900; display:block; text-align:center; box-shadow: 0 10px 20px rgba(30,58,138,0.3); text-transform:uppercase; font-size: 1.1rem; border: 2px solid white;">🚀 LƯU TRỮ TRỰC TIẾP VÀO THIẾT BỊ</a>', unsafe_allow_html=True)
+            st.markdown(f'<a href="data:application/pdf;base64,{base64_pdf}" download="{file_path}" style="text-decoration:none; background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color:white; padding:15px; border-radius:50px; font-weight:900; display:block; text-align:center; box-shadow: 0 10px 20px rgba(30,58,138,0.3); text-transform:uppercase; font-size: 1.1rem; border: 2px solid white;">🚀 TẢI VÀ MỞ BẰNG PHẦN MỀM ĐỌC PDF</a>', unsafe_allow_html=True)
         return True
     except Exception as e:
         st.error(f"Lỗi hệ thống PDF: {e}")
@@ -234,7 +231,7 @@ def render_pdf_anti_block(file_path):
 OFFICERS = [
     {"name": "Bà NGUYỄN THỊ NHÀI", "communes": "Xã Đức Lập, Xã Đắk Mil", "keywords": ["duc lap", "đức lập", "dak mil", "đắk mil", "dc0039c"], "phone": "0846.39.29.29", "zalo": "https://zalo.me/0846392929", "color": "#00d2ff"},
     {"name": "Ông BÙI THÀNH ĐẠT", "communes": "Xã Đắk Sắk, Xã Đắk Song", "keywords": ["dak sak", "đắk sắk", "dak song", "đắk song"], "phone": "0986.05.30.06", "zalo": "https://zalo.me/0986053006", "color": "#ffaa00"},
-    {"name": "Ông HOÀNG SỸ HẢI", "communes": "Xã Thuận An", "keywords": ["thuan an", "thuận an"], "phone": "0919.06.11.53", "zalo": "https://zalo.me/0919061153", "color": "#10b981"}
+    {"name": "Ông HOÀNG SỸ HẢI", "communes": "Xã Thuận An", "keywords": ["thuan an", "thuận an"], "phone": "0919.06.11.53", "zalo": "https://zalo.me/0919061153", "color": "#39ff14"}
 ]
 
 # --- HÀM RENDER NGÂN HÀNG VIP (COPY 1 CHẠM) ---
@@ -242,7 +239,7 @@ def render_vip_bank_accounts(unit_code="[Mã Đơn Vị]", unit_name="[Tên Đơ
     st.markdown("""
         <div class="bank-card">
             <h2 style='color:#1e3a8a; margin-top:0; font-weight: 900; text-align: center; font-size: 2rem;'>🏦 THÔNG TIN CHUYỂN KHOẢN ĐÓNG BHXH</h2>
-            <p style='color:#475569; font-size:1.1rem; text-align: center; font-weight: 600;'>Kế toán đơn vị vui lòng nhấn vào biểu tượng <b style="color: #2563eb;">Copy</b> ở góc phải mỗi số tài khoản để sao chép nhanh và chính xác nhất.</p>
+            <p style='color:#475569; font-size:1.1rem; text-align: center; font-weight: 600;'>Kế toán đơn vị vui lòng nhấn vào biểu tượng <b style="color: #2563eb;">Copy</b> ở góc phải mỗi số tài khoản để sao chép nhanh.</p>
         </div>
     """, unsafe_allow_html=True)
     
@@ -295,7 +292,7 @@ with st.sidebar:
     st.caption("v26.0 Ultimate Pro | Final Edition")
 
 # --- HEADER LED ---
-marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN PRO v26.0 • BẢO MẬT - MINH BẠCH - NHANH CHÓNG • TÍCH HỢP TRÍ TUỆ NHÂN TẠO GEMINI VÀ XỬ LÝ VĂN BẢN KỸ THUẬT SỐ •"
+marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN PRO v26.0 • BẢO MẬT - MINH BẠCH - NHANH CHÓNG • TÍCH HỢP TRÍ TUỆ NHÂN TẠO GEMINI VÀ XỬ LÝ VĂN BẢN KỸ THUẬT SỐ CHỐNG CHẶN 100% •"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -414,7 +411,7 @@ if df is not None:
             context = f"Đơn vị: {unit['tendvi']}, Mã: {unit['madvi']}, Nợ: {unit['tien_cuoi_ky']} VNĐ. Hãy dựa vào đây trả lời nếu đơn vị hỏi."
             st.success(f"🤖 AI đã liên kết với dữ liệu của **{unit['tendvi']}**. Bạn có thể hỏi về số nợ hiện tại!")
         else:
-            st.info("🤖 AI đã sẵn sàng. Hãy đặt câu hỏi về luật và quy định BHXH.")
+            st.info("🤖 AI đã sẵn sàng. Hệ thống chống sập 404 đã được kích hoạt. Hãy đặt câu hỏi!")
 
         for msg in st.session_state.chat_history:
             with st.chat_message(msg["role"]): st.markdown(msg["content"])
@@ -423,12 +420,12 @@ if df is not None:
             st.session_state.chat_history.append({"role": "user", "content": prompt})
             with st.chat_message("user"): st.markdown(prompt)
             with st.chat_message("assistant"):
-                with st.spinner("AI đang phân tích dữ liệu..."):
+                with st.spinner("AI đang phân tích siêu tốc..."):
                     resp = get_ai_response(prompt, context)
                     st.markdown(resp)
                     st.session_state.chat_history.append({"role": "assistant", "content": resp})
 
-    # --- TAB 3: PDF (CHỐNG CHẶN 100% VỚI BLOB JS) ---
+    # --- TAB 3: PDF (CHỐNG CHẶN 100% BẰNG PDF.JS LÕI) ---
     elif st.session_state.current_tab == "📂 Thư viện Văn bản":
         st.markdown("## 📂 THƯ VIỆN VĂN BẢN ĐIỀU HÀNH")
         pdfs = [f for f in os.listdir('.') if f.lower().endswith('.pdf')]
@@ -441,8 +438,8 @@ if df is not None:
                     if st.button(f"📄 {f}", use_container_width=True): st.session_state.active_pdf = f
             with c2:
                 if st.session_state.active_pdf:
-                    st.success(f"📌 ĐANG XEM: {st.session_state.active_pdf}")
-                    render_pdf_anti_block(st.session_state.active_pdf)
+                    st.success(f"📌 ĐANG XEM TÀI LIỆU AN TOÀN: {st.session_state.active_pdf}")
+                    render_pdf_unblockable(st.session_state.active_pdf)
 
     # --- CÁC TAB KHÁC ---
     elif st.session_state.current_tab == "📑 Cẩm nang Nghiệp vụ": 
