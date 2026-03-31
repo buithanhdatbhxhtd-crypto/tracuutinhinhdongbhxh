@@ -8,10 +8,11 @@ import time
 from datetime import datetime
 import google.generativeai as genai
 import base64
+import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v19.1 Radiant Quantum",
+    page_title="BHXH Thuận An - v20.0 Eternal Quantum",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -44,7 +45,7 @@ if "chat_history" not in st.session_state:
 if 'active_pdf' not in st.session_state:
     st.session_state.active_pdf = None
 
-# --- TỔNG LỰC CSS (GIAO DIỆN RADIANT v19.1) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN ETERNAL v20.0) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -55,49 +56,43 @@ st.markdown("""
         --accent: #0ea5e9;
         --neon-blue: #00d2ff;
         --neon-green: #10b981;
-        --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        --text-bright: #ffffff;
     }
 
     * { font-family: 'Plus Jakarta Sans', sans-serif; }
     
     .stApp {
-        background: var(--bg-gradient);
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     }
 
-    /* ĐỒNG HỒ THỜI GIAN THỰC */
-    .live-clock-container {
-        background: white;
-        padding: 10px 20px;
-        border-radius: 50px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        display: inline-flex;
-        align-items: center;
-        margin-bottom: 20px;
-        border: 2px solid var(--secondary);
-    }
-    .clock-text {
-        font-size: 1.1rem;
-        font-weight: 800;
-        color: var(--primary);
+    /* ĐỒNG HỒ DYNAMIC */
+    .clock-box {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(30, 58, 138, 0.2);
+        border: 1px solid rgba(255,255,255,0.2);
     }
 
-    /* BẢNG LED RGB CAO CẤP */
+    /* BẢNG LED RGB v20 */
     .led-marquee {
         background: #000;
         color: #00ff00;
-        padding: 15px 0;
+        padding: 12px 0;
         font-weight: 800;
         border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 255, 0, 0.2);
+        box-shadow: 0 15px 35px rgba(0, 255, 0, 0.15);
         border: 2px solid #333;
         margin-bottom: 30px;
         font-family: 'Courier New', Courier, monospace;
-        font-size: 1.3rem;
+        font-size: 1.35rem;
         text-shadow: 0 0 10px #00ff00;
         border-top: 3px solid var(--neon-blue);
     }
 
-    /* SIÊU Ô TÌM KIẾM GATEWAY v19.1 */
+    /* SIÊU Ô TÌM KIẾM GATEWAY v20 */
     .gateway-container {
         max-width: 1000px;
         margin: 0 auto 3rem auto;
@@ -112,74 +107,62 @@ st.markdown("""
     .stTextInput input {
         border-radius: 30px !important;
         padding: 15px 45px !important; 
-        border: 10px solid var(--secondary) !important;
-        font-size: 2.5rem !important; 
+        border: 8px solid var(--secondary) !important;
+        font-size: 2.8rem !important; 
         font-weight: 900 !important;
-        height: 130px !important; 
+        height: 140px !important; 
         background: white !important;
         color: var(--primary) !important;
-        box-shadow: 0 30px 60px rgba(59, 130, 246, 0.3) !important;
+        box-shadow: 0 40px 80px rgba(59, 130, 246, 0.3) !important;
         text-align: center !important;
         line-height: normal !important;
-        transition: all 0.4s ease;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     
     .stTextInput input:focus {
         border-color: var(--neon-blue) !important;
         transform: scale(1.02);
-        box-shadow: 0 40px 100px rgba(0, 210, 255, 0.4) !important;
+        box-shadow: 0 50px 120px rgba(0, 210, 255, 0.4) !important;
     }
 
-    /* THẺ DASHBOARD TRẮNG RỰC RỠ */
+    /* THẺ DASHBOARD RADIANT */
     .radiant-card {
         background: white;
-        padding: 25px;
-        border-radius: 30px;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.06);
+        padding: 30px;
+        border-radius: 35px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.05);
         border: 1px solid #f1f5f9;
         transition: all 0.3s ease;
     }
-    .radiant-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
 
-    /* THẺ CÁN BỘ & BANK MATRIX (BRIGHT MODE) */
-    .matrix-card-bright {
-        background: white;
-        padding: 22px;
-        border-radius: 25px;
-        border: 3px solid #f1f5f9;
-        margin-bottom: 20px;
-        text-align: center;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.04);
-    }
-    .matrix-card-bright:hover { border-color: var(--secondary); transform: scale(1.02); }
-
-    /* PDF VIEWER RADIANT */
-    .pdf-bright-container {
-        border-radius: 35px;
-        border: 12px solid white;
-        box-shadow: 0 40px 100px rgba(0,0,0,0.12);
-        overflow: hidden;
-        background: #f8fafc;
-        height: 800px;
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    /* SIDEBAR GLASSMORPISM */
+    /* FIX SIDEBAR ICON & TEXT - DỄ NHÌN HƠN */
     [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 100%);
+        background: linear-gradient(180deg, #0f172a 0%, #1e3a8a 100%);
     }
-    [data-testid="stSidebar"] .stButton>button {
-        background: rgba(255, 255, 255, 0.05) !important;
+    
+    /* Chỉnh màu chữ cho Radio Button trong Sidebar */
+    div[data-testid="stSidebar"] .stRadio label {
         color: white !important;
-        border: 1px solid rgba(255,255,255,0.1) !important;
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        padding: 10px 0 !important;
     }
-    [data-testid="stSidebar"] .stButton>button:hover {
-        background: var(--secondary) !important;
-        border-color: var(--neon-blue) !important;
+    
+    div[data-testid="stSidebar"] .stRadio div[role="radiogroup"] {
+        gap: 15px;
     }
 
-    /* BUTTONS MAIN AREA */
+    /* PDF VIEWER v20 - TRẮNG RỰC RỠ */
+    .pdf-v20-container {
+        border-radius: 35px;
+        border: 15px solid white;
+        box-shadow: 0 50px 150px rgba(0,0,0,0.15);
+        background: white;
+        height: 850px;
+        width: 100%;
+        margin-top: 10px;
+    }
+
     .stButton>button {
         border-radius: 50px !important;
         font-weight: 800 !important;
@@ -189,6 +172,38 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
+
+# --- CHỨC NĂNG ĐỒNG HỒ REAL-TIME (JS) ---
+def live_clock():
+    components.html("""
+    <div id="clock-container" style="
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+    ">
+        <div id="date" style="font-size: 0.9rem; opacity: 0.8; font-weight: 600;"></div>
+        <div id="time" style="font-size: 1.8rem; font-weight: 800; letter-spacing: 2px;"></div>
+    </div>
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date').innerText = now.toLocaleDateString('vi-VN', dateOptions).toUpperCase();
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('time').innerText = hours + ":" + minutes + ":" + seconds;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+    """, height=120)
 
 # --- DỮ LIỆU CÁN BỘ CHUYÊN QUẢN ---
 OFFICERS = [
@@ -201,20 +216,18 @@ OFFICERS = [
 def get_local_pdfs():
     return [f for f in os.listdir('.') if f.lower().endswith('.pdf')]
 
-def embed_pdf_radiant(file_path):
+def embed_pdf_v20(file_path):
     try:
         with open(file_path, "rb") as f:
             pdf_bytes = f.read()
             base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
         
-        # Nhúng bằng thẻ object
         pdf_display = f"""
-        <div class="pdf-bright-container">
+        <div class="pdf-v20-container">
             <object data="data:application/pdf;base64,{base64_pdf}" type="application/pdf" width="100%" height="100%">
                 <div style="padding: 100px 40px; text-align: center; background: white; height: 100%;">
-                    <h2 style="color: #ef4444;">⚠️ TRÌNH DUYỆT ĐANG CHẶN PDF</h2>
-                    <p style="font-size: 1.2rem; color: #64748b;">Do chính sách bảo mật của Chrome/Edge, Quý đơn vị vui lòng nhấn nút <b>"TẢI VĂN BẢN"</b> hoặc <b>"MỞ TAB MỚI"</b> bên dưới để xem nội dung.</p>
-                    <img src="https://cdn-icons-png.flaticon.com/512/337/337946.png" width="150" style="opacity: 0.3; margin-top: 20px;">
+                    <h2 style="color: #ef4444;">⚠️ TRÌNH DUYỆT CHẶN XEM TRỰC TIẾP</h2>
+                    <p style="font-size: 1.2rem; color: #64748b;">Quý đơn vị vui lòng nhấn nút <b>"MỞ TAB MỚI"</b> hoặc <b>"TẢI VỀ"</b> bên dưới để xem văn bản.</p>
                 </div>
             </object>
         </div>
@@ -247,38 +260,36 @@ def load_data_engine():
             return df
     except: return None
 
-# --- SIDEBAR RADIANT ---
+# --- SIDEBAR ETERNAL ---
 with st.sidebar:
-    st.markdown("<h1 style='color:white; text-align:center; font-size: 1.8rem; font-weight: 900;'>🛡️ QUANTUM HUB</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='color:white; text-align:center; font-size: 2rem; font-weight: 900; letter-spacing: 2px;'>🛡️ QUANTUM</h1>", unsafe_allow_html=True)
     st.divider()
     
-    menu = ["📊 Tra cứu C12-TS", "🤖 Trợ lý AI Gemini", "📂 Thư viện Văn bản", "📑 Cẩm nang Nghiệp vụ", "🧮 Máy tính BHXH", "📍 Liên hệ BHXH"]
-    selected_tab = st.radio("CÔNG CỤ TIỆN ÍCH", menu, label_visibility="collapsed")
+    menu_options = {
+        "📊 Tra cứu C12-TS": "📈",
+        "🤖 Trợ lý AI Gemini": "🧠",
+        "📂 Thư viện Văn bản": "📄",
+        "📑 Cẩm nang Nghiệp vụ": "📚",
+        "🧮 Máy tính BHXH": "🧮",
+        "📍 Liên hệ BHXH": "🏠"
+    }
+    
+    # Sử dụng Radio với CSS fix màu chữ trắng
+    selected_tab = st.radio(
+        "DANH MỤC CHỨC NĂNG",
+        list(menu_options.keys()),
+        label_visibility="collapsed"
+    )
     st.session_state.current_tab = selected_tab
     
     st.divider()
-    # Hiển thị ngày tháng trong sidebar
-    now = datetime.now()
-    st.markdown(f"""
-        <div style='background:rgba(255,255,255,0.1); padding:15px; border-radius:20px; text-align:center; color:white;'>
-            <small>HÔM NAY</small><br>
-            <b style='font-size:1.2rem;'>{now.strftime('%d/%m/%Y')}</b>
-        </div>
-    """, unsafe_allow_html=True)
-    st.caption("v19.1 Radiant | Elite Digital")
+    # Hiển thị đồng hồ trong Sidebar cho tiện theo dõi
+    live_clock()
+    st.caption("v20.0 Eternal Nexus | Radiant Hub")
 
-# --- HEADER & LIVE CLOCK ---
-col_head, col_clock = st.columns([3, 1])
-with col_head:
-    marquee_msg = "🛡️ CHÀO MỪNG QUÝ ĐƠN VỊ ĐẾN VỚI HỆ THỐNG TRA CỨU BHXH THUẬN AN PHIÊN BẢN v19.1 RADIANT QUANTUM • TRA CỨU NHANH - CHÍNH XÁC - MINH BẠCH •"
-    st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
-with col_clock:
-    # Hiển thị thời gian thực (tĩnh theo mỗi lần tương tác trong Streamlit)
-    st.markdown(f"""
-        <div class='live-clock-container'>
-            <span class='clock-text'>⏰ {datetime.now().strftime('%H:%M:%S')}</span>
-        </div>
-    """, unsafe_allow_html=True)
+# --- HEADER LED ---
+marquee_msg = "💎 HỆ THỐNG TRA CỨU BHXH THUẬN AN PHIÊN BẢN v20.0 ETERNAL QUANTUM • GIAO DIỆN SIÊU HIỂN THỊ • TRÍ TUỆ NHÂN TẠO GEMINI • TRA CỨU NHANH - CHÍNH XÁC •"
+st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data_engine()
 
@@ -288,14 +299,14 @@ if df is not None:
         if st.session_state.selected_unit is None:
             st.markdown("<div class='gateway-container'>", unsafe_allow_html=True)
             st.markdown("<h1 style='color:#1e3a8a; font-size:4rem; font-weight:900;'>🛡️ CỔNG TRA CỨU DỮ LIỆU</h1>", unsafe_allow_html=True)
-            st.markdown("<p style='color:#64748b; font-size:1.5rem; font-weight:700;'>MỜI NHẬP MÃ ĐƠN VỊ HOẶC TÊN CÔNG TY</p>", unsafe_allow_html=True)
-            query = st.text_input("Gateway", placeholder="Gõ mã hoặc tên vào đây...", label_visibility="collapsed")
+            st.markdown("<p style='color:#64748b; font-size:1.6rem; font-weight:700;'>NHẬP MÃ ĐƠN VỊ HOẶC TÊN CÔNG TY</p>", unsafe_allow_html=True)
+            query = st.text_input("Gateway", placeholder="Gõ thông tin tra cứu...", label_visibility="collapsed")
             st.markdown("</div>", unsafe_allow_html=True)
 
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
                 st.markdown("##### 📢 TIN TỨC MỚI")
-                st.markdown("<div class='radiant-card' style='text-align:center; min-height:350px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a;'>🛡️ AN SINH</h4><p style='color:#64748b;'>Hưởng lương hưu hàng tháng là giải pháp an toàn nhất cho tương lai.</p><hr><small style='color:#f59e0b; font-weight:800;'>BHXH THUẬN AN ĐỒNG HÀNH</small></div>", unsafe_allow_html=True)
+                st.markdown("<div class='radiant-card' style='text-align:center; min-height:350px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a;'>🛡️ AN SINH</h4><p style='color:#64748b;'>Tham gia BHXH đầy đủ để bảo vệ quyền lợi hưu trí vững chắc nhất.</p><hr><small style='color:#f59e0b; font-weight:800;'>BHXH THUẬN AN ĐỒNG HÀNH</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 if query:
@@ -310,17 +321,17 @@ if df is not None:
                 else: st.markdown("<br><center><img src='https://cdn-icons-png.flaticon.com/512/3772/3772274.png' width='160' style='opacity:0.2'></center>", unsafe_allow_html=True)
 
             with col_off:
-                st.markdown("##### 👨‍💼 LIÊN HỆ CÁN BỘ THEO XÃ")
+                st.markdown("##### 👨‍💼 CÁN BỘ & ZALO")
                 for off in OFFICERS:
                     st.markdown(f"""
-                    <div class="matrix-card-bright">
-                        <small style="color:{off['color']}; font-weight:800; text-transform:uppercase;">{off['communes']}</small>
-                        <div style="color:var(--primary); font-weight:900; font-size:1.2rem; margin-top:5px;">{off['name']}</div>
-                        <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:var(--primary); font-weight:800; font-size:1.2rem; display:block; margin:8px 0;">📱 {off['phone']}</a>
-                        <a href="{off['zalo']}" target="_blank" style="background:#0068ff; color:white; padding:8px 25px; border-radius:50px; text-decoration:none; display:inline-block; font-weight:900; font-size:0.8rem; box-shadow: 0 4px 10px rgba(0,104,255,0.2);">💬 CHAT ZALO</a>
+                    <div class='matrix-card-bright' style='background: white; border-radius: 20px; padding: 20px; border: 1px solid #eee; margin-bottom: 15px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.02);'>
+                        <small style='color:#2563eb; font-weight: 800;'>{off['communes']}</small>
+                        <div style='color:var(--primary); font-weight: 900; font-size: 1.2rem; margin: 5px 0;'>{off['name']}</div>
+                        <a href='tel:{off['phone'].replace('.','')}' style='text-decoration:none; color:var(--primary); font-weight: 800; font-size: 1.2rem;'>📱 {off['phone']}</a><br>
+                        <a href='{off['zalo']}' target='_blank' style='background:#0068ff; color:white; padding:8px 25px; border-radius:50px; text-decoration:none; display:inline-block; margin-top: 10px; font-weight: 900; font-size: 0.8rem;'>💬 CHAT ZALO</a>
                     </div>
                     """, unsafe_allow_html=True)
-                st.markdown("##### 🏦 SỐ TÀI KHOẢN CỦA BHXH THUẬN AN")
+                st.markdown("##### 🏦 TÀI KHOẢN BHXH")
                 st.markdown('<div class="radiant-card" style="padding:15px; border-left:8px solid #00d2ff; background: #f0f9ff;"><b style="color:#1e3a8a; font-size:0.9rem;">BIDV: 63510009867032<br>AGRIBANK: 5301202919045<br>VIETINBANK: 919035000003</b></div>', unsafe_allow_html=True)
 
         else:
@@ -366,7 +377,7 @@ if df is not None:
                     resp = get_ai_response(prompt)
                     st.markdown(resp); st.session_state.chat_history.append({"role": "assistant", "content": resp})
 
-    # --- TAB 3: VĂN BẢN PDF (RADIANT VIEW) ---
+    # --- TAB 3: VĂN BẢN PDF ---
     elif st.session_state.current_tab == "📂 Thư viện Văn bản":
         st.markdown("## 📂 THƯ VIỆN VĂN BẢN KỸ THUẬT SỐ")
         pdfs = get_local_pdfs()
@@ -381,7 +392,7 @@ if df is not None:
             with c2:
                 if st.session_state.active_pdf:
                     st.success(f"📌 ĐANG XEM: {st.session_state.active_pdf}")
-                    embed_pdf_radiant(st.session_state.active_pdf)
+                    embed_pdf_v20(st.session_state.active_pdf)
 
     # --- CÁC TAB KHÁC ---
     elif st.session_state.current_tab == "📑 Cẩm nang Nghiệp vụ": st.markdown("## 📑 CẨM NANG NGHIỆP VỤ")
@@ -390,4 +401,4 @@ if df is not None:
     elif st.session_state.current_tab == "📍 Liên hệ BHXH":
         st.markdown("## 📍 THÔNG TIN LIÊN HỆ"); st.write("🏠 Cơ sở: Thôn Thuận Sơn, Thuận An, Đắk Mil, Đắk Nông."); st.write("📞 Hotline: 1900 9068")
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.9rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | Radiant Quantum Hub v19.1</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.9rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | Eternal Quantum Hub v20.0</center>", unsafe_allow_html=True)
