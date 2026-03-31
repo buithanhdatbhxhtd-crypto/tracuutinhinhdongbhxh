@@ -11,7 +11,7 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v38.0 Stellar Horizon",
+    page_title="BHXH Thuận An - v39.0 Ascension",
     page_icon="🚀",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -58,10 +58,10 @@ def get_ai_response(prompt, context=""):
 
     elif any(word in prompt_lower for word in ["c12", "tra cuu", "thong bao"]):
         response += "💡 **Về Thông báo C12-TS:**\n"
-        response += "Hệ thống Stellar Horizon hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị (VD: TA0001) để xem bảng Dashboard tài chính trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
+        response += "Hệ thống v39.0 Ascension hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị (VD: TA0001) để xem bảng Dashboard tài chính trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
 
     elif any(word in prompt_lower for word in ["chao", "hello", "hi", "xin chao"]):
-        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v38.0. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
+        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v39.0. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
 
     else:
         if not response:
@@ -80,7 +80,7 @@ if 'active_pdf' not in st.session_state: st.session_state.active_pdf = None
 if 'search_query' not in st.session_state: st.session_state.search_query = ""
 if 'welcome_done' not in st.session_state: st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN STELLAR HORIZON v38.0 - TỐI ƯU HÓA HOÀN MỸ) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN ASCENSION v39.0 - VƯƠN TẦM CAO MỚI) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
@@ -91,12 +91,41 @@ st.markdown("""
 
     * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
     
-    /* V38 Smooth Content Fade-in Transition */
-    @keyframes fadeInSlideUp {
-        0% { opacity: 0; transform: translateY(20px); }
-        100% { opacity: 1; transform: translateY(0); }
+    /* V39 Màn hình khởi động (Splash Screen) */
+    .splash-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #020617; z-index: 999999;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        animation: fadeOutSplash 1.5s forwards; animation-delay: 1.2s;
+        pointer-events: none;
     }
-    .block-container { animation: fadeInSlideUp 0.6s ease-out; }
+    @keyframes fadeOutSplash { to { opacity: 0; visibility: hidden; } }
+    .splash-loader {
+        width: 60px; height: 60px; border: 5px solid rgba(0, 242, 254, 0.2);
+        border-top-color: #00f2fe; border-radius: 50%;
+        animation: spinLoader 1s linear infinite; margin-bottom: 20px;
+    }
+    @keyframes spinLoader { to { transform: rotate(360deg); } }
+
+    /* V39 Nút hỗ trợ Zalo trôi nổi (Floating Action Button) */
+    .floating-zalo {
+        position: fixed; bottom: 30px; right: 30px; z-index: 9999;
+        background: linear-gradient(135deg, #0088FF 0%, #005ce6 100%);
+        color: white !important; border-radius: 50px;
+        padding: 15px 25px; box-shadow: 0 10px 25px rgba(0, 136, 255, 0.5);
+        font-weight: 800; font-size: 1.1rem; text-decoration: none;
+        display: flex; align-items: center; justify-content: center;
+        animation: floatBounce 3s infinite; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .floating-zalo:hover { transform: scale(1.15) translateY(-5px); box-shadow: 0 15px 35px rgba(0, 136, 255, 0.7); }
+    @keyframes floatBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+    /* V38/V39 Smooth Content Fade-in Transition */
+    @keyframes fadeInSlideUp {
+        0% { opacity: 0; transform: translateY(30px) scale(0.98); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .block-container { animation: fadeInSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
 
     /* V38 Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
@@ -104,13 +133,13 @@ st.markdown("""
     ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #3b82f6, #00f2fe); border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #00f2fe, #39ff14); }
 
-    .stApp { background: #f8fafc; background-image: radial-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px); background-size: 30px 30px; }
+    .stApp { background: #f8fafc; background-image: radial-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px); background-size: 30px 30px; }
 
     /* SIDEBAR ĐẲNG CẤP VŨ TRỤ */
     [data-testid="stSidebar"] { background: linear-gradient(180deg, #020617 0%, #0f172a 50%, #1e3a8a 100%) !important; box-shadow: 8px 0 30px rgba(0,242,254,0.1); border-right: 1px solid rgba(0, 242, 254, 0.15); }
     [data-testid="stSidebar"] h1 { color: white !important; text-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--secondary); letter-spacing: 2px; }
     
-    /* NÂNG CẤP MENU SIDEBAR V38 (GLASSMORPHISM BẬC CAO) */
+    /* NÂNG CẤP MENU SIDEBAR V39 (GLASSMORPHISM BẬC CAO) */
     [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {
         background: rgba(255, 255, 255, 0.03);
         border-radius: 12px;
@@ -139,7 +168,7 @@ st.markdown("""
         animation: ledGlow 3s infinite; border-top: 2px solid #39ff14; border-bottom: 2px solid #39ff14;
     }
 
-    /* SIÊU Ô TÌM KIẾM GATEWAY - HIỆU ỨNG TẬP TRUNG (FOCUS) V38 */
+    /* SIÊU Ô TÌM KIẾM GATEWAY - HIỆU ỨNG TẬP TRUNG (FOCUS) V39 */
     .gateway-container { max-width: 1050px; margin: 0 auto 1.5rem auto; text-align: center; }
     div[data-testid="stTextInput"] > div { height: 130px !important; background: transparent !important; border:none !important; box-shadow:none !important; padding: 0 !important; margin: 0 !important; }
     
@@ -176,20 +205,20 @@ st.markdown("""
     .premium-header h1 { font-size: 3.8rem; font-weight: 900; margin: 0; text-shadow: 2px 2px 20px rgba(0,0,0,0.5); position: relative; z-index: 2; }
     .premium-header p { font-size: 1.4rem; font-weight: 600; margin: 10px 0 0 0; color: #e0f2fe; position: relative; z-index: 2; }
 
-    /* RADIANT CARDS 3D - HOVER GLOW V38 (PEARL GLOW) */
+    /* RADIANT CARDS 3D - HOVER GLOW V39 (PEARL GLOW + 3D TILT EFFECT) */
     .crystal-card {
         background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,249,255,0.95) 100%);
         padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.06);
         border: 1px solid #e2e8f0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
     }
     .crystal-card::before { content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: var(--secondary); transition: all 0.4s ease; }
-    .crystal-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 25px 45px rgba(0, 242, 254, 0.2); border-color: #7dd3fc; z-index: 10; }
+    .crystal-card:hover { transform: translateY(-10px) scale(1.03); box-shadow: 0 25px 45px rgba(0, 242, 254, 0.25); border-color: #7dd3fc; z-index: 10; }
     .crystal-card:hover::before { width: 100%; opacity: 0.05; background: linear-gradient(90deg, var(--secondary), var(--neon-blue)); }
     
     .metric-val { font-size: 2.8rem; font-weight: 900; color: var(--primary); margin-top: 8px; letter-spacing: -1px; text-shadow: 1px 1px 2px rgba(0,0,0,0.05); }
     .metric-lbl { font-size: 1.1rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
 
-    /* SMART SUMMARY BANNER V38 */
+    /* SMART SUMMARY BANNER V39 */
     .ai-summary {
         background: linear-gradient(90deg, #f0fdfa 0%, #e0f2fe 100%);
         border-left: 6px solid #10b981; padding: 20px 30px; border-radius: 15px;
@@ -197,11 +226,11 @@ st.markdown("""
         box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15); border-right: 1px solid #bae6fd;
     }
 
-    /* BANK CARD VIP V38 */
-    .bank-card { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 2px solid #fbbf24; border-radius: 20px; padding: 30px; margin-top: 20px; box-shadow: 0 15px 35px rgba(245, 158, 11, 0.15); }
+    /* BANK CARD VIP V39 */
+    .bank-card { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 2px solid #fbbf24; border-radius: 20px; padding: 30px; margin-top: 20px; box-shadow: 0 15px 35px rgba(245, 158, 11, 0.15); position: relative; overflow: hidden;}
     .stCodeBlock code { font-size: 1.5rem !important; font-weight: 900 !important; color: #b45309 !important; background: white !important; border-radius: 8px !important;}
     
-    /* V38 CYBER-CHAT UI */
+    /* V39 CYBER-CHAT UI */
     .stChatMessage {
         background: rgba(255, 255, 255, 0.9) !important;
         border-radius: 15px !important;
@@ -209,13 +238,15 @@ st.markdown("""
         box-shadow: 0 5px 15px rgba(0,0,0,0.05) !important;
         border: 1px solid #e2e8f0 !important;
         margin-bottom: 15px !important;
+        transition: transform 0.3s;
     }
+    .stChatMessage:hover { transform: translateX(5px); }
 
-    /* SLIDER STYLING CHO V38 */
+    /* SLIDER STYLING CHO V39 */
     div[data-testid="stSlider"] > div > div > div { background-color: var(--secondary) !important; }
     div[data-testid="stSlider"] > div > div > div > div { background-color: var(--neon-blue) !important; box-shadow: 0 0 15px var(--neon-blue) !important; border: 2px solid white; }
 
-    /* ANIMATED LIQUID BUTTON V38 */
+    /* ANIMATED LIQUID BUTTON V39 */
     @keyframes liquidSweep {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -238,7 +269,20 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- ĐỒNG HỒ REAL-TIME (JS V38 CYBERPUNK STYLE ĐỈNH CAO) ---
+# --- HIỆU ỨNG MÀN HÌNH KHỞI ĐỘNG VÀ NÚT HỖ TRỢ ZALO NỔI (V39.0 MỚI NHẤT) ---
+st.markdown("""
+    <div class="splash-screen">
+        <div class="splash-loader"></div>
+        <h1 style="color: #00f2fe; font-size: 2.5rem; text-shadow: 0 0 20px #00f2fe; font-weight: 900; letter-spacing: 3px; font-family: 'Plus Jakarta Sans', sans-serif;">🚀 INITIALIZING V39.0 ASCENSION...</h1>
+        <p style="color: #64748b; font-size: 1.2rem; margin-top: 10px;">Connecting to Quantum Core...</p>
+    </div>
+    <a href="https://zalo.me/0846392929" target="_blank" class="floating-zalo">
+        💬 HỖ TRỢ ZALO 24/7
+    </a>
+""", unsafe_allow_html=True)
+
+
+# --- ĐỒNG HỒ REAL-TIME (JS V39 CYBERPUNK STYLE ĐỈNH CAO) ---
 def live_clock():
     components.html("""
     <style>
@@ -307,7 +351,7 @@ def live_clock():
     </script>
     """, height=180)
 
-# --- USER PROFILE WIDGET (SIDEBAR V38) ---
+# --- USER PROFILE WIDGET (SIDEBAR V39) ---
 def render_admin_profile():
     st.sidebar.markdown("""
         <div style="background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid rgba(255,255,255,0.15); padding: 15px; border-radius: 20px; display: flex; align-items: center; margin-bottom: 20px; backdrop-filter: blur(15px); box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
@@ -376,13 +420,25 @@ OFFICERS = [
     {"name": "Ông HOÀNG SỸ HẢI", "communes": "Xã Thuận An", "keywords": ["thuan an", "thuận an"], "phone": "0919.06.11.53", "zalo": "https://zalo.me/0919061153", "color": "#39ff14"}
 ]
 
+# --- TIỆN ÍCH MÃ QR THANH TOÁN (V39 MỚI) ---
 def render_vip_bank_accounts(unit_code="[Mã Đơn Vị]", unit_name="[Tên Đơn Vị]"):
     st.markdown("<div class='bank-card'><h2 style='color:#b45309; margin-top:0; font-weight:900; text-align:center;'>🏦 THÔNG TIN CHUYỂN KHOẢN ĐÓNG BHXH</h2><p style='color:#475569; text-align:center; font-weight:600; font-size:1.1rem;'>Kế toán đơn vị vui lòng nhấn <b style='color:#ea580c;'>Copy</b> ở góc phải mỗi số tài khoản để sao chép chính xác nhất.</p></div>", unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1: st.info("🏦 **BIDV**"); st.code("63510009867032", language="text")
     with c2: st.success("🏦 **AGRIBANK**"); st.code("5301202919045", language="text")
     with c3: st.warning("🏦 **VIETINBANK**"); st.code("919035000003", language="text")
-    st.markdown(f"<div style='background:#fefce8; padding:30px; border-radius:20px; border:3px dashed #eab308; text-align:center; margin-top: 15px;'><div style='color:#b45309; font-weight:900; font-size:1.2rem; margin-bottom: 10px;'>📝 Nội dung chuyển khoản chuẩn xác nhất:</div><code style='font-size:1.7rem; color:#1e3a8a; font-weight:900; background:white; padding:15px 30px; border-radius:15px; display:inline-block; box-shadow: 0 10px 20px rgba(0,0,0,0.05);'>{unit_code} {unit_name} dong bhxh thang {datetime.now().month} nam {datetime.now().year}</code></div>", unsafe_allow_html=True)
+    
+    st.markdown(f"""
+        <div style='background:#fefce8; padding:30px; border-radius:20px; border:3px dashed #eab308; text-align:center; margin-top: 15px;'>
+            <div style='color:#b45309; font-weight:900; font-size:1.2rem; margin-bottom: 10px;'>📝 Nội dung chuyển khoản chuẩn xác nhất:</div>
+            <code style='font-size:1.7rem; color:#1e3a8a; font-weight:900; background:white; padding:15px 30px; border-radius:15px; display:inline-block; box-shadow: 0 10px 20px rgba(0,0,0,0.05);'>{unit_code} {unit_name} dong bhxh thang {datetime.now().month} nam {datetime.now().year}</code>
+            <br><br>
+            <div style="display:inline-block; margin-top: 10px; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                <div style="font-weight: 800; color: #1e3a8a; margin-bottom: 5px;">📱 Tính năng quét mã QR thanh toán nhanh (Mô phỏng)</div>
+                <img src="https://cdn-icons-png.flaticon.com/512/714/714152.png" width="80" style="opacity: 0.8; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
 
 # --- HÀM XUẤT DATA ---
 @st.cache_data
@@ -404,17 +460,17 @@ def load_data():
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("<h1 style='text-align:center;'>🚀 STELLAR HORIZON</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>🚀 ASCENSION V39</h1>", unsafe_allow_html=True)
     render_admin_profile()
     
     menu = ["📊 Tra cứu C12-TS", "🤖 Trợ lý AI Thông Minh", "📂 Thư viện Văn bản", "📑 Cẩm nang Nghiệp vụ", "🧮 Máy tính BHXH", "📍 Liên hệ BHXH"]
     st.session_state.current_tab = st.radio("CHUYỂN HƯỚNG TÍNH NĂNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v38.0 Stellar Horizon | Advanced Pro 3.1")
+    st.caption("v39.0 Ascension | Advanced Pro 3.1")
 
 # --- HEADER LED ---
-marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v38.0 KỶ NGUYÊN TINH TÚ • NÂNG CẤP TRẢI NGHIỆM CHUYỂN CẢNH MƯỢT MÀ VÀ GIAO DIỆN GLASSMORPHISM 5.0 🌟"
+marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v39.0 VƯƠN TẦM CAO MỚI • GIAO DIỆN CHUYỂN CẢNH MƯỢT MÀ • BỔ SUNG TIỆN ÍCH HỖ TRỢ ZALO VÀ QUÉT MÃ QR 🌟"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -446,8 +502,8 @@ if df is not None:
 
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
-                st.markdown("##### 📢 TIN TỨC V38")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 KỶ NGUYÊN TINH TÚ</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Trải nghiệm hiệu ứng chuyển cảnh mượt mà, nút bấm Liquid Gradient và giao diện Chat AI thế hệ mới.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 38.0</small></div>", unsafe_allow_html=True)
+                st.markdown("##### 📢 TIN TỨC V39")
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 KỶ NGUYÊN ASCENSION</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Cập nhật màn hình Splash Screen, nút hỗ trợ nổi toàn màn hình và tiện ích mã QR thanh toán nhanh.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 39.0</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -476,7 +532,7 @@ if df is not None:
                     """, unsafe_allow_html=True)
 
         else:
-            # --- DASHBOARD KẾT QUẢ v38 ---
+            # --- DASHBOARD KẾT QUẢ v39 ---
             if not st.session_state.welcome_done:
                 st.balloons(); st.session_state.welcome_done = True
             
@@ -631,7 +687,7 @@ if df is not None:
 
     # --- TAB 5: MÁY TÍNH BHXH (SLIDER TỐI ƯU HÓA) ---
     elif st.session_state.current_tab == "🧮 Máy tính BHXH":
-        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V38")
+        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V39")
         st.markdown("<p style='font-size: 1.2rem; color: #475569; margin-bottom: 20px;'>Kéo thanh trượt (slider) hoặc nhập trực tiếp mức lương cơ sở/quỹ lương để hệ thống tự động phân tách nghĩa vụ tài chính.</p>", unsafe_allow_html=True)
         
         sal = st.slider("🎚️ KÉO ĐỂ CHỌN MỨC LƯƠNG HOẶC QUỸ LƯƠNG ĐÓNG BHXH (VNĐ):", min_value=1000000, max_value=200000000, value=5000000, step=100000, format="%d VNĐ")
@@ -732,4 +788,4 @@ if df is not None:
         </div>
         """, unsafe_allow_html=True)
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v38.0 Stellar Horizon (Enterprise Level)</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v39.0 Ascension (Enterprise Level)</center>", unsafe_allow_html=True)
