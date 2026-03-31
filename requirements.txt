@@ -11,4 +11,4 @@ openpyxl
 unidecode
 plotly
 google-generativeai
-base64
+
