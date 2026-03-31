@@ -43,7 +43,7 @@ st.markdown("""
     /* Hero Title Section */
     .hero-container {
         text-align: center;
-        padding: 2rem 0;
+        padding: 3rem 0;
         background: transparent;
     }
     
@@ -101,19 +101,20 @@ st.markdown("""
         border: 1px solid rgba(255,255,255,0.2);
     }
 
-    /* Search Box */
+    /* Nổi bật ô Tìm kiếm - Gateway */
     .stTextInput input {
         border-radius: 25px !important;
-        padding: 1.8rem 3rem !important;
-        border: 2px solid #e2e8f0 !important;
+        padding: 2rem 3.5rem !important;
+        border: 3px solid #3b82f6 !important;
         background: white !important;
-        font-size: 1.4rem !important;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.05) !important;
+        font-size: 1.5rem !important;
+        box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15) !important;
         transition: all 0.3s ease;
     }
     .stTextInput input:focus {
-        border-color: #3b82f6 !important;
-        box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.15) !important;
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.2) !important;
+        transform: scale(1.02);
     }
 
     /* Bank Account Display */
@@ -200,7 +201,7 @@ def get_current_poster():
             "sub": "Doanh nghiệp vững mạnh - Xã hội phồn vinh"
         }
     ]
-    # Chọn poster dựa trên phút hiện tại (xoay vòng mỗi phút)
+    # Xoay vòng mỗi phút
     current_minute = datetime.now().minute
     idx = current_minute % len(posters)
     return posters[idx]
@@ -209,9 +210,9 @@ def get_current_poster():
 st.markdown("<div class='hero-container'><h1 class='hero-title'>BHXH cơ sở Thuận An</h1>", unsafe_allow_html=True)
 st.markdown("<p style='color:#64748b; font-size:1.4rem; font-weight:600; margin-top:-10px;'>Cổng Tra cứu & Quản lý Thông tin BHXH Kỹ thuật số</p></div>", unsafe_allow_html=True)
 
-# Marquee Information
+# Bảng tin chạy
 bank_info = "BIDV: 63510009867032 - Agribank: 5301202919045 - Vietinbank: 919035000003"
-marquee_text = f"🛡️ BHXH Thuận An - Thôn Thuận Sơn, xã Thuận An, Lâm Đồng. | 🏦 STK: {bank_info} | Luôn đồng hành cùng quyền lợi của người lao động và đơn vị. | Cập nhật số liệu nộp tiền định kỳ hàng tháng."
+marquee_text = f"📍 Địa chỉ: Thôn Thuận Sơn, xã Thuận An, Lâm Đồng. | 🏦 STK nhận tiền: {bank_info} | Chúc quý đơn vị hoàn thành tốt nghĩa vụ đóng BHXH tháng này! 🛡️"
 st.markdown(f"""
     <div class="marquee-wrapper">
         <marquee scrollamount="9" behavior="scroll" direction="left">{marquee_text}</marquee>
@@ -224,41 +225,59 @@ df = load_data()
 if df is not None:
     # MÀN HÌNH 1: TRANG CHỦ & TÌM KIẾM
     if st.session_state.selected_unit is None:
+        # Căn giữa ô tìm kiếm để làm nổi bật "Cửa ngõ"
+        _, col_search_center, _ = st.columns([0.2, 0.6, 0.2])
+        
+        with col_search_center:
+            st.markdown("<h3 style='text-align:center; color:#1e3a8a; margin-bottom:20px;'>🔍 BẮT ĐẦU TRA CỨU TẠI ĐÂY</h3>", unsafe_allow_html=True)
+            query = st.text_input("GatewaySearch", placeholder="Nhập mã đơn vị hoặc tên công ty...", label_visibility="collapsed")
+            st.markdown("<p style='text-align:center; color:#94a3b8; font-size:0.9rem;'>Hệ thống sẽ tự động lọc kết quả chính xác ngay khi bạn gõ</p>", unsafe_allow_html=True)
+
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        
         col_main, col_side = st.columns([1.7, 1])
         
         with col_main:
-            st.markdown("### 🔍 Tra cứu thông báo kết quả đóng")
-            query = st.text_input("SearchQuery", placeholder="Nhập tên đơn vị hoặc mã số đơn vị (vd: TC0243)...", label_visibility="collapsed")
-            
             if query:
                 clean_query = unidecode(query).lower()
                 results = df[df['search_index'].str.contains(clean_query, na=False)].head(12)
                 
                 if not results.empty:
-                    st.write(f"Tìm thấy **{len(results)}** kết quả phù hợp:")
+                    st.write(f"✨ Tìm thấy **{len(results)}** đơn vị phù hợp:")
                     for _, row in results.iterrows():
                         with st.container():
                             c_a, c_b = st.columns([4, 1.5])
                             c_a.markdown(f"""
                                 <div style='background:white; padding:25px; border-radius:25px; border-left:12px solid #e2e8f0; margin-bottom:15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);'>
-                                    <small style='color:#3b82f6; font-weight:800; text-transform:uppercase;'>Mã: {row.get('madvi')}</small><br>
+                                    <small style='color:#3b82f6; font-weight:800; text-transform:uppercase;'>Mã đơn vị: {row.get('madvi')}</small><br>
                                     <b style='font-size:1.4rem; color:#1e293b;'>{row.get('tendvi')}</b>
                                 </div>
                             """, unsafe_allow_html=True)
-                            if c_b.button("Xem chi tiết ➔", key=f"sel_{row.get('madvi')}_{_}", use_container_width=True):
-                                # Hiệu ứng chúc mừng & Loading
+                            if c_b.button("Xem kết quả ➔", key=f"sel_{row.get('madvi')}_{_}", use_container_width=True):
                                 st.balloons()
-                                with st.status("💎 Đang tổng hợp số liệu vàng...", expanded=False):
-                                    time.sleep(0.7)
+                                with st.status("💎 Đang tổng hợp dữ liệu...", expanded=False):
+                                    time.sleep(0.6)
                                 st.session_state.selected_unit = row.get('madvi')
                                 st.rerun()
                 else:
-                    st.error("Không tìm thấy đơn vị nào phù hợp. Vui lòng kiểm tra lại từ khóa.")
+                    st.error("Không tìm thấy đơn vị nào phù hợp. Vui lòng kiểm tra lại mã hoặc tên.")
             else:
-                st.markdown("<br><br><center><img src='https://cdn-icons-png.flaticon.com/512/3772/3772274.png' width='160' style='opacity:0.2'></center>", unsafe_allow_html=True)
+                # Hiển thị các tính năng nổi bật khi chưa tìm kiếm
+                st.markdown("""
+                <div style='display:grid; grid-template-columns: 1fr 1fr; gap:20px;'>
+                    <div class='premium-card' style='padding:30px; text-align:center;'>
+                        <h4 style='color:#1e3a8a;'>📊 Số liệu chính xác</h4>
+                        <p style='color:#64748b; font-size:0.9rem;'>Dữ liệu được cập nhật từ hệ thống quản lý C12 mới nhất.</p>
+                    </div>
+                    <div class='premium-card' style='padding:30px; text-align:center;'>
+                        <h4 style='color:#1e3a8a;'>⚡ Tra cứu tức thì</h4>
+                        <p style='color:#64748b; font-size:0.9rem;'>Nhận kết quả và mã QR thanh toán trong 1 giây.</p>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
 
         with col_side:
-            # Banner tự động xoay vòng
+            # Banner tự động xoay vòng theo phút
             poster_data = get_current_poster()
             st.markdown(f"""
                 <div class="poster-area">
@@ -268,13 +287,13 @@ if df is not None:
                     <h3 style='color:#fbbf24; margin:0;'>{poster_data['sub']}</h3>
                 </div>
             """, unsafe_allow_html=True)
-            st.caption(f"🕒 Banner tự động cập nhật nội dung mỗi phút. (Hiện tại: {datetime.now().strftime('%H:%M')})")
+            st.caption(f"🕒 Banner tự động cập nhật mỗi 1 phút. (Nội dung: {poster_data['title']})")
 
     # MÀN HÌNH 2: DASHBOARD CHI TIẾT
     else:
         unit_data = df[df['madvi'] == st.session_state.selected_unit].iloc[0]
         
-        if st.button("⬅ Quay lại trang tra cứu", use_container_width=False):
+        if st.button("⬅ Quay lại trang chủ", use_container_width=False):
             st.session_state.selected_unit = None
             st.rerun()
 
@@ -292,7 +311,7 @@ if df is not None:
             st.markdown("<div class='premium-card' style='margin-top:30px;'>", unsafe_allow_html=True)
             st.write("### 📉 Phân tích số liệu đóng BHXH")
             
-            # Metric Grid v10.0
+            # Metric Grid
             m1, m2, m3 = st.columns(3)
             with m1:
                 st.markdown("<p class='metric-title'>Tiền đầu kỳ</p>", unsafe_allow_html=True)
@@ -320,28 +339,28 @@ if df is not None:
                 st.markdown(f"<p class='metric-title'>{label_txt}</p>", unsafe_allow_html=True)
                 st.markdown(f"<p class='metric-value' style='color:{color_txt};'>{abs(debt):,.0f}đ</p>", unsafe_allow_html=True)
             
-            # Cú pháp nộp tiền chuẩn theo tháng/năm hiện tại
+            # Cú pháp nộp tiền thời gian thực
             now = datetime.now()
             transfer_note = f"{unit_data.get('madvi')} {unit_data.get('tendvi')} đóng bhxh tháng {now.month} năm {now.year}"
             
             st.markdown(f"""
                 <div class="transfer-code-box">
-                    <p style='color:#1e40af; font-weight:800; margin:0; font-size:1.1rem; text-transform:uppercase;'>📝 Cú pháp nộp tiền (Duy nhất):</p>
+                    <p style='color:#1e40af; font-weight:800; margin:0; font-size:1.1rem; text-transform:uppercase;'>📝 Nội dung nộp tiền chuyển khoản:</p>
                     <h2 style='color:#1e3a8a; font-family:monospace; margin:15px 0; font-size:1.8rem; background:white; padding:15px; border-radius:15px; border:1px solid #e2e8f0;'>{transfer_note}</h2>
-                    <p style='margin:0; font-size:0.9rem; color:#64748b;'><i>Vui lòng ghi đúng nội dung để phần mềm gạch nợ tự động trong 24h.</i></p>
+                    <p style='margin:0; font-size:0.9rem; color:#64748b;'><i>Vui lòng ghi đúng nội dung để hệ thống gạch nợ tự động chính xác.</i></p>
                 </div>
             """, unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
         with c_dash2:
-            # Interactive Gauge Chart
+            # Gauge Chart
             phai_dong = unit_data.get('so_phai_dong', 1)
             da_dong = unit_data.get('so_da_dong', 0)
             rate = min(round((da_dong / phai_dong) * 100, 1), 100) if phai_dong > 0 else 0
             
             fig = go.Figure(go.Indicator(
                 mode = "gauge+number", value = rate,
-                title = {'text': "Tỷ lệ nộp tiền hoàn thành", 'font': {'size': 22, 'color': '#64748b'}},
+                title = {'text': "Tỷ lệ đóng hoàn thành", 'font': {'size': 22, 'color': '#64748b'}},
                 number = {'suffix': "%", 'font': {'color': '#1e40af', 'size': 60}},
                 gauge = {
                     'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#cbd5e1"},
@@ -360,7 +379,7 @@ if df is not None:
             st.plotly_chart(fig, use_container_width=True)
             
             # Tài khoản Ngân hàng
-            st.markdown("### 🏦 Danh sách tài khoản thụ hưởng")
+            st.markdown("### 🏦 Thông tin Tài khoản nhận tiền")
             st.markdown("""
                 <div class="bank-grid">
                     <div class='bank-item'><b>BIDV</b> <span>63510009867032</span></div>
@@ -369,22 +388,22 @@ if df is not None:
                 </div>
             """, unsafe_allow_html=True)
             
-            # QR Pay Integration
+            # QR Pay
             qr_data = f"BHXH|{unit_data.get('madvi')}|{debt}"
             st.markdown(f"""
                 <center>
                     <div style='background:white; padding:20px; border-radius:30px; box-shadow: 0 15px 35px rgba(0,0,0,0.06); display:inline-block; margin-top:25px; border:1px solid #f1f5f9;'>
                         <img src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={qr_data}' width='200'>
                     </div>
-                    <p style='color:#1e3a8a; font-weight:800; font-size:1.1rem; margin-top:15px;'>QUÉT MÃ NỘP TIỀN NHANH</p>
+                    <p style='color:#1e3a8a; font-weight:800; font-size:1.1rem; margin-top:15px;'>QUÉT MÃ THANH TOÁN NHANH</p>
                 </center>
             """, unsafe_allow_html=True)
 
 # --- FOOTER SECTION ---
 st.markdown("<br><br><hr>", unsafe_allow_html=True)
 st.markdown(f"""
-    <center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px; line-height:1.6;'>
+    <center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>
         © {datetime.now().year} BHXH CƠ SỞ THUẬN AN - THÔN THUẬN SƠN, XÃ THUẬN AN, LÂM ĐỒNG<br>
-        🛡️ Kiến tạo tương lai - Bảo vệ an sinh. Hệ thống tra cứu tự động hóa v10.0
+        Kiến tạo niềm tin - Đảm bảo tương lai. Cổng thông tin phiên bản v10.0
     </center>
 """, unsafe_allow_html=True)
