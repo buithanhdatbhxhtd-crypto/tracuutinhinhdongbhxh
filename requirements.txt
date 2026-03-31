@@ -10,4 +10,4 @@ numpy
 xlrd
 openpyxl
 unidecode
-
+plotly
