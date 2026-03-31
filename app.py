@@ -12,21 +12,26 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v27.0 Pro Masterpiece",
+    page_title="BHXH Thuận An - v27.1 AI Mastery",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CẤU HÌNH AI GEMINI (THUẬT TOÁN SURVIVAL LOOP CHỐNG LỖI 404) ---
-api_key = st.secrets.get("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
-if api_key:
+# --- CẤU HÌNH AI GEMINI (TỰ ĐỘNG LÀM SẠCH KEY & FALLBACK MODEL) ---
+raw_api_key = st.secrets.get("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
+api_key = ""
+
+if raw_api_key:
+    # LÀM SẠCH KEY: Loại bỏ khoảng trắng và ngoặc kép thừa (Nguyên nhân chính gây lỗi 404/403)
+    api_key = str(raw_api_key).strip().strip('"').strip("'")
     try:
         genai.configure(api_key=api_key)
     except: pass
 
 def get_ai_response(prompt, context=""):
-    if not api_key: return "⚠️ **Chưa cấu hình API Key:** Vui lòng thêm `GOOGLE_API_KEY` vào Streamlit Secrets."
+    if not api_key: 
+        return "⚠️ **Chưa cấu hình API Key:** Vui lòng kiểm tra lại Streamlit Secrets."
     
     system_instruction = "Bạn là trợ lý AI cao cấp của Bảo hiểm xã hội cơ sở Thuận An, Lâm Đồng. Trả lời tận tâm, chính xác, lịch sự."
     if context:
@@ -34,8 +39,8 @@ def get_ai_response(prompt, context=""):
     else:
         full_prompt = f"{system_instruction}\n\n[CÂU HỎI]: {prompt}"
         
-    # Vòng lặp Sinh tồn: Thử lần lượt các model từ mới nhất đến cũ nhất để đảm bảo không bị lỗi 404
-    stable_models = ['gemini-1.5-flash', 'gemini-1.0-pro', 'gemini-pro']
+    # Danh sách Model chuẩn xác nhất của Google AI Studio hiện tại
+    stable_models = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro']
     last_error = ""
     
     for model_name in stable_models:
@@ -44,12 +49,13 @@ def get_ai_response(prompt, context=""):
             response = model.generate_content(full_prompt)
             return response.text
         except Exception as e:
-            last_error = str(e).lower()
-            if "429" in last_error or "quota" in last_error:
-                return "⚠️ **Trợ lý AI đang quá tải:** Số lượng câu hỏi vượt mức miễn phí trong 1 phút. Quý đơn vị vui lòng đợi 1 phút và thử lại nhé!"
-            continue # Nếu lỗi 404 (Không tìm thấy model), tiếp tục thử model khác
+            last_error = str(e)
+            # Bắt lỗi Quota (vượt quá giới hạn)
+            if "429" in last_error or "quota" in last_error.lower():
+                return "⚠️ **Trợ lý AI đang quá tải:** Vượt quá số lần hỏi miễn phí. Quý đơn vị vui lòng đợi 1 phút và thử lại nhé!"
+            continue # Thử model tiếp theo nếu bị lỗi Not Found (404)
             
-    return f"⚠️ **Trợ lý AI đang bận:** Các model AI đều không khả dụng cho API Key của bạn. Vui lòng chat Zalo cho cán bộ để được hỗ trợ! (Lỗi: {last_error[:80]}...)"
+    return f"⚠️ **Trợ lý AI đang bận:** (Lỗi: {last_error[:100]}...). Quý đơn vị vui lòng chat Zalo cho cán bộ để được hỗ trợ!"
 
 # --- KHỞI TẠO STATE ---
 if 'selected_unit' not in st.session_state:
@@ -65,7 +71,7 @@ if 'search_query' not in st.session_state:
 if 'welcome_done' not in st.session_state:
     st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN V27.0 - CHUẨN MỰC) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN V27.1) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -131,6 +137,12 @@ st.markdown("""
     }
     .stCodeBlock { background: transparent !important; }
     .stCodeBlock code { font-size: 1.5rem !important; font-weight: 900 !important; color: #1e3a8a !important; }
+
+    /* PDF DOC PORTAL */
+    .pdf-portal {
+        background: white; border-radius: 30px; padding: 30px; border: 4px solid #e2e8f0;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1); margin-top: 20px;
+    }
 
     .stButton>button {
         border-radius: 50px !important; font-weight: 800 !important; text-transform: uppercase;
@@ -212,7 +224,6 @@ def render_pdf_unblockable(file_path):
             }});
         </script>
         """
-        # Sử dụng scrolling=True để cuộn các trang Canvas
         components.html(js_code, height=850, scrolling=True)
         
         st.write("<br>", unsafe_allow_html=True)
@@ -221,7 +232,7 @@ def render_pdf_unblockable(file_path):
         with col_dl:
             st.download_button(label="📥 TẢI BẢN GỐC VỀ MÁY TÍNH", data=pdf_data, file_name=file_path, mime="application/pdf", use_container_width=True)
         with col_open:
-            st.markdown(f'<a href="data:application/pdf;base64,{base64_pdf}" download="{file_path}" style="text-decoration:none; background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color:white; padding:15px; border-radius:50px; font-weight:900; display:block; text-align:center; box-shadow: 0 10px 20px rgba(30,58,138,0.3); text-transform:uppercase; font-size: 1.1rem; border: 2px solid white;">🚀 TẢI VÀ MỞ BẰNG PHẦN MỀM ĐỌC PDF</a>', unsafe_allow_html=True)
+            st.markdown(f'<a href="data:application/pdf;base64,{base64_pdf}" download="{file_path}" style="text-decoration:none; background:linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color:white; padding:15px; border-radius:50px; font-weight:900; display:block; text-align:center; box-shadow: 0 10px 20px rgba(30,58,138,0.3); text-transform:uppercase; font-size: 1.1rem; border: 2px solid white;">🚀 LƯU TRỮ VÀ MỞ BẰNG TRÌNH ĐỌC PDF</a>', unsafe_allow_html=True)
         return True
     except Exception as e:
         st.error(f"Lỗi hệ thống PDF: {e}")
@@ -289,10 +300,10 @@ with st.sidebar:
     st.session_state.current_tab = st.radio("CHỨC NĂNG HỆ THỐNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v26.0 Ultimate Pro | Final Edition")
+    st.caption("v27.1 AI Mastery | Powered by Google Gemini")
 
 # --- HEADER LED ---
-marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN PRO v26.0 • BẢO MẬT - MINH BẠCH - NHANH CHÓNG • TÍCH HỢP TRÍ TUỆ NHÂN TẠO GEMINI VÀ XỬ LÝ VĂN BẢN KỸ THUẬT SỐ CHỐNG CHẶN 100% •"
+marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN PRO v27.1 • TÍCH HỢP TRÍ TUỆ NHÂN TẠO GEMINI THÔNG MINH • XEM VĂN BẢN PDF CÔNG NGHỆ CHỐNG CHẶN TRÌNH DUYỆT •"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -411,7 +422,7 @@ if df is not None:
             context = f"Đơn vị: {unit['tendvi']}, Mã: {unit['madvi']}, Nợ: {unit['tien_cuoi_ky']} VNĐ. Hãy dựa vào đây trả lời nếu đơn vị hỏi."
             st.success(f"🤖 AI đã liên kết với dữ liệu của **{unit['tendvi']}**. Bạn có thể hỏi về số nợ hiện tại!")
         else:
-            st.info("🤖 AI đã sẵn sàng. Hệ thống chống sập 404 đã được kích hoạt. Hãy đặt câu hỏi!")
+            st.info("🤖 AI đã sẵn sàng. Hãy đặt câu hỏi về luật và quy định BHXH.")
 
         for msg in st.session_state.chat_history:
             with st.chat_message(msg["role"]): st.markdown(msg["content"])
@@ -425,7 +436,7 @@ if df is not None:
                     st.markdown(resp)
                     st.session_state.chat_history.append({"role": "assistant", "content": resp})
 
-    # --- TAB 3: PDF (CHỐNG CHẶN 100% BẰNG PDF.JS LÕI) ---
+    # --- TAB 3: PDF (CHỐNG CHẶN 100% BẰNG KỸ THUẬT CANVAS JS) ---
     elif st.session_state.current_tab == "📂 Thư viện Văn bản":
         st.markdown("## 📂 THƯ VIỆN VĂN BẢN ĐIỀU HÀNH")
         pdfs = [f for f in os.listdir('.') if f.lower().endswith('.pdf')]
@@ -455,4 +466,4 @@ if df is not None:
         st.write("📍 **Địa chỉ:** Thôn Thuận Sơn, xã Thuận An, huyện Đắk Mil, tỉnh Đắk Nông.")
         st.write("📞 **Tổng đài:** 1900 9068")
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v26.0 Ultimate Pro (Final Edition)</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v27.1 AI Mastery</center>", unsafe_allow_html=True)
