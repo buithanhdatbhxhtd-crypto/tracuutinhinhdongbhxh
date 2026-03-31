@@ -7,18 +7,18 @@ from unidecode import unidecode
 import time
 from datetime import datetime
 import base64
-import requests # SỬ DỤNG TRỰC TIẾP REST API CHO AI
+import requests
 import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v28.0 The Pinnacle",
+    page_title="BHXH Thuận An - v29.0 The Apex",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CẤU HÌNH AI GEMINI BẰNG REST API (CHỐNG LỖI 404 TUYỆT ĐỐI) ---
+# --- CẤU HÌNH AI GEMINI BẰNG REST API (ROUTER ĐA MODEL CHỐNG LỖI 404) ---
 raw_api_key = st.secrets.get("GOOGLE_API_KEY", os.environ.get("GOOGLE_API_KEY", ""))
 api_key = str(raw_api_key).strip().strip('"').strip("'") if raw_api_key else ""
 
@@ -32,31 +32,37 @@ def get_ai_response(prompt, context=""):
     else:
         full_prompt = f"{system_instruction}\n\n[CÂU HỎI]: {prompt}"
         
-    # Giao tiếp trực tiếp với Google Server (Bỏ qua thư viện lỗi)
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
     headers = {'Content-Type': 'application/json'}
     data = {
         "contents": [{"parts": [{"text": full_prompt}]}]
     }
     
-    try:
-        response = requests.post(url, headers=headers, json=data)
-        if response.status_code == 200:
-            result = response.json()
-            return result['candidates'][0]['content']['parts'][0]['text']
-        else:
-            # Fallback sang model khác nếu 1.5-flash bị lỗi tại khu vực của user
-            url_fallback = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={api_key}"
-            resp_fallback = requests.post(url_fallback, headers=headers, json=data)
-            if resp_fallback.status_code == 200:
-                return resp_fallback.json()['candidates'][0]['content']['parts'][0]['text']
+    # HỆ THỐNG ĐỊNH TUYẾN MODEL: Quét các model khả dụng nhất hiện hành
+    available_models = [
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-1.5-flash-latest",
+        "gemini-1.0-pro"
+    ]
+    
+    last_error = ""
+    for model in available_models:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
+        try:
+            response = requests.post(url, headers=headers, json=data)
+            if response.status_code == 200:
+                return response.json()['candidates'][0]['content']['parts'][0]['text']
             else:
-                err_msg = resp_fallback.json().get('error', {}).get('message', 'Lỗi không xác định')
+                err_msg = response.json().get('error', {}).get('message', 'Lỗi không xác định')
+                last_error = f"[{model}] {err_msg}"
+                # Nếu API key sai, thoát ngay lập tức
                 if "API key not valid" in err_msg:
-                    return "⚠️ **Lỗi API Key:** Khóa API của bạn không hợp lệ hoặc đã bị khoá."
-                return f"⚠️ **Trợ lý AI đang bận (Mã lỗi Server):** {err_msg[:100]}"
-    except Exception as e:
-        return f"⚠️ **Lỗi kết nối mạng đến Google:** {str(e)}"
+                    return "⚠️ **Lỗi API Key:** Khóa API của bạn không hợp lệ hoặc đã bị xoá trên Google AI Studio."
+                # Nếu lỗi 404 thì tiếp tục vòng lặp sang model khác
+        except Exception as e:
+            last_error = str(e)
+            
+    return f"⚠️ **Trợ lý AI đang bận (Lỗi hệ thống Google):** {last_error[:150]}"
 
 # --- KHỞI TẠO STATE ---
 if 'selected_unit' not in st.session_state:
@@ -72,7 +78,7 @@ if 'search_query' not in st.session_state:
 if 'welcome_done' not in st.session_state:
     st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN THE PINNACLE v28.0) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN THE APEX v29.0) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -100,15 +106,26 @@ st.markdown("""
         font-size: 1.35rem; letter-spacing: 1px; text-transform: uppercase;
     }
 
-    /* SIÊU Ô TÌM KIẾM GATEWAY */
+    /* SIÊU Ô TÌM KIẾM GATEWAY - CĂN CHỈNH TUYỆT ĐỐI CHỐNG CẮT CHỮ */
     .gateway-container { max-width: 1000px; margin: 0 auto 1.5rem auto; text-align: center; }
-    div[data-testid="stTextInput"] > div { background: transparent !important; border:none !important; box-shadow:none !important; }
+    
+    div[data-testid="stTextInput"] > div { 
+        height: 130px !important; /* Khoá cứng khung ngoài */
+        background: transparent !important; border:none !important; box-shadow:none !important; 
+        padding: 0 !important; margin: 0 !important; 
+    }
     
     .stTextInput input {
-        border-radius: 20px !important; padding: 35px 45px 35px 110px !important; 
-        border: 8px solid var(--secondary) !important; font-size: 2.8rem !important; font-weight: 900 !important;
-        min-height: 140px !important; background: white url('https://cdn-icons-png.flaticon.com/512/622/622669.png') no-repeat 35px center !important;
-        background-size: 50px !important; color: var(--primary) !important;
+        border-radius: 20px !important; 
+        padding: 0 45px 0 110px !important; /* Dùng 0 cho top/bottom để tránh đẩy chữ */
+        border: 8px solid var(--secondary) !important; 
+        font-size: 2.8rem !important; 
+        font-weight: 900 !important;
+        height: 130px !important; 
+        line-height: 114px !important; /* (130 - 16px border) để căn giữa dọc chuẩn xác */
+        background: white url('https://cdn-icons-png.flaticon.com/512/622/622669.png') no-repeat 35px center !important;
+        background-size: 50px !important; 
+        color: var(--primary) !important;
         box-shadow: 0 30px 80px rgba(37, 99, 235, 0.25) !important;
     }
     .stTextInput input:focus { border-color: var(--neon-blue) !important; transform: scale(1.02); }
@@ -219,7 +236,7 @@ def render_pdf_unblockable(file_path):
 
 # --- DATA HUB (CÁN BỘ) ---
 OFFICERS = [
-    {"name": "Bà NGUYỄN THỊ NHÀI", "communes": "Xã Đức Lập, Xã Đắk Mil", "keywords": ["duc lap", "đức lập", "dak mil", "đắk mil", "dc0039c"], "phone": "0846.39.29.29", "zalo": "https://zalo.me/0846392929", "color": "#00d2ff"},
+    {"name": "Bà NGUYỄN THỊ NHÀI", "communes": "Xã Đức Lập, Xã Đắk Mil", "keywords": ["duc lap", "đức lập", "dak mil", "đắk mil", "dc0039c", "đức hòa", "duc hoa"], "phone": "0846.39.29.29", "zalo": "https://zalo.me/0846392929", "color": "#00d2ff"},
     {"name": "Ông BÙI THÀNH ĐẠT", "communes": "Xã Đắk Sắk, Xã Đắk Song", "keywords": ["dak sak", "đắk sắk", "dak song", "đắk song"], "phone": "0986.05.30.06", "zalo": "https://zalo.me/0986053006", "color": "#ffaa00"},
     {"name": "Ông HOÀNG SỸ HẢI", "communes": "Xã Thuận An", "keywords": ["thuan an", "thuận an"], "phone": "0919.06.11.53", "zalo": "https://zalo.me/0919061153", "color": "#39ff14"}
 ]
@@ -259,10 +276,10 @@ with st.sidebar:
     st.session_state.current_tab = st.radio("CHỨC NĂNG HỆ THỐNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v28.0 The Pinnacle | Powered by Google API")
+    st.caption("v29.0 The Apex | Powered by Google API")
 
 # --- HEADER LED ---
-marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN ĐỈNH CAO v28.0 • HOẠT ĐỘNG ỔN ĐỊNH - BẢO MẬT - MINH BẠCH • TÍCH HỢP TRÍ TUỆ NHÂN TẠO GEMINI REST API •"
+marquee_msg = "💎 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN ĐỈNH CAO v29.0 • HOẠT ĐỘNG ỔN ĐỊNH - BẢO MẬT - MINH BẠCH • TÍCH HỢP TRÍ TUỆ NHÂN TẠO GEMINI REST API •"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -296,7 +313,7 @@ if df is not None:
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
                 st.markdown("##### 📢 TIN TỨC")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a; font-size: 1.5rem;'>🛡️ BẢO MẬT PRO</h4><p style='font-size: 1.1rem; color: #475569;'>Hệ thống tra cứu đã được bọc lõi REST API, miễn nhiễm mọi lỗi 404.</p><hr><small style='color:#10b981; font-weight:900;'>PHIÊN BẢN v28.0</small></div>", unsafe_allow_html=True)
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center;'><h4 style='color:#1e3a8a; font-size: 1.5rem;'>🛡️ BẢO MẬT PRO</h4><p style='font-size: 1.1rem; color: #475569;'>Hệ thống tra cứu đã được bọc lõi REST API, loại bỏ toàn bộ lỗi cắt chữ và lỗi kết nối.</p><hr><small style='color:#10b981; font-weight:900;'>PHIÊN BẢN v29.0</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -388,7 +405,7 @@ if df is not None:
             context = f"Đơn vị: {unit['tendvi']}, Mã: {unit['madvi']}, Nợ: {unit['tien_cuoi_ky']} VNĐ."
             st.success(f"🤖 AI đã liên kết với dữ liệu của **{unit['tendvi']}**. Bạn có thể hỏi về số nợ hiện tại!")
         else:
-            st.info("🤖 AI đã nâng cấp hệ thống REST API chống sập 100%. Hãy đặt câu hỏi!")
+            st.info("🤖 AI đã nâng cấp hệ thống REST API chống sập. Hãy đặt câu hỏi!")
 
         for msg in st.session_state.chat_history:
             with st.chat_message(msg["role"]): st.markdown(msg["content"])
@@ -432,4 +449,4 @@ if df is not None:
         st.write("📍 **Địa chỉ:** Thôn Thuận Sơn, xã Thuận An, huyện Đắk Mil, tỉnh Đắk Nông.")
         st.write("📞 **Tổng đài:** 1900 9068")
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v28.0 The Pinnacle</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v29.0 The Apex</center>", unsafe_allow_html=True)
