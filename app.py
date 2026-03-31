@@ -9,7 +9,7 @@ from datetime import datetime
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH cơ sở Thuận An - Elite Digital v12.0",
+    page_title="BHXH cơ sở Thuận An - Elite Digital v12.1",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -23,7 +23,7 @@ if 'last_query' not in st.session_state:
 if 'show_loading' not in st.session_state:
     st.session_state.show_loading = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN ELITE v12.0) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN ELITE v12.1 - FIXED) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
@@ -46,17 +46,17 @@ st.markdown("""
     /* BANNER HERO SECTION */
     .hero-banner {
         text-align: center;
-        padding: 2rem 0;
-        margin-bottom: 2rem;
+        padding: 1.5rem 0;
+        margin-bottom: 1rem;
     }
 
     .hero-title {
         background: linear-gradient(90deg, #1e3a8a, #2563eb, #0ea5e9);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        font-size: 5rem;
+        font-size: 4.5rem;
         font-weight: 800;
-        letter-spacing: -4px;
+        letter-spacing: -3px;
         margin-bottom: 0px;
         line-height: 1.1;
     }
@@ -65,62 +65,61 @@ st.markdown("""
     .led-marquee {
         background: #000;
         color: #00ff00;
-        padding: 10px 0;
+        padding: 8px 0;
         font-weight: 700;
         border-radius: 8px;
         box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
         border: 2px solid #333;
-        margin-bottom: 30px;
+        margin-bottom: 25px;
         font-family: 'Courier New', Courier, monospace;
-        text-transform: uppercase;
     }
 
-    /* Ô TÌM KIẾM CỬA NGÕ (SIÊU NỔI BẬT) */
+    /* Ô TÌM KIẾM CỬA NGÕ (FIXED HEIGHT) */
     .gateway-container {
-        max-width: 900px;
-        margin: 0 auto 3rem auto;
+        max-width: 800px;
+        margin: 0 auto 2rem auto;
         text-align: center;
-        background: rgba(255, 255, 255, 0.4);
-        padding: 40px;
-        border-radius: 50px;
-        box-shadow: 0 30px 60px rgba(0,0,0,0.05);
-        border: 1px solid rgba(255,255,255,0.8);
+        background: rgba(255, 255, 255, 0.6);
+        padding: 30px;
+        border-radius: 40px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        border: 1px solid rgba(255,255,255,1);
     }
 
     .stTextInput input {
         border-radius: 50px !important;
-        padding: 1.2rem 3rem !important; /* Fix lỗi che chữ */
+        padding: 0.8rem 2.5rem !important; /* Fixed padding to prevent clipping */
         border: 4px solid #3b82f6 !important;
-        font-size: 1.6rem !important;
+        font-size: 1.4rem !important;
+        height: 65px !important; /* Fixed height for better display */
         background: white !important;
-        box-shadow: 0 15px 35px rgba(59, 130, 246, 0.15) !important;
-        transition: all 0.4s ease;
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1) !important;
+        transition: all 0.3s ease;
     }
     
     .stTextInput input:hover {
-        transform: scale(1.02);
-        box-shadow: 0 20px 45px rgba(59, 130, 246, 0.25) !important;
+        border-color: #2563eb !important;
+        box-shadow: 0 15px 35px rgba(59, 130, 246, 0.2) !important;
     }
 
     /* THẺ CÁN BỘ NEON */
     .officer-card {
-        background: #111;
-        padding: 25px;
+        background: #0a0a0a;
+        padding: 22px;
         border-radius: 25px;
-        border: 3px solid #333;
-        margin-bottom: 25px;
+        border: 3px solid #222;
+        margin-bottom: 20px;
         text-align: center;
         transition: all 0.4s ease;
-        position: relative;
     }
     
     .officer-card:hover {
-        transform: translateY(-10px) rotate(1deg);
+        transform: translateY(-8px);
     }
 
-    @keyframes blink-blue { 0%, 100% { border-color: #00d2ff; box-shadow: 0 0 15px #00d2ff; } 50% { border-color: #333; box-shadow: 0 0 0px #000; } }
-    @keyframes blink-gold { 0%, 100% { border-color: #ffaa00; box-shadow: 0 0 15px #ffaa00; } 50% { border-color: #333; box-shadow: 0 0 0px #000; } }
-    @keyframes blink-green { 0%, 100% { border-color: #39ff14; box-shadow: 0 0 15px #39ff14; } 50% { border-color: #333; box-shadow: 0 0 0px #000; } }
+    @keyframes blink-blue { 0%, 100% { border-color: #00d2ff; box-shadow: 0 0 10px #00d2ff; } 50% { border-color: #111; } }
+    @keyframes blink-gold { 0%, 100% { border-color: #ffaa00; box-shadow: 0 0 10px #ffaa00; } 50% { border-color: #111; } }
+    @keyframes blink-green { 0%, 100% { border-color: #39ff14; box-shadow: 0 0 10px #39ff14; } 50% { border-color: #111; } }
 
     .card-nhai { animation: blink-blue 2s infinite; }
     .card-dat { animation: blink-gold 2.5s infinite; }
@@ -128,45 +127,42 @@ st.markdown("""
 
     /* DASHBOARD PANEL */
     .dashboard-panel {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(25px);
-        border-radius: 40px;
-        padding: 45px;
-        box-shadow: 0 35px 70px rgba(0,0,0,0.08);
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 35px;
+        padding: 40px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.06);
         border: 1px solid #fff;
     }
 
     .metric-card {
         background: #f8fafc;
-        padding: 24px;
-        border-radius: 28px;
+        padding: 20px;
+        border-radius: 20px;
         border: 1px solid #edf2f7;
         text-align: center;
-        transition: transform 0.3s ease;
     }
-    .metric-card:hover { transform: scale(1.05); background: #fff; }
+
+    /* TÀI KHOẢN NGÂN HÀNG (NEON STYLE) */
+    .bank-account-card {
+        background: #111;
+        padding: 20px;
+        border-radius: 20px;
+        border: 2px solid #333;
+        margin-bottom: 12px;
+        transition: all 0.3s;
+    }
+    .bank-account-card:hover {
+        border-color: #00d2ff;
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+    }
+    .bank-name { color: #00d2ff; font-weight: 800; font-size: 0.9rem; }
+    .bank-number { color: #fff; font-size: 1.3rem; font-family: 'Courier New', Courier, monospace; letter-spacing: 1px; }
 
     /* BUTTONS */
     .stButton>button {
         border-radius: 50px !important;
         font-weight: 800 !important;
-        padding: 0.8rem 2rem !important;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-    }
-    .stButton>button:active { transform: scale(0.9); }
-
-    /* BANNER POSTER */
-    .poster-box {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-        color: white;
-        padding: 40px;
-        border-radius: 40px;
-        text-align: center;
-        min-height: 400px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        box-shadow: 0 25px 50px rgba(30, 58, 138, 0.25);
+        transition: all 0.2s ease !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -176,7 +172,7 @@ OFFICERS = [
     {
         "name": "Bà NGUYỄN THỊ NHÀI",
         "title": "Chuyên viên BHXH",
-        "scope": "Đức Lập, Đắk Mil",
+        "scope": "Xã Đức Lập, Xã Đắk Mil",
         "phone": "0846.39.29.29",
         "class": "card-nhai",
         "color": "#00d2ff",
@@ -185,7 +181,7 @@ OFFICERS = [
     {
         "name": "Ông BÙI THÀNH ĐẠT",
         "title": "Chuyên viên BHXH",
-        "scope": "Đắk Sắk, Đắk Song",
+        "scope": "Xã Đắk Sắk, Xã Đắk Song",
         "phone": "0986.05.30.06",
         "class": "card-dat",
         "color": "#ffaa00",
@@ -194,12 +190,19 @@ OFFICERS = [
     {
         "name": "Ông HOÀNG SỸ HẢI",
         "title": "Chuyên viên BHXH",
-        "scope": "Thuận An",
+        "scope": "Xã Thuận An",
         "phone": "0919.06.11.53",
         "class": "card-hai",
         "color": "#39ff14",
         "areas": ["thuan an", "thuận an"]
     }
+]
+
+# --- DỮ LIỆU NGÂN HÀNG ---
+BANKS = [
+    {"name": "BIDV", "number": "63510009867032", "owner": "BHXH cơ sở Thuận An"},
+    {"name": "AGRIBANK", "number": "5301202919045", "owner": "BHXH cơ sở Thuận An"},
+    {"name": "VIETINBANK", "number": "919035000003", "owner": "BHXH cơ sở Thuận An"}
 ]
 
 # --- HÀM TẢI DỮ LIỆU ---
@@ -236,7 +239,7 @@ def get_dynamic_poster():
 # --- HEADER & LED MARQUEE ---
 st.markdown("<div class='hero-banner'><h1 class='hero-title'>BHXH cơ sở Thuận An</h1></div>", unsafe_allow_html=True)
 
-marquee_msg = "📍 ĐỊA CHỈ: THÔN THUẬN SƠN, XÃ THUẬN AN, TỈNH LÂM ĐỒNG • 🏦 BIDV: 63510009867032 • 🏦 AGRIBANK: 5301202919045 • 🏦 VIETINBANK: 919035000003 • CHÚC QUÝ ĐƠN VỊ SỨC KHỎE VÀ THÀNH CÔNG! •"
+marquee_msg = "📍 ĐỊA CHỈ: THÔN THUẬN SƠN, XÃ THUẬN AN, TỈNH LÂM ĐỒNG • CHÚC QUÝ ĐƠN VỊ SỨC KHỎE VÀ THÀNH CÔNG! • TRA CỨU NHANH - NỘP TIỀN ĐÚNG - QUYỀN LỢI VỮNG BỀN •"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -247,10 +250,10 @@ if df is not None:
     if st.session_state.selected_unit is None:
         st.markdown("<div class='gateway-container'>", unsafe_allow_html=True)
         st.markdown("<h2 style='color:#1e3a8a; margin-top:0;'>🔍 BẮT ĐẦU TRA CỨU</h2>", unsafe_allow_html=True)
-        query = st.text_input("Gateway", placeholder="Nhập tên hoặc mã đơn vị để lọc kết quả ngay...", label_visibility="collapsed")
+        query = st.text_input("Gateway", placeholder="Gõ tên hoặc mã đơn vị để tìm kiếm...", label_visibility="collapsed")
         st.markdown("</div>", unsafe_allow_html=True)
 
-        col_main, col_officers = st.columns([1.8, 1])
+        col_main, col_info = st.columns([1.8, 1])
 
         with col_main:
             if query:
@@ -264,17 +267,16 @@ if df is not None:
                             ca.markdown(f"""
                                 <div style='background:white; padding:25px; border-radius:30px; border-left:12px solid #e2e8f0; margin-bottom:15px; box-shadow:0 10px 20px rgba(0,0,0,0.05);'>
                                     <small style='color:#2563eb; font-weight:800;'>MÃ: {row.get('madvi')}</small><br>
-                                    <b style='font-size:1.5rem; color:#1e293b;'>{row.get('tendvi')}</b>
+                                    <b style='font-size:1.4rem; color:#1e293b;'>{row.get('tendvi')}</b>
                                 </div>
                             """, unsafe_allow_html=True)
-                            if cb.button("Tra cứu chi tiết ➔", key=f"sel_{row.get('madvi')}_{idx}", use_container_width=True):
+                            if cb.button("Xác nhận tra cứu ➔", key=f"sel_{row.get('madvi')}_{idx}", use_container_width=True):
                                 st.session_state.selected_unit = row.get('madvi')
                                 st.session_state.show_loading = True
                                 st.rerun()
                 else:
                     st.error("Không tìm thấy đơn vị. Hãy kiểm tra lại từ khóa.")
             else:
-                # Banner Poster Tự động
                 p = get_dynamic_poster()
                 st.markdown(f"""
                     <div class="poster-box">
@@ -284,18 +286,28 @@ if df is not None:
                         <h2 style='color:#ffaa00; margin:0;'>{p['s']}</h2>
                     </div>
                 """, unsafe_allow_html=True)
-                st.caption(f"🕒 Banner tự động cập nhật nội dung hàng phút (Nội dung: {p['t']})")
 
-        with col_officers:
-            st.markdown("<h3 style='text-align:center;'>📞 Cán bộ Chuyên quản</h3>", unsafe_allow_html=True)
+        with col_info:
+            st.markdown("### 🏦 Số tài khoản nộp tiền")
+            for bank in BANKS:
+                st.markdown(f"""
+                <div class="bank-account-card">
+                    <div class="bank-name">{bank['name']}</div>
+                    <div class="bank-number">{bank['number']}</div>
+                    <div style="color: #888; font-size: 0.75rem;">{bank['owner']}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("### 👨‍💼 Cán bộ Chuyên quản")
             for off in OFFICERS:
                 st.markdown(f"""
                 <div class="officer-card {off['class']}">
                     <h4 style="margin:0; color:{off['color']}; text-shadow: 0 0 5px {off['color']};">{off['name']}</h4>
-                    <p style="margin:8px 0; font-size:0.9rem; color:#aaa;">{off['title']}</p>
-                    <p style="margin:5px 0; font-size:0.8rem; color:#fff;">Khu vực: {off['scope']}</p>
-                    <div style="background:rgba(255,255,255,0.1); padding:10px; border-radius:15px; margin-top:15px;">
-                        <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:white; font-weight:800; font-size:1.3rem;">📱 {off['phone']}</a>
+                    <p style="margin:5px 0; font-size:0.85rem; color:#aaa;">{off['title']}</p>
+                    <p style="margin:5px 0; font-size:0.8rem; color:#fff;">{off['scope']}</p>
+                    <div style="background:rgba(255,255,255,0.1); padding:8px; border-radius:12px; margin-top:10px; border:1px solid #444;">
+                        <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:white; font-weight:800; font-size:1.2rem;">📱 {off['phone']}</a>
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -322,12 +334,12 @@ if df is not None:
         unit_data = df[df['madvi'] == st.session_state.selected_unit].iloc[0]
         unit_addr = unidecode(str(unit_data.get('diachi', ''))).lower()
         
-        if st.button("⬅ QUAY LẠI CỬA NGÕ TÌM KIẾM"):
+        if st.button("⬅ QUAY LẠI TÌM KIẾM"):
             st.session_state.selected_unit = None
             st.rerun()
 
         st.markdown(f"""
-            <div style='background:white; padding:45px; border-radius:45px; border-left:25px solid #1e3a8a; box-shadow: 0 30px 70px rgba(0,0,0,0.1); margin-top:20px;'>
+            <div style='background:white; padding:45px; border-radius:45px; border-left:25px solid #1e3a8a; box-shadow: 0 30px 70px rgba(0,0,0,0.1); margin-top:15px;'>
                 <h1 style='margin:0; color:#1e3a8a; font-size:3.5rem;'>🏢 {unit_data.get('tendvi')}</h1>
                 <p style='margin:12px 0 0 0; color:#64748b; font-size:1.4rem;'>Mã: <b style='color:#1e3a8a;'>{unit_data.get('madvi')}</b> | Địa chỉ: {unit_data.get('diachi', 'N/A')}</p>
             </div>
@@ -387,7 +399,7 @@ if df is not None:
             st.plotly_chart(fig, use_container_width=True)
             
             # Cán bộ phụ trách (Highlight nhấp nháy)
-            st.markdown("### 👨‍💼 Cán bộ Phụ trách Đơn vị")
+            st.markdown("### 👨‍💼 Cán bộ Phụ trách Xã")
             found_officer = False
             for off in OFFICERS:
                 is_assigned = any(area in unit_addr for area in off['areas'])
@@ -396,19 +408,19 @@ if df is not None:
                 if is_assigned:
                     found_officer = True
                     st.markdown(f"""
-                    <div class="officer-card {blink_class}" style="background:#000;">
+                    <div class="officer-card {blink_class}">
                         <span style="color:#39ff14; font-weight:800; font-size:0.7rem; border:1px solid #39ff14; padding:2px 8px; border-radius:50px;">PHỤ TRÁCH TRỰC TIẾP</span>
                         <h4 style="margin:10px 0; color:{off['color']}; text-shadow: 0 0 10px {off['color']};">{off['name']}</h4>
                         <p style="margin:5px 0; font-size:0.85rem; color:#fff;">{off['title']}</p>
-                        <div style="background:#222; padding:10px; border-radius:15px; margin-top:15px; border:1px solid #444;">
-                            <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:white; font-weight:800; font-size:1.4rem;">📱 {off['phone']}</a>
+                        <div style="background:#222; padding:8px; border-radius:15px; margin-top:10px; border:1px solid #444;">
+                            <a href="tel:{off['phone'].replace('.','')}" style="text-decoration:none; color:white; font-weight:800; font-size:1.3rem;">📱 {off['phone']}</a>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
             
             if not found_officer:
-                st.warning("Hệ thống không nhận diện được vùng quản lý. Vui lòng liên hệ bất kỳ cán bộ nào.")
+                st.warning("Hệ thống không nhận diện được xã quản lý. Vui lòng liên hệ bất kỳ cán bộ nào.")
 
 # --- FOOTER ---
 st.markdown("<br><hr>", unsafe_allow_html=True)
-st.markdown(f"<center style='color:#94a3b8; font-size:0.9rem; padding-bottom:60px;'>© {datetime.now().year} BHXH CƠ SỞ THUẬN AN - LÂM ĐỒNG | Elite Digital Hub v12.0</center>", unsafe_allow_html=True)
+st.markdown(f"<center style='color:#94a3b8; font-size:0.9rem; padding-bottom:60px;'>© {datetime.now().year} BHXH CƠ SỞ THUẬN AN - LÂM ĐỒNG | Elite Digital Hub v12.1</center>", unsafe_allow_html=True)
