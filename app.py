@@ -388,6 +388,9 @@ def load_data():
             # FIX LỖI TÊN CỘT: Xử lý triệt để dấu xuống dòng (\n) và khoảng trắng thừa bằng split()
             df.columns = ["_".join(unidecode(str(c)).lower().split()) for c in df.columns]
             
+            # Tự động chuyển đổi các ô trống hoặc NaN thành số 0 để không bị lỗi tính toán
+            df = df.fillna(0)
+            
             if 'madvi' in df.columns: df['madvi'] = df['madvi'].astype(str).str.strip()
             df['search_index'] = df.apply(lambda x: unidecode(str(x.get('madvi', '')) + " " + str(x.get('tendvi', ''))).lower(), axis=1)
             return df
@@ -491,12 +494,19 @@ if df is not None:
             """, unsafe_allow_html=True)
 
             # LẤY CÁC TRƯỜNG DỮ LIỆU CHUẨN XÁC SAU KHI ĐÃ ĐƯỢC LÀM SẠCH BẰNG .SPLIT()
-            tien_dau_ky = unit_data.get('tien_dau_ky', 0)
-            so_phai_dong = unit_data.get('so_phai_dong', 0)
-            dieu_chinh = unit_data.get('dieu_chinh_ky_truoc', 0)
-            so_da_dong = unit_data.get('so_da_dong', 0)
-            so_bi_lech = unit_data.get('so_bi_lech', 0)
-            debt_val = unit_data.get('tien_cuoi_ky', 0)
+            def get_val(row, keys):
+                for k in keys:
+                    if k in row:
+                        val = row[k]
+                        return float(val) if pd.notna(val) and str(val).strip() != '' else 0.0
+                return 0.0
+
+            tien_dau_ky = get_val(unit_data, ['tien_dau_ky'])
+            so_phai_dong = get_val(unit_data, ['so_tien_phai_nop', 'so_phai_dong'])
+            dieu_chinh = get_val(unit_data, ['so_tien_dieu_chinh_ky_truoc', 'dieu_chinh_ky_truoc'])
+            so_da_dong = get_val(unit_data, ['tien_da_nop', 'so_da_dong'])
+            so_bi_lech = get_val(unit_data, ['so_tien_lech', 'so_bi_lech'])
+            debt_val = get_val(unit_data, ['tien_cuoi_ky', 'so_tien_cuoi_ky'])
 
             # AI SMART SUMMARY
             status_text = "✨ Đã hoàn thành 100% nghĩa vụ đóng BHXH, không có nợ đọng." if debt_val <= 0 else f"⚠️ Hiện đang lệch/nợ: {abs(debt_val):,.0f} VNĐ. Cần kiểm tra UNC để nộp bù."
@@ -545,23 +555,23 @@ if df is not None:
                     number={'suffix': "%", 'font': {'color': '#2563eb', 'size': 70}}, 
                     gauge={'axis': {'range': [0, 100]}, 'bar': {'color': "#2563eb"}}
                 )).update_layout(paper_bgcolor="rgba(0,0,0,0)", height=350, margin=dict(t=30, b=0))
-                st.plotly_chart(fig, use_container_width=True)
-                
-                for off in OFFICERS:
-                    if any(kw in unit_addr for kw in off['keywords']) or any(kw in unit_data.get('madvi','').lower() for kw in off['keywords']):
-                        st.markdown(f"<div class='crystal-card' style='background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; margin-top:0px;'><small style='color:#39ff14; font-weight:900; letter-spacing: 1.5px;'>👨‍💼 CÁN BỘ PHỤ TRÁCH TRỰC TIẾP</small><h2 style='color:#fff; margin:15px 0; font-size: 2.2rem;'>{off['name']}</h2><a href='tel:{off['phone'].replace('.','')}' style='color:#00f2fe; font-size: 2.2rem; text-decoration:none; font-weight:900; text-shadow: 0 0 15px #00f2fe;'>📱 {off['phone']}</a><br><a href='{off['zalo']}' target='_blank' style='background:white; color:#1e3a8a; padding:15px 40px; border-radius:50px; text-decoration:none; display:inline-block; margin-top:25px; font-weight:900; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-transform: uppercase; transition: all 0.3s;'>💬 CHAT ZALO NGAY</a></div>", unsafe_allow_html=True)
-                        break
-
-            render_vip_bank_accounts(unit_data.get('madvi'), unit_data.get('tendvi'))
-
-    # --- TAB 2: AI NỘI BỘ (ĐƯỢC BẢO LƯU 100%) ---
+    # --- TAB 2: AI NỘI BỘ (ĐƯỢC BẢO LƯU 100% VÀ NÂNG CẤP UI) ---
     elif st.session_state.current_tab == "🤖 Trợ lý AI Thông Minh":
         st.markdown("## 🧠 TRỢ LÝ THÔNG MINH BHXH (CHẾ ĐỘ OFFLINE 2.0)")
         
         context = ""
         if st.session_state.selected_unit:
             unit = df[df['madvi'] == st.session_state.selected_unit].iloc[0]
-            context = f"Tên đơn vị: {unit['tendvi']}\nMã đơn vị: {unit['madvi']}\nSố tiền nợ/dư cuối kỳ: {unit['tien_cuoi_ky']:,} VNĐ."
+            
+            def get_val_ai(row, keys):
+                for k in keys:
+                    if k in row:
+                        val = row[k]
+                        return float(val) if pd.notna(val) and str(val).strip() != '' else 0.0
+                return 0.0
+            debt_val_ai = get_val_ai(unit, ['tien_cuoi_ky', 'so_tien_cuoi_ky'])
+            
+            context = f"Tên đơn vị: {unit['tendvi']}\nMã đơn vị: {unit['madvi']}\nSố tiền nợ/dư cuối kỳ: {debt_val_ai:,.0f} VNĐ."
             st.success(f"🤖 Trợ lý đã liên kết dữ liệu của **{unit['tendvi']}**. Hệ thống hoạt động 100% Offline bảo mật, không cần API Key.")
         else:
             st.info("🤖 Trợ lý thông minh đã kích hoạt chế độ Không cần API Key. Bất tử trước mọi lỗi mạng! Đảm bảo phản hồi ngay lập tức!")
