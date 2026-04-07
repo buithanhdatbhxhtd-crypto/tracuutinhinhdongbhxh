@@ -555,6 +555,15 @@ if df is not None:
                     number={'suffix': "%", 'font': {'color': '#2563eb', 'size': 70}}, 
                     gauge={'axis': {'range': [0, 100]}, 'bar': {'color': "#2563eb"}}
                 )).update_layout(paper_bgcolor="rgba(0,0,0,0)", height=350, margin=dict(t=30, b=0))
+                st.plotly_chart(fig, use_container_width=True)
+                
+                for off in OFFICERS:
+                    if any(kw in unit_addr for kw in off['keywords']) or any(kw in unit_data.get('madvi','').lower() for kw in off['keywords']):
+                        st.markdown(f"<div class='crystal-card' style='background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; margin-top:0px;'><small style='color:#39ff14; font-weight:900; letter-spacing: 1.5px;'>👨‍💼 CÁN BỘ PHỤ TRÁCH TRỰC TIẾP</small><h2 style='color:#fff; margin:15px 0; font-size: 2.2rem;'>{off['name']}</h2><a href='tel:{off['phone'].replace('.','')}' style='color:#00f2fe; font-size: 2.2rem; text-decoration:none; font-weight:900; text-shadow: 0 0 15px #00f2fe;'>📱 {off['phone']}</a><br><a href='{off['zalo']}' target='_blank' style='background:white; color:#1e3a8a; padding:15px 40px; border-radius:50px; text-decoration:none; display:inline-block; margin-top:25px; font-weight:900; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-transform: uppercase; transition: all 0.3s;'>💬 CHAT ZALO NGAY</a></div>", unsafe_allow_html=True)
+                        break
+
+            render_vip_bank_accounts(unit_data.get('madvi'), unit_data.get('tendvi'))
+
     # --- TAB 2: AI NỘI BỘ (ĐƯỢC BẢO LƯU 100% VÀ NÂNG CẤP UI) ---
     elif st.session_state.current_tab == "🤖 Trợ lý AI Thông Minh":
         st.markdown("## 🧠 TRỢ LÝ THÔNG MINH BHXH (CHẾ ĐỘ OFFLINE 2.0)")
