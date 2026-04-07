@@ -11,23 +11,19 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v39.0 Ascension",
+    page_title="BHXH Thuận An - v39.1 Ascension",
     page_icon="🚀",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # --- CẤU HÌNH AI NỘI BỘ (OFFLINE SMART ENGINE 2.0) ---
-# ĐƯỢC GIỮ NGUYÊN 100% THEO YÊU CẦU: Bất tử trước mọi lỗi mạng, không cần API Key.
-
 def get_ai_response(prompt, context=""):
     prompt_lower = unidecode(prompt).lower()
     response = ""
 
-    # Mô phỏng độ trễ suy nghĩ của AI chuyên nghiệp
     time.sleep(1.0)
 
-    # 1. Xử lý nhận thức ngữ cảnh (Dữ liệu công ty đang tra cứu)
     if context and any(word in prompt_lower for word in ["no", "thieu", "dong", "tai sao", "kiem tra", "tien", "tinh hinh"]):
         response += f"📊 **Dữ liệu phân tích tự động từ hệ thống:**\n{context}\n"
         if "nợ: 0 " in context.lower() or "-0 " in context.lower():
@@ -35,7 +31,6 @@ def get_ai_response(prompt, context=""):
         else:
             response += "👉 **Phân tích thông minh:** Đơn vị hiện đang có khoản nợ/lệch so với dữ liệu trên hệ thống. Quý đơn vị vui lòng kiểm tra lại Ủy nhiệm chi (UNC) tháng gần nhất hoặc liên hệ Cán bộ chuyên quản qua Zalo để tiến hành đối chiếu, điều chỉnh kịp thời.\n\n---\n"
 
-    # 2. Bộ não tri thức BHXH (Knowledge Base)
     if any(word in prompt_lower for word in ["muc dong", "bao nhieu phan tram", "ty le", "phan tram"]):
         response += "💡 **Quy định Mức đóng BHXH, BHYT, BHTN hiện hành (áp dụng trên quỹ Lương):**\n"
         response += "- **BHXH** (Hưu trí, tử tuất, ốm đau, thai sản): 25.5% (Doanh nghiệp: 17.5%, NLĐ: 8%)\n"
@@ -58,10 +53,10 @@ def get_ai_response(prompt, context=""):
 
     elif any(word in prompt_lower for word in ["c12", "tra cuu", "thong bao"]):
         response += "💡 **Về Thông báo C12-TS:**\n"
-        response += "Hệ thống v39.0 Ascension hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị (VD: TA0001) để xem bảng Dashboard tài chính trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
+        response += "Hệ thống v39.1 Ascension hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị để xem bảng Dashboard tài chính trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
 
     elif any(word in prompt_lower for word in ["chao", "hello", "hi", "xin chao"]):
-        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v39.0. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
+        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v39.1. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
 
     else:
         if not response:
@@ -80,7 +75,7 @@ if 'active_pdf' not in st.session_state: st.session_state.active_pdf = None
 if 'search_query' not in st.session_state: st.session_state.search_query = ""
 if 'welcome_done' not in st.session_state: st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN ASCENSION v39.0 - VƯƠN TẦM CAO MỚI) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN ASCENSION v39.1) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
@@ -91,7 +86,6 @@ st.markdown("""
 
     * { font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; }
     
-    /* V39 Màn hình khởi động (Splash Screen) */
     .splash-screen {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: #020617; z-index: 999999;
@@ -107,7 +101,6 @@ st.markdown("""
     }
     @keyframes spinLoader { to { transform: rotate(360deg); } }
 
-    /* V39 Nút hỗ trợ Zalo trôi nổi (Floating Action Button) */
     .floating-zalo {
         position: fixed; bottom: 30px; right: 30px; z-index: 9999;
         background: linear-gradient(135deg, #0088FF 0%, #005ce6 100%);
@@ -120,14 +113,12 @@ st.markdown("""
     .floating-zalo:hover { transform: scale(1.15) translateY(-5px); box-shadow: 0 15px 35px rgba(0, 136, 255, 0.7); }
     @keyframes floatBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-    /* V38/V39 Smooth Content Fade-in Transition */
     @keyframes fadeInSlideUp {
         0% { opacity: 0; transform: translateY(30px) scale(0.98); }
         100% { opacity: 1; transform: translateY(0) scale(1); }
     }
     .block-container { animation: fadeInSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
 
-    /* V38 Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #0f172a; border-radius: 4px; }
     ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #3b82f6, #00f2fe); border-radius: 4px; }
@@ -135,11 +126,9 @@ st.markdown("""
 
     .stApp { background: #f8fafc; background-image: radial-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px); background-size: 30px 30px; }
 
-    /* SIDEBAR ĐẲNG CẤP VŨ TRỤ */
     [data-testid="stSidebar"] { background: linear-gradient(180deg, #020617 0%, #0f172a 50%, #1e3a8a 100%) !important; box-shadow: 8px 0 30px rgba(0,242,254,0.1); border-right: 1px solid rgba(0, 242, 254, 0.15); }
     [data-testid="stSidebar"] h1 { color: white !important; text-shadow: 0 0 20px var(--neon-blue), 0 0 40px var(--secondary); letter-spacing: 2px; }
     
-    /* NÂNG CẤP MENU SIDEBAR V39 (GLASSMORPHISM BẬC CAO) */
     [data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {
         background: rgba(255, 255, 255, 0.03);
         border-radius: 12px;
@@ -160,7 +149,6 @@ st.markdown("""
         text-shadow: 1px 1px 2px rgba(0,0,0,0.8) !important; padding: 10px 0 !important; letter-spacing: 0.5px;
     }
 
-    /* BẢNG LED RGB ANIMATION */
     @keyframes ledGlow { 0%, 100% { box-shadow: 0 0 15px #39ff14; } 50% { box-shadow: 0 0 35px #39ff14, 0 0 10px #39ff14 inset; } }
     .led-marquee {
         background: #020617; color: #39ff14; padding: 15px 0; font-weight: 900; border-radius: 12px;
@@ -168,7 +156,6 @@ st.markdown("""
         animation: ledGlow 3s infinite; border-top: 2px solid #39ff14; border-bottom: 2px solid #39ff14;
     }
 
-    /* SIÊU Ô TÌM KIẾM GATEWAY - HIỆU ỨNG TẬP TRUNG (FOCUS) V39 */
     .gateway-container { max-width: 1050px; margin: 0 auto 1.5rem auto; text-align: center; }
     div[data-testid="stTextInput"] > div { height: 130px !important; background: transparent !important; border:none !important; box-shadow:none !important; padding: 0 !important; margin: 0 !important; }
     
@@ -188,7 +175,6 @@ st.markdown("""
         outline: none !important;
     }
 
-    /* ANIMATED HEADER CARD (GLASSMORPHISM 5.0) */
     @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     .premium-header {
         background: linear-gradient(-45deg, #1e3a8a, #3b82f6, #8b5cf6, #0f172a);
@@ -205,20 +191,18 @@ st.markdown("""
     .premium-header h1 { font-size: 3.8rem; font-weight: 900; margin: 0; text-shadow: 2px 2px 20px rgba(0,0,0,0.5); position: relative; z-index: 2; }
     .premium-header p { font-size: 1.4rem; font-weight: 600; margin: 10px 0 0 0; color: #e0f2fe; position: relative; z-index: 2; }
 
-    /* RADIANT CARDS 3D - HOVER GLOW V39 (PEARL GLOW + 3D TILT EFFECT) */
     .crystal-card {
         background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,249,255,0.95) 100%);
         padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.06);
         border: 1px solid #e2e8f0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
     }
     .crystal-card::before { content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: var(--secondary); transition: all 0.4s ease; }
-    .crystal-card:hover { transform: translateY(-10px) scale(1.03); box-shadow: 0 25px 45px rgba(0, 242, 254, 0.25); border-color: #7dd3fc; z-index: 10; }
+    .crystal-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 25px 45px rgba(0, 242, 254, 0.2); border-color: #7dd3fc; z-index: 10; }
     .crystal-card:hover::before { width: 100%; opacity: 0.05; background: linear-gradient(90deg, var(--secondary), var(--neon-blue)); }
     
     .metric-val { font-size: 2.8rem; font-weight: 900; color: var(--primary); margin-top: 8px; letter-spacing: -1px; text-shadow: 1px 1px 2px rgba(0,0,0,0.05); }
     .metric-lbl { font-size: 1.1rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
 
-    /* SMART SUMMARY BANNER V39 */
     .ai-summary {
         background: linear-gradient(90deg, #f0fdfa 0%, #e0f2fe 100%);
         border-left: 6px solid #10b981; padding: 20px 30px; border-radius: 15px;
@@ -226,11 +210,9 @@ st.markdown("""
         box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15); border-right: 1px solid #bae6fd;
     }
 
-    /* BANK CARD VIP V39 */
     .bank-card { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 2px solid #fbbf24; border-radius: 20px; padding: 30px; margin-top: 20px; box-shadow: 0 15px 35px rgba(245, 158, 11, 0.15); position: relative; overflow: hidden;}
     .stCodeBlock code { font-size: 1.5rem !important; font-weight: 900 !important; color: #b45309 !important; background: white !important; border-radius: 8px !important;}
     
-    /* V39 CYBER-CHAT UI */
     .stChatMessage {
         background: rgba(255, 255, 255, 0.9) !important;
         border-radius: 15px !important;
@@ -242,11 +224,9 @@ st.markdown("""
     }
     .stChatMessage:hover { transform: translateX(5px); }
 
-    /* SLIDER STYLING CHO V39 */
     div[data-testid="stSlider"] > div > div > div { background-color: var(--secondary) !important; }
     div[data-testid="stSlider"] > div > div > div > div { background-color: var(--neon-blue) !important; box-shadow: 0 0 15px var(--neon-blue) !important; border: 2px solid white; }
 
-    /* ANIMATED LIQUID BUTTON V39 */
     @keyframes liquidSweep {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
@@ -263,17 +243,16 @@ st.markdown("""
     }
     .btn-main > div > button:hover { transform: scale(1.05) translateY(-5px) !important; box-shadow: 0 25px 50px rgba(139, 92, 246, 0.6) !important; }
     
-    /* BLINKING LIVE DOT */
     @keyframes blink { 0% {opacity: 1; text-shadow: 0 0 10px red;} 50% {opacity: 0.2; text-shadow: none;} 100% {opacity: 1; text-shadow: 0 0 10px red;} }
     .live-dot { color: #ef4444; animation: blink 1.5s infinite; font-size: 1.3rem; vertical-align: middle; margin-right: 8px;}
     </style>
     """, unsafe_allow_html=True)
 
-# --- HIỆU ỨNG MÀN HÌNH KHỞI ĐỘNG VÀ NÚT HỖ TRỢ ZALO NỔI (V39.0 MỚI NHẤT) ---
+# --- HIỆU ỨNG MÀN HÌNH KHỞI ĐỘNG VÀ NÚT HỖ TRỢ ZALO NỔI ---
 st.markdown("""
     <div class="splash-screen">
         <div class="splash-loader"></div>
-        <h1 style="color: #00f2fe; font-size: 2.5rem; text-shadow: 0 0 20px #00f2fe; font-weight: 900; letter-spacing: 3px; font-family: 'Plus Jakarta Sans', sans-serif;">🚀 INITIALIZING V39.0 ASCENSION...</h1>
+        <h1 style="color: #00f2fe; font-size: 2.5rem; text-shadow: 0 0 20px #00f2fe; font-weight: 900; letter-spacing: 3px; font-family: 'Plus Jakarta Sans', sans-serif;">🚀 INITIALIZING V39.1 ASCENSION...</h1>
         <p style="color: #64748b; font-size: 1.2rem; margin-top: 10px;">Connecting to Quantum Core...</p>
     </div>
     <a href="https://zalo.me/0846392929" target="_blank" class="floating-zalo">
@@ -281,77 +260,31 @@ st.markdown("""
     </a>
 """, unsafe_allow_html=True)
 
-
-# --- ĐỒNG HỒ REAL-TIME (JS V39 CYBERPUNK STYLE ĐỈNH CAO) ---
+# --- ĐỒNG HỒ REAL-TIME (JS CYBERPUNK STYLE) ---
 def live_clock():
     components.html("""
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@600;800&display=swap');
-        
-        @keyframes rotateBorder {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes neonFlicker {
-            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { text-shadow: 0 0 15px #00f2fe, 0 0 30px #3b82f6; opacity: 1; }
-            20%, 24%, 55% { text-shadow: 0 0 5px #3b82f6; opacity: 0.9; }
-        }
-        
-        .clock-wrapper {
-            background: linear-gradient(45deg, #00f2fe, #4facfe, #3b82f6, #8b5cf6);
-            background-size: 300% 300%;
-            animation: rotateBorder 5s ease infinite;
-            padding: 3px;
-            border-radius: 20px;
-            margin-bottom: 10px;
-        }
-        
-        .clock-container {
-            background: rgba(2, 6, 23, 0.9);
-            border-radius: 17px;
-            padding: 20px 10px;
-            text-align: center;
-            backdrop-filter: blur(15px);
-        }
-        .date-text {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: #bae6fd;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-        }
-        .time-text {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: #ffffff;
-            letter-spacing: 3px;
-            animation: neonFlicker 3s infinite;
-        }
+        @keyframes rotateBorder { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes neonFlicker { 0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { text-shadow: 0 0 15px #00f2fe, 0 0 30px #3b82f6; opacity: 1; } 20%, 24%, 55% { text-shadow: 0 0 5px #3b82f6; opacity: 0.9; } }
+        .clock-wrapper { background: linear-gradient(45deg, #00f2fe, #4facfe, #3b82f6, #8b5cf6); background-size: 300% 300%; animation: rotateBorder 5s ease infinite; padding: 3px; border-radius: 20px; margin-bottom: 10px; }
+        .clock-container { background: rgba(2, 6, 23, 0.9); border-radius: 17px; padding: 20px 10px; text-align: center; backdrop-filter: blur(15px); }
+        .date-text { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.9rem; font-weight: 800; color: #bae6fd; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px; }
+        .time-text { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: 900; color: #ffffff; letter-spacing: 3px; animation: neonFlicker 3s infinite; }
     </style>
-    <div class="clock-wrapper">
-        <div class="clock-container">
-            <div class="date-text" id="day-str"></div>
-            <div class="time-text" id="time-str"></div>
-        </div>
-    </div>
+    <div class="clock-wrapper"><div class="clock-container"><div class="date-text" id="day-str"></div><div class="time-text" id="time-str"></div></div></div>
     <script>
         function updateClock() {
             const now = new Date();
             const opts = { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' };
             document.getElementById('day-str').innerText = now.toLocaleDateString('vi-VN', opts).toUpperCase();
-            document.getElementById('time-str').innerText = String(now.getHours()).padStart(2, '0') + ":" + 
-                                                            String(now.getMinutes()).padStart(2, '0') + ":" + 
-                                                            String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('time-str').innerText = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
         }
         setInterval(updateClock, 1000); updateClock();
     </script>
     """, height=180)
 
-# --- USER PROFILE WIDGET (SIDEBAR V39) ---
+# --- USER PROFILE WIDGET (SIDEBAR) ---
 def render_admin_profile():
     st.sidebar.markdown("""
         <div style="background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid rgba(255,255,255,0.15); padding: 15px; border-radius: 20px; display: flex; align-items: center; margin-bottom: 20px; backdrop-filter: blur(15px); box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
@@ -420,7 +353,7 @@ OFFICERS = [
     {"name": "Ông HOÀNG SỸ HẢI", "communes": "Xã Thuận An", "keywords": ["thuan an", "thuận an"], "phone": "0919.06.11.53", "zalo": "https://zalo.me/0919061153", "color": "#39ff14"}
 ]
 
-# --- TIỆN ÍCH MÃ QR THANH TOÁN (V39 MỚI) ---
+# --- TIỆN ÍCH MÃ QR THANH TOÁN ---
 def render_vip_bank_accounts(unit_code="[Mã Đơn Vị]", unit_name="[Tên Đơn Vị]"):
     st.markdown("<div class='bank-card'><h2 style='color:#b45309; margin-top:0; font-weight:900; text-align:center;'>🏦 THÔNG TIN CHUYỂN KHOẢN ĐÓNG BHXH</h2><p style='color:#475569; text-align:center; font-weight:600; font-size:1.1rem;'>Kế toán đơn vị vui lòng nhấn <b style='color:#ea580c;'>Copy</b> ở góc phải mỗi số tài khoản để sao chép chính xác nhất.</p></div>", unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
@@ -440,7 +373,7 @@ def render_vip_bank_accounts(unit_code="[Mã Đơn Vị]", unit_name="[Tên Đơ
         </div>
     """, unsafe_allow_html=True)
 
-# --- HÀM XUẤT DATA ---
+# --- HÀM XUẤT DATA (LÀM SẠCH CỘT V39.1) ---
 @st.cache_data
 def convert_df(df_export): return df_export.to_csv(index=False).encode('utf-8-sig')
 
@@ -452,7 +385,9 @@ def load_data():
         target = files[0]
         df = pd.read_csv(target) if target.lower().endswith('.csv') else pd.read_excel(target)
         if df is not None:
-            df.columns = [unidecode(str(c)).lower().strip().replace(' ', '_') for c in df.columns]
+            # FIX LỖI TÊN CỘT: Xử lý triệt để dấu xuống dòng (\n) và khoảng trắng thừa bằng split()
+            df.columns = ["_".join(unidecode(str(c)).lower().split()) for c in df.columns]
+            
             if 'madvi' in df.columns: df['madvi'] = df['madvi'].astype(str).str.strip()
             df['search_index'] = df.apply(lambda x: unidecode(str(x.get('madvi', '')) + " " + str(x.get('tendvi', ''))).lower(), axis=1)
             return df
@@ -467,10 +402,10 @@ with st.sidebar:
     st.session_state.current_tab = st.radio("CHUYỂN HƯỚNG TÍNH NĂNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v39.0 Ascension | Advanced Pro 3.1")
+    st.caption("v39.1 Ascension | Advanced Pro 3.1")
 
 # --- HEADER LED ---
-marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v39.0 VƯƠN TẦM CAO MỚI • GIAO DIỆN CHUYỂN CẢNH MƯỢT MÀ • BỔ SUNG TIỆN ÍCH HỖ TRỢ ZALO VÀ QUÉT MÃ QR 🌟"
+marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v39.1 VƯƠN TẦM CAO MỚI • ĐÃ FIX LỖI ĐỌC DỮ LIỆU C12 TỰ ĐỘNG CHUẨN XÁC 100% 🌟"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -502,8 +437,8 @@ if df is not None:
 
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
-                st.markdown("##### 📢 TIN TỨC V39")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 KỶ NGUYÊN ASCENSION</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Cập nhật màn hình Splash Screen, nút hỗ trợ nổi toàn màn hình và tiện ích mã QR thanh toán nhanh.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 39.0</small></div>", unsafe_allow_html=True)
+                st.markdown("##### 📢 TIN TỨC V39.1")
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 KỶ NGUYÊN ASCENSION</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Đã fix hoàn toàn lỗi hiển thị dữ liệu C12 do khoảng trắng/xuống dòng trong Excel.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 39.1</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -532,7 +467,7 @@ if df is not None:
                     """, unsafe_allow_html=True)
 
         else:
-            # --- DASHBOARD KẾT QUẢ v39 ---
+            # --- DASHBOARD KẾT QUẢ v39.1 ---
             if not st.session_state.welcome_done:
                 st.balloons(); st.session_state.welcome_done = True
             
@@ -555,12 +490,19 @@ if df is not None:
                 </div>
             """, unsafe_allow_html=True)
 
-            # AI SMART SUMMARY
+            # LẤY CÁC TRƯỜNG DỮ LIỆU CHUẨN XÁC SAU KHI ĐÃ ĐƯỢC LÀM SẠCH BẰNG .SPLIT()
+            tien_dau_ky = unit_data.get('tien_dau_ky', 0)
+            so_phai_dong = unit_data.get('so_phai_dong', 0)
+            dieu_chinh = unit_data.get('dieu_chinh_ky_truoc', 0)
+            so_da_dong = unit_data.get('so_da_dong', 0)
+            so_bi_lech = unit_data.get('so_bi_lech', 0)
             debt_val = unit_data.get('tien_cuoi_ky', 0)
+
+            # AI SMART SUMMARY
             status_text = "✨ Đã hoàn thành 100% nghĩa vụ đóng BHXH, không có nợ đọng." if debt_val <= 0 else f"⚠️ Hiện đang lệch/nợ: {abs(debt_val):,.0f} VNĐ. Cần kiểm tra UNC để nộp bù."
             st.markdown(f"""
                 <div class='ai-summary'>
-                    <span style='font-size: 1.5rem;'>🤖</span> <b>AI Tự Động Phân Tích:</b> Doanh nghiệp đã đóng <b>{unit_data.get('so_da_dong', 0):,.0f} VNĐ</b> / <b>{unit_data.get('so_phai_dong', 0):,.0f} VNĐ</b>. {status_text}
+                    <span style='font-size: 1.5rem;'>🤖</span> <b>AI Tự Động Phân Tích:</b> Doanh nghiệp đã đóng <b>{so_da_dong:,.0f} VNĐ</b> / <b>{so_phai_dong:,.0f} VNĐ</b>. {status_text}
                 </div>
             """, unsafe_allow_html=True)
             
@@ -568,24 +510,22 @@ if df is not None:
             with cl:
                 st.write("<h3 style='color:#1e3a8a; margin-top: 15px; font-weight: 900;'>📊 BÁO CÁO TÀI CHÍNH CHI TIẾT</h3>", unsafe_allow_html=True)
                 m1, m2, m3 = st.columns(3)
-                with m1: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Đầu kỳ</div><div class='metric-val'>{unit_data.get('tien_dau_ky', 0):,.0f}</div></div>", unsafe_allow_html=True)
-                with m2: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Phải đóng</div><div class='metric-val'>{unit_data.get('so_phai_dong', 0):,.0f}</div></div>", unsafe_allow_html=True)
-                with m3: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Điều chỉnh</div><div class='metric-val'>{unit_data.get('dieu_chinh_ky_truoc', 0):,.0f}</div></div>", unsafe_allow_html=True)
+                with m1: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Đầu kỳ</div><div class='metric-val'>{tien_dau_ky:,.0f}</div></div>", unsafe_allow_html=True)
+                with m2: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Phải đóng</div><div class='metric-val'>{so_phai_dong:,.0f}</div></div>", unsafe_allow_html=True)
+                with m3: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Điều chỉnh</div><div class='metric-val'>{dieu_chinh:,.0f}</div></div>", unsafe_allow_html=True)
                 
                 st.write("<br>", unsafe_allow_html=True)
                 m4, m5, m6 = st.columns(3)
-                with m4: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Đã đóng</div><div class='metric-val' style='color:#10b981;'>{unit_data.get('so_da_dong', 0):,.0f}</div></div>", unsafe_allow_html=True)
-                with m5: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Lệch</div><div class='metric-val' style='color:#ef4444;'>{unit_data.get('so_bi_lech', 0):,.0f}</div></div>", unsafe_allow_html=True)
+                with m4: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Đã đóng</div><div class='metric-val' style='color:#10b981;'>{so_da_dong:,.0f}</div></div>", unsafe_allow_html=True)
+                with m5: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Lệch</div><div class='metric-val' style='color:#ef4444;'>{so_bi_lech:,.0f}</div></div>", unsafe_allow_html=True)
                 status_clr = '#ef4444' if debt_val > 0 else '#10b981'
                 with m6: st.markdown(f"<div class='crystal-card' style='border: 4px solid {status_clr}; background: {status_clr}11;'><div class='metric-lbl'>{'SỐ TIỀN CÒN NỢ' if debt_val > 0 else 'SỐ TIỀN DƯ CÓ'}</div><div class='metric-val' style='color:{status_clr};'>{abs(debt_val):,.0f}</div></div>", unsafe_allow_html=True)
                 
                 st.write("<br>", unsafe_allow_html=True)
                 
-                # Nút tải báo cáo
                 csv_data = convert_df(pd.DataFrame([unit_data]))
                 st.download_button(label="📥 TẢI BÁO CÁO NÀY (EXCEL/CSV)", data=csv_data, file_name=f"BaoCao_BHXH_{unit_data.get('madvi')}.csv", mime='text/csv', use_container_width=True)
                 
-                # TIỆN ÍCH IN BÁO CÁO NHANH BẰNG JS
                 components.html("""
                     <button onclick="window.parent.print()" style="width: 100%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 15px; border-radius: 50px; font-weight: 900; font-size: 1.1rem; cursor: pointer; box-shadow: 0 10px 20px rgba(16,185,129,0.3); font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; transition: all 0.3s; margin-top: 10px;">
                         🖨️ IN BẢN BÁO CÁO NÀY NGAY
@@ -594,7 +534,8 @@ if df is not None:
                 """, height=80)
 
             with cr:
-                rate = min(round((unit_data.get('so_da_dong', 0) / unit_data.get('so_phai_dong', 1)) * 100, 1), 100)
+                # Đảm bảo chia không lỗi cho trường hợp file trống
+                rate = min(round((so_da_dong / so_phai_dong) * 100, 1), 100) if so_phai_dong else 100
                 st.markdown("<p style='font-weight: 800; color: #1e3a8a; text-align: center; font-size: 1.2rem; margin-bottom: 5px;'>THANH TIẾN ĐỘ</p>", unsafe_allow_html=True)
                 st.progress(int(rate))
 
@@ -613,7 +554,7 @@ if df is not None:
 
             render_vip_bank_accounts(unit_data.get('madvi'), unit_data.get('tendvi'))
 
-    # --- TAB 2: AI NỘI BỘ (ĐƯỢC BẢO LƯU 100% VÀ NÂNG CẤP UI) ---
+    # --- TAB 2: AI NỘI BỘ (ĐƯỢC BẢO LƯU 100%) ---
     elif st.session_state.current_tab == "🤖 Trợ lý AI Thông Minh":
         st.markdown("## 🧠 TRỢ LÝ THÔNG MINH BHXH (CHẾ ĐỘ OFFLINE 2.0)")
         
@@ -685,9 +626,9 @@ if df is not None:
             3. **Nộp hồ sơ giấy:** Đơn vị thu hồi Tờ bìa sổ và các tờ rời của NLĐ (kèm theo Mẫu TK1-TS nếu cần điều chỉnh thông tin) và gửi qua dịch vụ bưu chính về cơ quan BHXH để tiến hành in tờ rời chốt sổ.
             """)
 
-    # --- TAB 5: MÁY TÍNH BHXH (SLIDER TỐI ƯU HÓA) ---
+    # --- TAB 5: MÁY TÍNH BHXH ---
     elif st.session_state.current_tab == "🧮 Máy tính BHXH":
-        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V39")
+        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V39.1")
         st.markdown("<p style='font-size: 1.2rem; color: #475569; margin-bottom: 20px;'>Kéo thanh trượt (slider) hoặc nhập trực tiếp mức lương cơ sở/quỹ lương để hệ thống tự động phân tách nghĩa vụ tài chính.</p>", unsafe_allow_html=True)
         
         sal = st.slider("🎚️ KÉO ĐỂ CHỌN MỨC LƯƠNG HOẶC QUỸ LƯƠNG ĐÓNG BHXH (VNĐ):", min_value=1000000, max_value=200000000, value=5000000, step=100000, format="%d VNĐ")
@@ -773,7 +714,7 @@ if df is not None:
         }])
         st.download_button(label="📥 TẢI BẢNG DỰ TOÁN CHI TIẾT (CSV)", data=convert_df(calc_data), file_name="Bang_Du_Toan_BHXH.csv", mime='text/csv')
 
-    # --- TAB 6: LIÊN HỆ (ĐÃ KIỂM TRA ĐỊA CHỈ & SĐT CHUẨN XÁC) ---
+    # --- TAB 6: LIÊN HỆ ---
     elif st.session_state.current_tab == "📍 Liên hệ BHXH":
         st.markdown("## 📍 TRUNG TÂM HỖ TRỢ & LIÊN HỆ")
         st.markdown("""
@@ -788,4 +729,4 @@ if df is not None:
         </div>
         """, unsafe_allow_html=True)
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v39.0 Ascension (Enterprise Level)</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v39.1 Ascension (Enterprise Level)</center>", unsafe_allow_html=True)
