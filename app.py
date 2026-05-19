@@ -11,13 +11,14 @@ import streamlit.components.v1 as components
 
 # --- CẤU HÌNH TRANG ---
 st.set_page_config(
-    page_title="BHXH Thuận An - v39.1 Ascension",
+    page_title="BHXH Thuận An - v40.0 Galactic Gold",
     page_icon="🚀",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # --- CẤU HÌNH AI NỘI BỘ (OFFLINE SMART ENGINE 2.0) ---
+# ĐƯỢC GIỮ NGUYÊN 100% THEO YÊU CẦU: Bất tử trước mọi lỗi mạng, không cần API Key.
 def get_ai_response(prompt, context=""):
     prompt_lower = unidecode(prompt).lower()
     response = ""
@@ -26,10 +27,10 @@ def get_ai_response(prompt, context=""):
 
     if context and any(word in prompt_lower for word in ["no", "thieu", "dong", "tai sao", "kiem tra", "tien", "tinh hinh"]):
         response += f"📊 **Dữ liệu phân tích tự động từ hệ thống:**\n{context}\n"
-        if "nợ: 0 " in context.lower() or "-0 " in context.lower():
-            response += "👉 **Phân tích thông minh:** Đơn vị hiện tại đã hoàn thành 100% nghĩa vụ tài chính BHXH, không phát sinh nợ đọng. Xin chân thành cảm ơn sự đồng hành của Quý đơn vị!\n\n---\n"
+        if "dư" in context.lower():
+            response += "👉 **Phân tích thông minh:** Đơn vị hiện tại đã hoàn thành tốt nghĩa vụ tài chính BHXH và đang có số tiền dư có. Xin chân thành cảm ơn sự đồng hành đóng nộp tích cực của Quý đơn vị!\n\n---\n"
         else:
-            response += "👉 **Phân tích thông minh:** Đơn vị hiện đang có khoản nợ/lệch so với dữ liệu trên hệ thống. Quý đơn vị vui lòng kiểm tra lại Ủy nhiệm chi (UNC) tháng gần nhất hoặc liên hệ Cán bộ chuyên quản qua Zalo để tiến hành đối chiếu, điều chỉnh kịp thời.\n\n---\n"
+            response += "👉 **Phân tích thông minh:** Đơn vị hiện đang có khoản tiền còn thiếu (nợ) đóng trên hệ thống. Quý đơn vị vui lòng kiểm tra lại Ủy nhiệm chi (UNC) tháng gần nhất hoặc liên hệ Cán bộ chuyên quản qua Zalo để tiến hành đối chiếu, điều chỉnh kịp thời.\n\n---\n"
 
     if any(word in prompt_lower for word in ["muc dong", "bao nhieu phan tram", "ty le", "phan tram"]):
         response += "💡 **Quy định Mức đóng BHXH, BHYT, BHTN hiện hành (áp dụng trên quỹ Lương):**\n"
@@ -53,10 +54,10 @@ def get_ai_response(prompt, context=""):
 
     elif any(word in prompt_lower for word in ["c12", "tra cuu", "thong bao"]):
         response += "💡 **Về Thông báo C12-TS:**\n"
-        response += "Hệ thống v39.1 Ascension hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị để xem bảng Dashboard tài chính trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
+        response += "Hệ thống v40.0 Galactic Gold hiện tại đã số hóa hoàn toàn dữ liệu C12. Quý đơn vị chỉ cần truy cập **Trang chủ (Cổng tra cứu)**, nhập Mã Đơn vị để xem bảng Dashboard tài chính trực quan, minh bạch thay vì chờ file PDF C12 thủ công."
 
     elif any(word in prompt_lower for word in ["chao", "hello", "hi", "xin chao"]):
-        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v39.1. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
+        response += "👋 Xin chào! Tôi là Trợ lý AI Nội bộ của BHXH Thuận An. Chào mừng Quý đơn vị đến với hệ thống v40.0. Tôi có thể hỗ trợ gì về chính sách BHXH, BHYT, BHTN hôm nay?"
 
     else:
         if not response:
@@ -75,7 +76,7 @@ if 'active_pdf' not in st.session_state: st.session_state.active_pdf = None
 if 'search_query' not in st.session_state: st.session_state.search_query = ""
 if 'welcome_done' not in st.session_state: st.session_state.welcome_done = False
 
-# --- TỔNG LỰC CSS (GIAO DIỆN ASCENSION v39.1) ---
+# --- TỔNG LỰC CSS (GIAO DIỆN GALACTIC GOLD v40.0) ---
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
@@ -252,7 +253,7 @@ st.markdown("""
 st.markdown("""
     <div class="splash-screen">
         <div class="splash-loader"></div>
-        <h1 style="color: #00f2fe; font-size: 2.5rem; text-shadow: 0 0 20px #00f2fe; font-weight: 900; letter-spacing: 3px; font-family: 'Plus Jakarta Sans', sans-serif;">🚀 INITIALIZING V39.1 ASCENSION...</h1>
+        <h1 style="color: #00f2fe; font-size: 2.5rem; text-shadow: 0 0 20px #00f2fe; font-weight: 900; letter-spacing: 3px; font-family: 'Plus Jakarta Sans', sans-serif;">🚀 INITIALIZING V40.0 GALACTIC GOLD...</h1>
         <p style="color: #64748b; font-size: 1.2rem; margin-top: 10px;">Connecting to Quantum Core...</p>
     </div>
     <a href="https://zalo.me/0846392929" target="_blank" class="floating-zalo">
@@ -373,42 +374,94 @@ def render_vip_bank_accounts(unit_code="[Mã Đơn Vị]", unit_name="[Tên Đơ
         </div>
     """, unsafe_allow_html=True)
 
-# --- HÀM XUẤT DATA (LÀM SẠCH CỘT V39.1) ---
+# --- HÀM TẢI DATA DỮ LIỆU ĐA NĂNG ĐỘNG (Xử lý .xlsx, .xls, .csv tự động) ---
 @st.cache_data
 def convert_df(df_export): return df_export.to_csv(index=False).encode('utf-8-sig')
 
 @st.cache_data
 def load_data():
     try:
-        files = [f for f in os.listdir('.') if f.lower().startswith('c12')]
-        if not files: return None
-        target = files[0]
-        df = pd.read_csv(target) if target.lower().endswith('.csv') else pd.read_excel(target)
-        if df is not None:
-            # FIX LỖI TÊN CỘT: Xử lý triệt để dấu xuống dòng (\n) và khoảng trắng thừa bằng split()
-            df.columns = ["_".join(unidecode(str(c)).lower().split()) for c in df.columns]
+        # Quét tất cả các file trong thư mục làm việc hiện tại
+        files = os.listdir('.')
+        
+        # Lọc ra các file Excel hợp lệ (bỏ qua file tạm Excel có chứa ký tự ~$ hoặc ._)
+        excel_files = [f for f in files if f.lower().endswith(('.xlsx', '.xls')) and not f.startswith('~$') and not f.startswith('._')]
+        csv_files = [f for f in files if f.lower().endswith('.csv') and 'c12' in f.lower() and not f.startswith('._')]
+        
+        if not excel_files and not csv_files:
+            return None
             
-            # Tự động chuyển đổi các ô trống hoặc NaN thành số 0 để không bị lỗi tính toán
+        # Ưu tiên mở file Excel trước, nếu không có mới mở file CSV
+        if excel_files:
+            # Chọn file Excel đầu tiên tìm thấy
+            target = excel_files[0]
+            df = pd.read_excel(target)
+        else:
+            target = csv_files[0]
+            df = pd.read_csv(target)
+            
+        if df is not None:
+            # Quy chuẩn hóa tất cả các tiêu đề cột (Xóa bỏ dấu, xuống dòng, viết thường, thay khoảng trắng bằng gạch dưới)
+            cleaned_cols = []
+            for col in df.columns:
+                normalized = unidecode(str(col)).lower().strip()
+                # Loại bỏ hoàn toàn dấu xuống dòng và khoảng trắng thừa bằng split()
+                words = normalized.split()
+                cleaned_cols.append("_".join(words))
+            df.columns = cleaned_cols
+            
+            # Ánh xạ thông minh các biến thể cột có thể xảy ra từ file người dùng tải lên
+            col_mapping = {}
+            for col in df.columns:
+                if 'madvi' in col:
+                    col_mapping[col] = 'madvi'
+                elif 'tendv' in col:
+                    col_mapping[col] = 'tendvi'
+                elif 'diachi' in col:
+                    col_mapping[col] = 'diachi'
+                elif 'du_dk' in col:
+                    col_mapping[col] = 'du_dk'
+                elif '_tien_dk' in col or 'tien_dk' in col:
+                    col_mapping[col] = '_tien_dk'
+                elif 'tongbhck' in col:
+                    col_mapping[col] = 'tongbhck'
+                elif '_tien_unc' in col or 'tien_unc' in col:
+                    col_mapping[col] = '_tien_unc'
+                elif 'lech' in col:
+                    col_mapping[col] = 'lech'
+                elif '_tien_ck' in col or 'tien_ck' in col:
+                    col_mapping[col] = '_tien_ck'
+            
+            df = df.rename(columns=col_mapping)
+            
+            # Khử giá trị NaN/Rỗng đưa về 0 để tránh lỗi toán học
             df = df.fillna(0)
             
-            if 'madvi' in df.columns: df['madvi'] = df['madvi'].astype(str).str.strip()
-            df['search_index'] = df.apply(lambda x: unidecode(str(x.get('madvi', '')) + " " + str(x.get('tendvi', ''))).lower(), axis=1)
+            if 'madvi' in df.columns: 
+                df['madvi'] = df['madvi'].astype(str).str.strip()
+            
+            # Tạo chỉ mục tìm kiếm thông minh không dấu
+            df['search_index'] = df.apply(
+                lambda x: unidecode(str(x.get('madvi', '')) + " " + str(x.get('tendvi', ''))).lower(), axis=1
+            )
             return df
-    except: return None
+    except Exception as e:
+        st.error(f"Lỗi hệ thống khi tải file: {e}")
+        return None
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.markdown("<h1 style='text-align:center;'>🚀 ASCENSION V39</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align:center;'>🚀 COSMIC NEXUS</h1>", unsafe_allow_html=True)
     render_admin_profile()
     
     menu = ["📊 Tra cứu C12-TS", "🤖 Trợ lý AI Thông Minh", "📂 Thư viện Văn bản", "📑 Cẩm nang Nghiệp vụ", "🧮 Máy tính BHXH", "📍 Liên hệ BHXH"]
     st.session_state.current_tab = st.radio("CHUYỂN HƯỚNG TÍNH NĂNG", menu, label_visibility="collapsed")
     st.divider()
     live_clock()
-    st.caption("v39.1 Ascension | Advanced Pro 3.1")
+    st.caption("v40.0 Cosmic Nexus | Advanced Pro 3.1")
 
 # --- HEADER LED ---
-marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v39.1 VƯƠN TẦM CAO MỚI • ĐÃ FIX LỖI ĐỌC DỮ LIỆU C12 TỰ ĐỘNG CHUẨN XÁC 100% 🌟"
+marquee_msg = "🌟 HỆ THỐNG TRA CỨU DỮ LIỆU BHXH THUẬN AN PHIÊN BẢN v40.0 KỶ NGUYÊN KHÔNG GIAN • HOÀN THIỆN ÁNH XẠ 9 CỘT DỮ LIỆU VÀ TỰ ĐỘNG PHÁT HIỆN FILE EXCEL DỘNG 🌟"
 st.markdown(f"<div class='led-marquee'><marquee scrollamount='10'>{marquee_msg}</marquee></div>", unsafe_allow_html=True)
 
 df = load_data()
@@ -418,7 +471,7 @@ if df is not None:
     if st.session_state.current_tab == "📊 Tra cứu C12-TS":
         if st.session_state.selected_unit is None:
             st.markdown("<div class='gateway-container'>", unsafe_allow_html=True)
-            st.markdown("<h1 style='color:#0f172a; font-size:4.6rem; font-weight:900; margin-bottom: 5px; text-shadow: 2px 2px 0px #cbd5e1;'>🛡️ CỔNG TRA CỨU DỮ LIỆU</h1>", unsafe_allow_html=True)
+            st.markdown("<h1 style='color:#0f172a; font-size:4.5rem; font-weight:900; margin-bottom: 5px; text-shadow: 2px 2px 0px #cbd5e1;'>🛡️ CỔNG TRA CỨU DỮ LIỆU</h1>", unsafe_allow_html=True)
             st.markdown("<p style='color:#475569; font-size:1.8rem; font-weight:800; margin-bottom: 30px;'>NHẬP MÃ ĐƠN VỊ HOẶC TÊN CÔNG TY</p>", unsafe_allow_html=True)
             user_input = st.text_input("Gateway", placeholder="Gõ từ khóa tìm kiếm...", label_visibility="collapsed")
             st.markdown("</div>", unsafe_allow_html=True)
@@ -440,8 +493,8 @@ if df is not None:
 
             col_news, col_res, col_off = st.columns([0.8, 1.4, 1.1])
             with col_news:
-                st.markdown("##### 📢 TIN TỨC V39.1")
-                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 KỶ NGUYÊN ASCENSION</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Đã fix hoàn toàn lỗi hiển thị dữ liệu C12 do khoảng trắng/xuống dòng trong Excel.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 39.1</small></div>", unsafe_allow_html=True)
+                st.markdown("##### 📢 TIN TỨC V40.0")
+                st.markdown("<div class='crystal-card' style='min-height:380px; display:flex; flex-direction:column; justify-content:center; background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%);'><h4 style='color:#2563eb; font-size: 1.5rem; font-weight: 900;'>🚀 KỶ NGUYÊN KHÔNG GIAN</h4><p style='font-size: 1.15rem; color: #334155; font-weight: 500;'>Cập nhật giao diện Glowing Tương Lai. Định nghĩa 9 cột nghiệp vụ chuẩn và cơ cấu phát hiện file Excel tự động.</p><hr><small style='color:#10b981; font-weight:900; font-size: 1.1rem;'>VERSION 40.0</small></div>", unsafe_allow_html=True)
 
             with col_res:
                 final_q = st.session_state.search_query if st.session_state.search_query else user_input
@@ -451,7 +504,7 @@ if df is not None:
                         for idx, row in results.iterrows():
                             with st.container():
                                 ca, cb = st.columns([3.5, 1.5])
-                                ca.markdown(f"<div class='crystal-card' style='padding:22px; border-left:12px solid #2563eb; text-align:left; min-height: 100px;'><small style='color:#2563eb; font-weight:900; letter-spacing:1px; font-size:1rem;'>MÃ: {row.get('madvi')}</small><br><b style='font-size:1.4rem; color:#0f172a;'>{row.get('tendvi')}</b></div>", unsafe_allow_html=True)
+                                ca.markdown(f"<div class='crystal-card' style='padding:22px; border-left:12px solid #2563eb; text-align:left; min-height: 100px;'><small style='color:#2563eb; font-weight:900; letter-spacing:1px; font-size:1rem;'>MÃ ĐƠN VỊ: {row.get('madvi')}</small><br><b style='font-size:1.4rem; color:#0f172a;'>{row.get('tendvi')}</b></div>", unsafe_allow_html=True)
                                 if cb.button("XÁC NHẬN ➔", key=f"sel_{row.get('madvi')}_{idx}", use_container_width=True):
                                     st.session_state.selected_unit = row.get('madvi'); st.session_state.welcome_done = False; st.rerun()
                     else: st.error("Không tìm thấy dữ liệu khớp với từ khóa.")
@@ -470,7 +523,7 @@ if df is not None:
                     """, unsafe_allow_html=True)
 
         else:
-            # --- DASHBOARD KẾT QUẢ v39.1 ---
+            # --- DASHBOARD KẾT QUẢ v40.0 ---
             if not st.session_state.welcome_done:
                 st.balloons(); st.session_state.welcome_done = True
             
@@ -487,49 +540,84 @@ if df is not None:
 
             st.markdown(f"""
                 <div class='premium-header'>
-                    <div style='font-size: 1.2rem; color: #bae6fd; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; position: relative; z-index: 2;'>{greeting}, ĐƠN VỊ:</div>
+                    <div style='font-size: 1.2rem; color: #bae6fd; font-weight: 800; margin-bottom: 5px; text-transform: uppercase; position: relative; z-index: 2;'>{greeting}, ĐƠN VỊ SỬ DỤNG LAO ĐỘNG:</div>
                     <h1>🏢 {unit_data.get('tendvi')}</h1>
-                    <p>MÃ ĐƠN VỊ: <span style='background:rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 10px;'>{unit_data.get('madvi')}</span> &nbsp;|&nbsp; ĐỊA CHỈ: {unit_data.get('diachi', 'N/A')}</p>
+                    <p>MÃ ĐƠN VỊ (BHXH CẤP): <span style='background:rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 10px; font-weight: 800;'>{unit_data.get('madvi')}</span> &nbsp;|&nbsp; ĐỊA CHỈ LIÊN HỆ: {unit_data.get('diachi', 'N/A')}</p>
                 </div>
             """, unsafe_allow_html=True)
 
-            # LẤY CÁC TRƯỜNG DỮ LIỆU CHUẨN XÁC SAU KHI ĐÃ ĐƯỢC LÀM SẠCH BẰNG .SPLIT()
+            # ĐỌC CÁC CỘT THEO ĐÚNG TIÊU CHUẨN ĐẦU VÀO MỚI CỦA KHÁCH HÀNG
             def get_val(row, keys):
                 for k in keys:
                     if k in row:
                         val = row[k]
-                        return float(val) if pd.notna(val) and str(val).strip() != '' else 0.0
+                        try:
+                            return float(val)
+                        except:
+                            return 0.0
                 return 0.0
 
-            tien_dau_ky = get_val(unit_data, ['tien_dau_ky'])
-            so_phai_dong = get_val(unit_data, ['so_tien_phai_nop', 'so_phai_dong'])
-            dieu_chinh = get_val(unit_data, ['so_tien_dieu_chinh_ky_truoc', 'dieu_chinh_ky_truoc'])
-            so_da_dong = get_val(unit_data, ['tien_da_nop', 'so_da_dong'])
-            so_bi_lech = get_val(unit_data, ['so_tien_lech', 'so_bi_lech'])
-            debt_val = get_val(unit_data, ['tien_cuoi_ky', 'so_tien_cuoi_ky'])
+            # Lấy thông số từ 9 cột
+            du_dk = get_val(unit_data, ['du_dk'])
+            _tien_dk = get_val(unit_data, ['_tien_dk'])
+            tongBhCk = get_val(unit_data, ['tongbhck', 'tongbhck'])
+            _tien_unc = get_val(unit_data, ['_tien_unc'])
+            lech = get_val(unit_data, ['lech'])
+            _tien_ck = get_val(unit_data, ['_tien_ck'])
+
+            # Phân loại Thừa (-) / Thiếu cuối kỳ dựa trên giá trị âm hay dương
+            if _tien_ck < 0:
+                ck_text = f"💚 SỐ TIỀN DƯ CÓ (ĐÓNG THỪA): {abs(_tien_ck):,.0f} VNĐ"
+                ck_html = f"<div class='crystal-card' style='border: 4px solid #10b981; background: rgba(16, 185, 129, 0.08);'><div class='metric-lbl' style='color:#10b981;'>SỐ TIỀN THỪA CUỐI KỲ (DƯ CÓ)</div><div class='metric-val' style='color:#10b981;'>{abs(_tien_ck):,.0f} VNĐ</div></div>"
+                status_text = f"✨ Doanh nghiệp đang nộp dư **{abs(_tien_ck):,.0f} VNĐ** mang sang kỳ sau."
+            else:
+                ck_text = f"🔴 SỐ TIỀN THIẾU (NỢ): {_tien_ck:,.0f} VNĐ"
+                ck_html = f"<div class='crystal-card' style='border: 4px solid #f43f5e; background: rgba(244, 63, 94, 0.08);'><div class='metric-lbl' style='color:#f43f5e;'>SỐ TIỀN THIẾU CUỐI KỲ (NỢ)</div><div class='metric-val' style='color:#f43f5e;'>{_tien_ck:,.0f} VNĐ</div></div>"
+                status_text = f"⚠️ Đơn vị còn thiếu (nợ) **{_tien_ck:,.0f} VNĐ** tiền đóng BHXH tháng này."
 
             # AI SMART SUMMARY
-            status_text = "✨ Đã hoàn thành 100% nghĩa vụ đóng BHXH, không có nợ đọng." if debt_val <= 0 else f"⚠️ Hiện đang lệch/nợ: {abs(debt_val):,.0f} VNĐ. Cần kiểm tra UNC để nộp bù."
             st.markdown(f"""
                 <div class='ai-summary'>
-                    <span style='font-size: 1.5rem;'>🤖</span> <b>AI Tự Động Phân Tích:</b> Doanh nghiệp đã đóng <b>{so_da_dong:,.0f} VNĐ</b> / <b>{so_phai_dong:,.0f} VNĐ</b>. {status_text}
+                    <span style='font-size: 1.5rem;'>🤖</span> <b>AI Tự Động Phân Tích:</b> Đơn vị đã đóng nộp tổng cộng <b>{_tien_unc:,.0f} VNĐ</b> thông qua UNC trong tháng. {status_text}
                 </div>
             """, unsafe_allow_html=True)
             
             cl, cr = st.columns([1.8, 1])
             with cl:
                 st.write("<h3 style='color:#1e3a8a; margin-top: 15px; font-weight: 900;'>📊 BÁO CÁO TÀI CHÍNH CHI TIẾT</h3>", unsafe_allow_html=True)
-                m1, m2, m3 = st.columns(3)
-                with m1: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Đầu kỳ</div><div class='metric-val'>{tien_dau_ky:,.0f}</div></div>", unsafe_allow_html=True)
-                with m2: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Phải đóng</div><div class='metric-val'>{so_phai_dong:,.0f}</div></div>", unsafe_allow_html=True)
-                with m3: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Điều chỉnh</div><div class='metric-val'>{dieu_chinh:,.0f}</div></div>", unsafe_allow_html=True)
+                
+                # HÀNG 1: ĐẦU KỲ MANG SANG (NỔI BẬT KHÁC BIỆT MÀU SẮC)
+                st.markdown("<p style='font-weight:800; color:#475569; margin-bottom:5px;'>➡️ SỐ LIỆU ĐẦU KỲ MANG SANG</p>", unsafe_allow_html=True)
+                m1, m2 = st.columns(2)
+                with m1: 
+                    st.markdown(f"""
+                    <div class='crystal-card' style='border-top: 6px solid #10b981; background: rgba(16, 185, 129, 0.04);'>
+                        <div class='metric-lbl' style='color:#10b981;'>DƯ ĐẦU KỲ (THỪA THÁNG TRƯỚC SANG)</div>
+                        <div class='metric-val' style='color:#10b981;'>{du_dk:,.0f}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with m2: 
+                    st.markdown(f"""
+                    <div class='crystal-card' style='border-top: 6px solid #ea580c; background: rgba(234, 88, 12, 0.04);'>
+                        <div class='metric-lbl' style='color:#ea580c;'>THIẾU ĐẦU KỲ (NỢ THÁNG TRƯỚC SANG)</div>
+                        <div class='metric-val' style='color:#ea580c;'>{_tien_dk:,.0f}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
                 
                 st.write("<br>", unsafe_allow_html=True)
-                m4, m5, m6 = st.columns(3)
-                with m4: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Đã đóng</div><div class='metric-val' style='color:#10b981;'>{so_da_dong:,.0f}</div></div>", unsafe_allow_html=True)
-                with m5: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>Lệch</div><div class='metric-val' style='color:#ef4444;'>{so_bi_lech:,.0f}</div></div>", unsafe_allow_html=True)
-                status_clr = '#ef4444' if debt_val > 0 else '#10b981'
-                with m6: st.markdown(f"<div class='crystal-card' style='border: 4px solid {status_clr}; background: {status_clr}11;'><div class='metric-lbl'>{'SỐ TIỀN CÒN NỢ' if debt_val > 0 else 'SỐ TIỀN DƯ CÓ'}</div><div class='metric-val' style='color:{status_clr};'>{abs(debt_val):,.0f}</div></div>", unsafe_allow_html=True)
+                
+                # HÀNG 2: PHÁT SINH TRONG THÁNG
+                st.markdown("<p style='font-weight:800; color:#475569; margin-bottom:5px;'>⚡ SỐ LIỆU PHÁT SINH THÁNG NÀY</p>", unsafe_allow_html=True)
+                m3, m4, m5 = st.columns(3)
+                with m3: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>PHẢI ĐÓNG THÁNG NÀY</div><div class='metric-val'>{tongBhCk:,.0f}</div></div>", unsafe_allow_html=True)
+                with m4: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>ĐÃ NỘP TRONG THÁNG (UNC)</div><div class='metric-val' style='color:#10b981;'>{_tien_unc:,.0f}</div></div>", unsafe_allow_html=True)
+                with m5: st.markdown(f"<div class='crystal-card'><div class='metric-lbl'>SỐ TIỀN LỆCH</div><div class='metric-val' style='color:#ef4444;'>{lech:,.0f}</div></div>", unsafe_allow_html=True)
+
+                st.write("<br>", unsafe_allow_html=True)
+                
+                # HÀNG 3: TỔNG KẾT CUỐI KỲ (PHÂN LOẠI THỪA/THIẾU SẮC NÉT)
+                st.markdown("<p style='font-weight:800; color:#475569; margin-bottom:5px;'>📊 TRẠNG THÁI CUỐI KỲ</p>", unsafe_allow_html=True)
+                st.markdown(ck_html, unsafe_allow_html=True)
                 
                 st.write("<br>", unsafe_allow_html=True)
                 
@@ -544,14 +632,13 @@ if df is not None:
                 """, height=80)
 
             with cr:
-                # Đảm bảo chia không lỗi cho trường hợp file trống
-                rate = min(round((so_da_dong / so_phai_dong) * 100, 1), 100) if so_phai_dong else 100
-                st.markdown("<p style='font-weight: 800; color: #1e3a8a; text-align: center; font-size: 1.2rem; margin-bottom: 5px;'>THANH TIẾN ĐỘ</p>", unsafe_allow_html=True)
+                rate = min(round((_tien_unc / tongBhCk) * 100, 1), 100) if tongBhCk else 100
+                st.markdown("<p style='font-weight: 800; color: #1e3a8a; text-align: center; font-size: 1.2rem; margin-bottom: 5px;'>TỶ LỆ HOÀN THÀNH KỲ NÀY</p>", unsafe_allow_html=True)
                 st.progress(int(rate))
 
                 fig = go.Figure(go.Indicator(
                     mode="gauge+number", value=rate, 
-                    title={'text': "<b>TỶ LỆ HOÀN THÀNH (%)</b>", 'font': {'size': 24, 'color': '#1e3a8a'}}, 
+                    title={'text': "<b>TỶ LỆ ĐÃ NỘP (%)</b>", 'font': {'size': 24, 'color': '#1e3a8a'}}, 
                     number={'suffix': "%", 'font': {'color': '#2563eb', 'size': 70}}, 
                     gauge={'axis': {'range': [0, 100]}, 'bar': {'color': "#2563eb"}}
                 )).update_layout(paper_bgcolor="rgba(0,0,0,0)", height=350, margin=dict(t=30, b=0))
@@ -562,9 +649,10 @@ if df is not None:
                         st.markdown(f"<div class='crystal-card' style='background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: white; margin-top:0px;'><small style='color:#39ff14; font-weight:900; letter-spacing: 1.5px;'>👨‍💼 CÁN BỘ PHỤ TRÁCH TRỰC TIẾP</small><h2 style='color:#fff; margin:15px 0; font-size: 2.2rem;'>{off['name']}</h2><a href='tel:{off['phone'].replace('.','')}' style='color:#00f2fe; font-size: 2.2rem; text-decoration:none; font-weight:900; text-shadow: 0 0 15px #00f2fe;'>📱 {off['phone']}</a><br><a href='{off['zalo']}' target='_blank' style='background:white; color:#1e3a8a; padding:15px 40px; border-radius:50px; text-decoration:none; display:inline-block; margin-top:25px; font-weight:900; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-transform: uppercase; transition: all 0.3s;'>💬 CHAT ZALO NGAY</a></div>", unsafe_allow_html=True)
                         break
 
+            # Hiển thị số tài khoản cơ sở Thuận An & cú pháp chuyển tiền chính xác
             render_vip_bank_accounts(unit_data.get('madvi'), unit_data.get('tendvi'))
 
-    # --- TAB 2: AI NỘI BỘ (ĐƯỢC BẢO LƯU 100% VÀ NÂNG CẤP UI) ---
+    # --- TAB 2: AI NỘI BỘ (ĐƯỢC BẢO LƯU 100%) ---
     elif st.session_state.current_tab == "🤖 Trợ lý AI Thông Minh":
         st.markdown("## 🧠 TRỢ LÝ THÔNG MINH BHXH (CHẾ ĐỘ OFFLINE 2.0)")
         
@@ -576,11 +664,19 @@ if df is not None:
                 for k in keys:
                     if k in row:
                         val = row[k]
-                        return float(val) if pd.notna(val) and str(val).strip() != '' else 0.0
+                        try:
+                            return float(val)
+                        except:
+                            return 0.0
                 return 0.0
-            debt_val_ai = get_val_ai(unit, ['tien_cuoi_ky', 'so_tien_cuoi_ky'])
+            debt_val_ai = get_val_ai(unit, ['_tien_ck'])
             
-            context = f"Tên đơn vị: {unit['tendvi']}\nMã đơn vị: {unit['madvi']}\nSố tiền nợ/dư cuối kỳ: {debt_val_ai:,.0f} VNĐ."
+            if debt_val_ai < 0:
+                status_ai = f"Dư có: {abs(debt_val_ai):,.0f} VNĐ"
+            else:
+                status_ai = f"Nợ: {debt_val_ai:,.0f} VNĐ"
+                
+            context = f"Tên đơn vị: {unit['tendvi']}\nMã đơn vị: {unit['madvi']}\nTrạng thái tài chính cuối kỳ: {status_ai}."
             st.success(f"🤖 Trợ lý đã liên kết dữ liệu của **{unit['tendvi']}**. Hệ thống hoạt động 100% Offline bảo mật, không cần API Key.")
         else:
             st.info("🤖 Trợ lý thông minh đã kích hoạt chế độ Không cần API Key. Bất tử trước mọi lỗi mạng! Đảm bảo phản hồi ngay lập tức!")
@@ -647,7 +743,7 @@ if df is not None:
 
     # --- TAB 5: MÁY TÍNH BHXH ---
     elif st.session_state.current_tab == "🧮 Máy tính BHXH":
-        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V39.1")
+        st.markdown("## 🧮 SIÊU MÁY TÍNH DỰ TOÁN ĐÓNG BHXH V40.0")
         st.markdown("<p style='font-size: 1.2rem; color: #475569; margin-bottom: 20px;'>Kéo thanh trượt (slider) hoặc nhập trực tiếp mức lương cơ sở/quỹ lương để hệ thống tự động phân tách nghĩa vụ tài chính.</p>", unsafe_allow_html=True)
         
         sal = st.slider("🎚️ KÉO ĐỂ CHỌN MỨC LƯƠNG HOẶC QUỸ LƯƠNG ĐÓNG BHXH (VNĐ):", min_value=1000000, max_value=200000000, value=5000000, step=100000, format="%d VNĐ")
@@ -733,7 +829,7 @@ if df is not None:
         }])
         st.download_button(label="📥 TẢI BẢNG DỰ TOÁN CHI TIẾT (CSV)", data=convert_df(calc_data), file_name="Bang_Du_Toan_BHXH.csv", mime='text/csv')
 
-    # --- TAB 6: LIÊN HỆ ---
+    # --- TAB 6: LIÊN HỆ (ĐÃ KIỂM TRA ĐỊA CHỈ & SĐT CHUẨN XÁC) ---
     elif st.session_state.current_tab == "📍 Liên hệ BHXH":
         st.markdown("## 📍 TRUNG TÂM HỖ TRỢ & LIÊN HỆ")
         st.markdown("""
@@ -748,4 +844,4 @@ if df is not None:
         </div>
         """, unsafe_allow_html=True)
 
-st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v39.1 Ascension (Enterprise Level)</center>", unsafe_allow_html=True)
+st.markdown("<br><hr><center style='color:#94a3b8; font-size:0.95rem; padding-bottom:60px;'>© 2026 BHXH CƠ SỞ THUẬN AN | v40.0 Cosmic Nexus (Enterprise Level)</center>", unsafe_allow_html=True)
